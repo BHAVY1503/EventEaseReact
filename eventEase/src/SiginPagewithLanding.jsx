@@ -1,18 +1,16 @@
-// src/pages/SignUpPageWithLanding.jsx
 import React, { useState } from 'react';
 import { LandingPage } from '../src/components/common/LandingPage'; 
-import { SignUpModal } from './components/user/SignupModal'; 
+import { SignInModal } from './components/user/SignInModal'; 
 
 
 
-
-export const SignUpPageWithLanding = () => {
+export const SigninPageWithLanding = () => {
   const [showModal, setShowModal] = useState(true);
 
   return (
     <div>
       <LandingPage />
-      {showModal && <SignUpModal onClose={() => setShowModal(false)} />}
+      {showModal && <SignInModal onClose={() => setShowModal(false)} />}
      
 
     </div>

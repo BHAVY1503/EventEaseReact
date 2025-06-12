@@ -31,21 +31,27 @@ export const SignUpModal = ({ onClose }) => {
     }
 
    }
+   const submitHandler = async (data) => {
+  try {
+    console.log(data);
+    data.roleId = "68480a087e2eb1da1f656aec";
+    const res = await axios.post("/user", data);
+    console.log(res);
+    console.log(res.data);
 
-    const submitHandler = async(data)=>{
-        console.log(data)
-        const res = await axios.post("http://localhost:3100/user",data)
-        console.log(res) //axiosobject
-        console.log(res.data) //api response
-
-        if( res.status===201){
-          alert("Signup Successfully")
-          navigate("/signin")
-        }
-        else{
-          alert("user not created")
-        }
+    if (res.status === 201) {
+      alert("Signup Successfully");
+      navigate("/signin");
+    } else {
+      alert("User not created");
     }
+  } catch (err) {
+    console.error("Signup error:", err);
+    alert("Signup failed: " + (err.response?.data?.message || err.message));
+  }
+};
+
+   
     
   return (
     <div className="modal-overlay" id="#signuphd">
@@ -55,15 +61,19 @@ export const SignUpModal = ({ onClose }) => {
             <div className="mb-2">
             <label>Full Name:</label>
             <input type="text" className="form-control" id="fullName" {...register("fullName", validationSchema.fNameValidator)} />
-             <span style={{color:'red'}}>{errors.fullName?.message}</span>
+             <small style={{color:'red'}}>{errors.fullName?.message}</small>
           </div>
           <div className="mb-2">
             <label>Email:</label>
-            <input type="email" className="form-control" id='Email' {...register("Email", validationSchema.emailValidator)} />
+            <input type="email" className="form-control" id='email' {...register("email", validationSchema.emailValidator)} />
+             <small style={{color:'red'}}>{errors.email?.message}</small>
+
           </div>
           <div className="mb-2">
             <label>Password:</label>
             <input type="password" className="form-control" id='password' {...register("password", validationSchema.passwordValidator)} />
+             <small style={{color:'red'}}>{errors.password?.message}</small>
+
           </div>
           {/* <div className="mb-3">
             <label>Age:</label>
