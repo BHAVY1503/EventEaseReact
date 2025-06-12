@@ -19,6 +19,9 @@ import { SignUpPageWithLanding } from './SignupPagewithLanding'
 import { SigninPageWithLanding } from './SiginPagewithLanding'
 import axios from 'axios'
 import { AdminLanding } from './AdminLanding'
+import { OrganizerSignup } from './components/organizer/OrganizerSignup'
+import { OrganizerWithLanding } from './organizerWithlandig'
+import { OrganizerSigninLanding } from './OrganizerSiginLanding'
 
 
 
@@ -38,6 +41,10 @@ function App() {
      <Route path="/signup" element={<SignUpPageWithLanding />} />
      <Route path="/signin" element={<SigninPageWithLanding  />} />
      <Route path="/adminsignin" element={<AdminLanding/>} />
+     <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
+     <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
+
+
 
 
 

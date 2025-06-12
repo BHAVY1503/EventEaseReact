@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom'
 
 
 export const LandingPage = () => {
+
+  
   return (
     <div>
       <>
@@ -98,6 +100,7 @@ export const LandingPage = () => {
             <h1 className="mb-5">
               Generate more leads with a professional landing page!
             </h1>
+            <Link to="/organizersignup" className="btn btn-primary" >Organize TheEvent</Link>
           
             {/* <form
               className="form-subscribe"
