@@ -43,12 +43,12 @@ export const OrganizerSignin = () => {
      }
       }catch(err){
         console.error("Signin Error",err)
-      } if (err.response && err.response.data && err.response.data.message) {
+       if (err.response && err.response.data && err.response.data.message) {
       alert(err.response.data.message); // e.g., "invalid cred.." or "Email not found.."
     } else {
       alert("Signin failed. Please check your Candidate");
     }
-
+  }
     }
 
   return (

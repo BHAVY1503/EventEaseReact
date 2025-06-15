@@ -26,6 +26,7 @@ import { AdminHeroPage } from './components/admin/AdminHeroPage'
 import { OrganizerHeroPage } from './components/organizer/OrganizerHeroPage'
 import { AddEvent } from './components/organizer/AddEvent'
 import { ViewMyEvent } from './components/organizer/ViewMyEvent'
+import { UpdateEvent } from './components/organizer/UpdateEvent'
 
 
 
@@ -54,7 +55,12 @@ function App() {
       <Route path='/organizer' element={<OrganizerHeroPage/>}>
       <Route path='addevent' element={<AddEvent/>}></Route>
       <Route path='viewevent' element={<ViewMyEvent/>}></Route>
+      {/* <Route path='updateevent' element={<ViewMyEvent/>}></Route> */}
+      {/* <Route path='updateevent/:id' element={<UpdateEvent/>}></Route> */}
       </Route>
+      
+      <Route path='updateevent/:id' element={<UpdateEvent/>}></Route>
+      
       {/* <Route path='/viewevent' element={<ViewMyEvent/>}></Route> */}
 
     </Routes>

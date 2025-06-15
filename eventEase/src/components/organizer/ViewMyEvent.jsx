@@ -1,5 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom';
 
 export const ViewMyEvent = () => {
   const [events, setevents] = useState([])
@@ -67,9 +68,14 @@ useEffect(() => {
                 </p>
               </div>
               <div className='card-footer text-center'>
-                <button className='btn btn-primary btn-sm me-2'>Edit</button>
+                <Link to={`/updateevent/${event._id}`} >
+                      Update
+                    </Link>
+               </div>
+                <div className='card-footer text-center'>
                 <button className='btn btn-danger btn-sm' onClick={() => handleDelete(event._id)}>Delete</button>
-              </div>
+                </div>
+              
             </div>
           </div>
         ))}

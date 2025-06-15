@@ -9,6 +9,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { AddEvent } from './AddEvent';
 import { ViewMyEvent } from './ViewMyEvent';
 import axios from 'axios';
+import { UpdateEvent } from './UpdateEvent';
 
 export const OrganizerHeroPage = () => {
 
@@ -151,6 +152,7 @@ export const OrganizerHeroPage = () => {
       <div id='addevent'>
       <AddEvent/>
       </div>
+      {/* <UpdateEvent/> */}
       <Outlet></Outlet>
     </div>
   );
