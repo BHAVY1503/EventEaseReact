@@ -37,7 +37,7 @@ export const OrganizerSignin = () => {
             alert("Signin Successfully")
              localStorage.setItem("id", res.data.data._id);
              localStorage.setItem("role", role);
-             navigate("/")
+             navigate("/organizer")
         }else{
         alert("Access denied, This login is for Admin only")
      }

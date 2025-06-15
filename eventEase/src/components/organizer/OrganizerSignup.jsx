@@ -50,7 +50,7 @@ export const OrganizerSignup = () => {
              
             if(res.status === 201 ){
                 alert("Organizer registered..")
-                navigate("")
+                navigate("/organizersignin")
             }else{
                 alert("Organizer not register...")
             }

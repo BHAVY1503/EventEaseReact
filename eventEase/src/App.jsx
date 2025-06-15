@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+// import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 // import './App.css'
 import { Routes , Route} from 'react-router-dom'
@@ -22,6 +22,10 @@ import { AdminLanding } from './AdminLanding'
 import { OrganizerSignup } from './components/organizer/OrganizerSignup'
 import { OrganizerWithLanding } from './organizerWithlandig'
 import { OrganizerSigninLanding } from './OrganizerSiginLanding'
+import { AdminHeroPage } from './components/admin/AdminHeroPage'
+import { OrganizerHeroPage } from './components/organizer/OrganizerHeroPage'
+import { AddEvent } from './components/organizer/AddEvent'
+import { ViewMyEvent } from './components/organizer/ViewMyEvent'
 
 
 
@@ -44,9 +48,14 @@ function App() {
      <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
 
+      <Route path='/admin' element={<AdminHeroPage/>}></Route>
 
 
-
+      <Route path='/organizer' element={<OrganizerHeroPage/>}>
+      <Route path='addevent' element={<AddEvent/>}></Route>
+      <Route path='viewevent' element={<ViewMyEvent/>}></Route>
+      </Route>
+      {/* <Route path='/viewevent' element={<ViewMyEvent/>}></Route> */}
 
     </Routes>
    
