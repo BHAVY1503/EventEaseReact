@@ -27,6 +27,10 @@ import { OrganizerHeroPage } from './components/organizer/OrganizerHeroPage'
 import { AddEvent } from './components/organizer/AddEvent'
 import { ViewMyEvent } from './components/organizer/ViewMyEvent'
 import { UpdateEvent } from './components/organizer/UpdateEvent'
+import { UserHero } from './components/user/UserHero'
+import { ViewEvents } from './components/user/ViweEvents'
+import { BookedTickets } from './components/BookedTickets'
+import { MyTickets } from './components/organizer/MyTickets'
 
 
 
@@ -51,19 +55,26 @@ function App() {
 
       <Route path='/admin' element={<AdminHeroPage/>}></Route>
 
-
+     {/* organizer  */}
       <Route path='/organizer' element={<OrganizerHeroPage/>}>
       <Route path='addevent' element={<AddEvent/>}></Route>
       <Route path='viewevent' element={<ViewMyEvent/>}></Route>
-      {/* <Route path='updateevent' element={<ViewMyEvent/>}></Route> */}
-      {/* <Route path='updateevent/:id' element={<UpdateEvent/>}></Route> */}
+      {/* <Route path='bookedtickets' element={<MyTickets/>}></Route> */}
       </Route>
+
+      <Route path='/updateevent/:id' element={<UpdateEvent/>}></Route>
+      <Route path='/bookedtickets' element={<MyTickets/>}></Route>
+      {/* <Route path='bookedtickets' element={<MyTickets/>}></Route> */}
       
-      <Route path='updateevent/:id' element={<UpdateEvent/>}></Route>
+    {/* user  */}
+      <Route path='/user' element={<UserHero/>}>
+      <Route path='viewevents' element={<ViewEvents/>}></Route>
       
-      {/* <Route path='/viewevent' element={<ViewMyEvent/>}></Route> */}
+      </Route>
 
     </Routes>
+
+    
    
   )
 }

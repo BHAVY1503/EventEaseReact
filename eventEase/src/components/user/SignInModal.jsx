@@ -34,7 +34,7 @@ export const SignInModal = () => {
 
     if (res.status === 200) {
       alert("Login Successfully");
-      localStorage.setItem("id", res.data.data._id);
+      localStorage.setItem("userId", res.data.data._id);
       localStorage.setItem("role", res.data.data.roleId.name);
       // navigate("/")
       //Redirect based on role

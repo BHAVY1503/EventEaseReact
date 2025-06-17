@@ -10,6 +10,7 @@ import { AddEvent } from './AddEvent';
 import { ViewMyEvent } from './ViewMyEvent';
 import axios from 'axios';
 import { UpdateEvent } from './UpdateEvent';
+import { MyTickets } from './MyTickets';
 
 export const OrganizerHeroPage = () => {
 
@@ -35,8 +36,10 @@ export const OrganizerHeroPage = () => {
 },[])
 
   const signout = ()=>{
-    // alert("are you want to SignOut")
-    !window.confirm("Are you sure you want to SignOut?")
+    if (window.confirm("Are you sure you want to SignOut?")) {
+    localStorage.clear(); // OR just remove specific items
+    window.location.href = "/signin";
+  }
 
   }
   return (
@@ -67,6 +70,11 @@ export const OrganizerHeroPage = () => {
                 <a className="nav-link" href="#addevent">AddEvents</a>
                 {/* <Link to="organizer/addevent" className="nav-link">Events</Link> */}
 
+              </li>
+              <li className="nav-item">
+                <Link to="/bookedtickets" className="nav-link">Tickets</Link>
+                {/* <a className="nav-link" href="/bookedtickets">Tickets</a> */}
+                {/* <Link to="organizer/addevent" className="nav-link">Events</Link> */}
               </li>
               <li className="nav-item dropdown">
                 <a
@@ -145,7 +153,7 @@ export const OrganizerHeroPage = () => {
       </div> 
          
        
-      
+      <MyTickets/>
       <div id='viewevent'>
       <ViewMyEvent/>
       </div>

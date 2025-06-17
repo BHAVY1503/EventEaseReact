@@ -28,6 +28,12 @@ export const SignUpModal = ({ onClose }) => {
             value:true,
             message:"password was required"
         }
+    },
+    phoneNoValidator:{
+      required:{
+        value:true,
+        message:"mobile number is required.."
+      }
     }
 
    }
@@ -73,8 +79,12 @@ export const SignUpModal = ({ onClose }) => {
             <label>Password:</label>
             <input type="password" className="form-control" id='password' {...register("password", validationSchema.passwordValidator)} />
              <small style={{color:'red'}}>{errors.password?.message}</small>
-
-          </div>
+         </div>
+          <div className="mb-2">
+            <label>PhoneNo:</label>
+            <input type="number" className="form-control" id='phoneNumber' {...register("phoneNumber", validationSchema.phoneNoValidator)} />
+             <small style={{color:'red'}}>{errors.phoneNumber?.message}</small>
+         </div>
           {/* <div className="mb-3">
             <label>Age:</label>
             <input type="password" className="form-control" />

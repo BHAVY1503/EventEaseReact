@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import img1 from '../../assets/img/hero-bg.jpg';
 import img2 from '../../assets/img/page-title-bg.webp';
@@ -8,8 +8,27 @@ import user2 from '../../assets/img/testimonials-2.jpg';
 import user3 from '../../assets/img/testimonials-3.jpg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import axios from 'axios';
 
 export const LandingPage = () => {
+
+  const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
+
+useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get("/event/geteventstats"); // change if your endpoint is different
+      // console.log("api response",res.data)
+      setEventStats(res.data);
+    } catch (err) {
+      console.error("Failed to fetch event stats", err);
+    }
+  };
+
+  fetchStats();
+}, []);
+
+
   return (
     <div>
       {/* Navigation */}
@@ -51,6 +70,7 @@ export const LandingPage = () => {
         }}
       >
         <div className="carousel-caption d-flex flex-column align-items-center justify-content-center h-100">
+              <h1 style={{color:'#ffffff', float:"inline-start"}}>Welcome to!</h1><p>EventEase</p>
           <Link to="/organizersignup" className="btn btn-primary mt-3"><b>Organize The Event</b></Link>
         </div>
       </div>
@@ -69,6 +89,36 @@ export const LandingPage = () => {
 
       {/* About Us Section */}
       <section className="features-icons bg-light text-center" id="aboutus">
+  <div className="container">
+    <h2 className="mb-4">About Us</h2>
+    <p className="lead mb-5">
+  <strong>EventEase</strong> is your all-in-one platform for discovering, organizing, and managing events with ease. 
+  Whether you're a passionate attendee or a professional organizer, EventEase connects people through seamless, innovative event experiences.
+  </p>
+    <div className="row">
+      <div className="col-lg-4">
+        <div className="features-icons-item mx-auto mb-5">
+          <h3>Total Events</h3>
+          <p className="lead mb-0 display-6">{eventStats.totalEvents}</p>
+        </div>
+      </div>
+      <div className="col-lg-4">
+        <div className="features-icons-item mx-auto mb-5">
+          <h3>Active Events</h3>
+          <p className="lead mb-0 display-6">{eventStats.activeEvents}</p>
+        </div>
+      </div>
+      <div className="col-lg-4">
+        <div className="features-icons-item mx-auto mb-5">
+          <h3>Community Growth</h3>
+          <p className="lead mb-0">Join thousands of organizers!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+      {/* <section className="features-icons bg-light text-center" id="aboutus">
         <div className="container">
           <div className="row">
             <div className="col-lg-4">
@@ -100,14 +150,14 @@ export const LandingPage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Events Showcase */}
       <section className="showcase" id="events">
         <div className="container-fluid p-0">
-          {[{ img: img1, heading: "Responsive Design", text: "Works on all devices!" },
-            { img: img2, heading: "Bootstrap 5", text: "Built with the latest tech." },
-            { img: img3, heading: "Customizable", text: "Easy to tweak and extend." }
+          {[{ img: img1, heading: "", text: "Empowering organizers. Connecting communities. Making events effortless." },
+            { img: img2, heading: "", text:  "A vibrant platform where ideas turn into unforgettable experiences." },
+            { img: img3, heading: "", text: "Your journey to organize or attend the perfect event begins here." }
           ].map((item, i) => (
             <div className="row g-0" key={i}>
               <div className={`col-lg-6 ${i % 2 === 0 ? "order-lg-2" : ""} text-white showcase-img`}
