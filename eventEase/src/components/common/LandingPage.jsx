@@ -9,6 +9,7 @@ import user3 from '../../assets/img/testimonials-3.jpg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
+import { UserFeedback } from '../user/UserFeedBack';
 
 export const LandingPage = () => {
 
@@ -172,7 +173,10 @@ useEffect(() => {
       </section>
 
       {/* Testimonials */}
-      <section className="testimonials text-center bg-light">
+      <div>
+       <UserFeedback/>
+       </div>
+      {/* <section className="testimonials text-center bg-light">
         <div className="container">
           <h2 className="mb-5">What People Are Saying</h2>
           <div className="row">
@@ -190,7 +194,7 @@ useEffect(() => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Call to Action */}
       <section className="call-to-action text-white text-center bg-primary">
@@ -205,8 +209,8 @@ useEffect(() => {
       </section>
 
       {/* Footer */}
-      <footer className="footer bg-light py-4">
-        <div className="container">
+      <footer className="footer bg-light py-4 ">   {/*footer bg-light py-4*/}
+        <div className=" ">
           <div className="row">
             <div className="col-lg-6 text-center text-lg-start">
               <ul className="list-inline mb-2">

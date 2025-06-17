@@ -31,6 +31,8 @@ import { UserHero } from './components/user/UserHero'
 import { ViewEvents } from './components/user/ViweEvents'
 import { BookedTickets } from './components/BookedTickets'
 import { MyTickets } from './components/organizer/MyTickets'
+import { UserFeedback } from './components/user/UserFeedBack'
+import { BookingsOfMyEvents } from './components/organizer/BookingOfMyEvents'
 
 
 
@@ -61,17 +63,20 @@ function App() {
       <Route path='viewevent' element={<ViewMyEvent/>}></Route>
       {/* <Route path='bookedtickets' element={<MyTickets/>}></Route> */}
       </Route>
+      <Route path='/bookingofmyevents' element={<BookingsOfMyEvents/>}></Route>
+      <Route path='/bookedtickets' element={<BookedTickets/>}></Route>
 
+      
       <Route path='/updateevent/:id' element={<UpdateEvent/>}></Route>
-      <Route path='/bookedtickets' element={<MyTickets/>}></Route>
+      <Route path='/mytickets' element={<MyTickets/>}></Route>
       {/* <Route path='bookedtickets' element={<MyTickets/>}></Route> */}
       
     {/* user  */}
       <Route path='/user' element={<UserHero/>}>
       <Route path='viewevents' element={<ViewEvents/>}></Route>
-      
+      <Route path='userfeedback' element={<UserFeedback/>}></Route>
       </Route>
-
+      <Route path='/mytickets' element={<MyTickets/>}></Route>
     </Routes>
 
     

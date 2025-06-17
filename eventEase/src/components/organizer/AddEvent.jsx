@@ -52,7 +52,7 @@ export const AddEvent = () => {
     console.log(res)
     console.log(res.data)
      alert("Event add successfully..")
-    navigate("/organizer")
+    navigate("/organizer/viewevent")
     
    
     }catch(err){
@@ -64,7 +64,7 @@ export const AddEvent = () => {
   return (
     <div> 
       <h1 style={{textAlign:'center', marginTop:"200px"}}>ADD NEW EVENTS..! </h1>
-    <div style={{backgroundColor:'#555', height:"900px", }}>
+    <div className='alert alert-primary' style={{backgroundColor:'', height:"900px", }}>
     <div className='container mt-6' id='addevent' style={{padding:"100px"}} >
     <div className='card p-4 shadow'  >
  <form onSubmit={handleSubmit(submitHandler)} >
@@ -88,9 +88,9 @@ export const AddEvent = () => {
         <option value="Exhibition">Exhibition</option>
         <option value="Gala Dinner">Gala Dinner</option>
         <option value="Incentive">Incentive</option>
-        <option value="ZoomMetting">ZoomMeeting</option>
         <option value="Music Consert">Music consert</option>
         <option value='Meeting'> Meeting</option>
+        <option value="ZoomMeeting">ZoomMeeting</option>
         <option value='Other'>Other</option>
       </select>
     </div>

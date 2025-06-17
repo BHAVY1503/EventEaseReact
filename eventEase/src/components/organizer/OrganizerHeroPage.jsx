@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import img1 from '../../assets/img/hero-bg.jpg';
 import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
-import defaultprofile from '../../assets/profile.jpg'
+import defaultprofile from '../../assets/img/testimonials-2.jpg'
 import { Link, Outlet } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -11,6 +11,9 @@ import { ViewMyEvent } from './ViewMyEvent';
 import axios from 'axios';
 import { UpdateEvent } from './UpdateEvent';
 import { MyTickets } from './MyTickets';
+import { BookedTickets } from '../BookedTickets';
+import { BookingsOfMyEvents } from './BookingOfMyEvents';
+import { UserFeedback } from '../user/UserFeedBack';
 
 export const OrganizerHeroPage = () => {
 
@@ -18,7 +21,7 @@ export const OrganizerHeroPage = () => {
 
   useEffect(()=>{
     const fatchUser = async ()=>{
-      const userId = localStorage.getItem("id")
+      const userId = localStorage.getItem("organizerId") //for organizer Name on Navbar
       if(!userId) return
 
       try{
@@ -72,7 +75,7 @@ export const OrganizerHeroPage = () => {
 
               </li>
               <li className="nav-item">
-                <Link to="/bookedtickets" className="nav-link">Tickets</Link>
+                <Link to="/bookingofmyevents" className="nav-link">Tickets</Link>
                 {/* <a className="nav-link" href="/bookedtickets">Tickets</a> */}
                 {/* <Link to="organizer/addevent" className="nav-link">Events</Link> */}
               </li>
@@ -152,14 +155,43 @@ export const OrganizerHeroPage = () => {
         </button>
       </div> 
          
-       
-      <MyTickets/>
+       {/* <BookedTickets/> */}
+      {/* <MyTickets/> */}
+      {/* <BookingsOfMyEvents/> */}
       <div id='viewevent'>
       <ViewMyEvent/>
       </div>
       <div id='addevent'>
       <AddEvent/>
       </div>
+
+      
+           <div>
+            <UserFeedback/>
+           </div>
+      
+            {/* Footer */}
+            <footer className="footer bg-light py-4">
+              <div className="container">
+                <div className="row">
+                  <div className="col-lg-6 text-center text-lg-start">
+                    <ul className="list-inline mb-2">
+                      <li className="list-inline-item"><a href="#aboutus">About</a></li>
+                      <li className="list-inline-item">⋅</li>
+                      <li className="list-inline-item"><a href="#!">Contact</a></li>
+                    </ul>
+                    <p className="text-muted small mb-0">© EventEase 2025. All rights reserved.</p>
+                  </div>
+                  <div className="col-lg-6 text-center text-lg-end">
+                    <ul className="list-inline mb-0">
+                      <li className="list-inline-item me-3"><a href="#"><i className="bi-facebook fs-3" /></a></li>
+                      <li className="list-inline-item me-3"><a href="#"><i className="bi-twitter fs-3" /></a></li>
+                      <li className="list-inline-item"><a href="#"><i className="bi-instagram fs-3" /></a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </footer>
       {/* <UpdateEvent/> */}
       <Outlet></Outlet>
     </div>

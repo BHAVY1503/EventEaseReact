@@ -6,7 +6,7 @@ export const BookedTickets = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      const organizerId = localStorage.getItem("id");
+      const organizerId = localStorage.getItem("organizerId");
       if (!organizerId) return;
 
       try {
@@ -31,8 +31,13 @@ export const BookedTickets = () => {
         <thead>
           <tr>
             <th>Event Name</th>
-            <th>Booked By</th>
-            <th>Email</th>
+            <th>Event Type</th>
+            <th>Booked By organizer</th>
+            {/* <th>Booked By user</th> */}
+            {/* <th>Email</th> */}
+            <th>State</th>     
+            <th>City</th> 
+            {/* <th>organizer</th>  */}
             <th>Quantity</th>
             <th>Booking Date</th>
           </tr>
@@ -40,12 +45,13 @@ export const BookedTickets = () => {
         <tbody>
           {tickets.map((ticket, index) => (
             <tr key={index}>
-              <td>{ticket.eventId?.name || "N/A"}</td>
-              <td>{ticket.userId?.fullName || "Unknown"}</td>
-              <td>{ticket.userId?.email || "Unknown"}</td>
-              <td>{ticket.stateId?.name || "Unknown"}</td>
+              <td>{ticket.eventId?.eventName || "N/A"}</td>
+              <td>{ticket.eventId?.eventType || "N/A"}</td>
+              <td>{ticket.organizerId?.name || "Unknown"}</td>
+              {/* <td>{ticket.userId?.fullName || "Unknown"}</td> */}
+              <td>{ticket.stateId?.Name || "Unknown"}</td>
               <td>{ticket.cityId?.name || "Unknown"}</td>
-
+              {/* <td>{ticket.organizerId?.name || "Unknown"}</td> */}
               <td>{ticket.quantity}</td>
               <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
             </tr>

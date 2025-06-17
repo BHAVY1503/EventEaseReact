@@ -35,7 +35,7 @@ export const OrganizerSignin = () => {
         const role = res.data.data.roleId.name
         if(role === "Organizer"){
             alert("Signin Successfully")
-             localStorage.setItem("id", res.data.data._id);
+             localStorage.setItem("organizerId", res.data.data._id);
              localStorage.setItem("role", role);
              navigate("/organizer")
         }else{
