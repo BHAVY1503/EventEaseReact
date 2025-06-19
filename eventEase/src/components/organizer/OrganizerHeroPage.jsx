@@ -11,9 +11,10 @@ import { ViewMyEvent } from './ViewMyEvent';
 import axios from 'axios';
 import { UpdateEvent } from './UpdateEvent';
 import { MyTickets } from './MyTickets';
-import { BookedTickets } from '../BookedTickets';
+// import { BookedTickets } from '../BookedTickets';
 import { BookingsOfMyEvents } from './BookingOfMyEvents';
 import { UserFeedback } from '../user/UserFeedBack';
+import { ViewEvents } from '../user/ViweEvents';
 
 export const OrganizerHeroPage = () => {
 
@@ -41,7 +42,7 @@ export const OrganizerHeroPage = () => {
   const signout = ()=>{
     if (window.confirm("Are you sure you want to SignOut?")) {
     localStorage.clear(); // OR just remove specific items
-    window.location.href = "/signin";
+    window.location.href = "/organizersignin";
   }
 
   }
@@ -91,7 +92,7 @@ export const OrganizerHeroPage = () => {
                   Dropdown
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li style={{textAlign:'center'}}><a className="dropdown-item" href="#">UsersList</a></li>
+                  <li style={{textAlign:'center'}}><a className="dropdown-item" href="/bookedtickets">MyTickets</a></li>
                   <li style={{textAlign:'center'}}><a className="dropdown-item" href="#">OrganizerList</a></li>
                   <li style={{textAlign:'center'}}>
                    <Link to="/" className="btn btn-danger btn-sm" onClick={signout}>SignOut</Link>
@@ -155,7 +156,9 @@ export const OrganizerHeroPage = () => {
         </button>
       </div> 
          
-       {/* <BookedTickets/> */}
+       <div id='events'>
+        <ViewEvents/>
+       </div>
       {/* <MyTickets/> */}
       {/* <BookingsOfMyEvents/> */}
       <div id='viewevent'>

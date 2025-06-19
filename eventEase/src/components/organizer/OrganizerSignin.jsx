@@ -31,12 +31,14 @@ export const OrganizerSignin = () => {
         const res = await axios.post("/organizer/signin",data)
         console.log(res)
         console.log(res.data)
-
         const role = res.data.data.roleId.name
+        const token = res.data.token;
         if(role === "Organizer"){
             alert("Signin Successfully")
              localStorage.setItem("organizerId", res.data.data._id);
              localStorage.setItem("role", role);
+             localStorage.setItem("token", token);
+              axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
              navigate("/organizer")
         }else{
         alert("Access denied, This login is for Admin only")

@@ -31,11 +31,16 @@ export const SignInModal = () => {
     const res = await axios.post("/user/login", data);
     console.log(res); // axios response object
     console.log(res.data); // API response data
-
+        
+    const token = res.data.token;
+  
     if (res.status === 200) {
       alert("Login Successfully");
       localStorage.setItem("userId", res.data.data._id);
       localStorage.setItem("role", res.data.data.roleId.name);
+      localStorage.setItem("token", token)
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       // navigate("/")
       //Redirect based on role
       if (res.data.data.roleId.name === "User") {

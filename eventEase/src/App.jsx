@@ -29,10 +29,12 @@ import { ViewMyEvent } from './components/organizer/ViewMyEvent'
 import { UpdateEvent } from './components/organizer/UpdateEvent'
 import { UserHero } from './components/user/UserHero'
 import { ViewEvents } from './components/user/ViweEvents'
-import { BookedTickets } from './components/BookedTickets'
+import { BookedTickets } from './components/organizer/BookedTickets'
 import { MyTickets } from './components/organizer/MyTickets'
 import { UserFeedback } from './components/user/UserFeedBack'
 import { BookingsOfMyEvents } from './components/organizer/BookingOfMyEvents'
+import MapPicker from './components/common/MapPicker'
+import PrivateRoute from './components/common/PrivateRoute'
 
 
 
@@ -54,29 +56,35 @@ function App() {
      <Route path="/adminsignin" element={<AdminLanding/>} />
      <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
+      <Route path='/mappicker' element={<MapPicker/>}></Route>
 
+      {/* Admin  */}
+      <Route element={<PrivateRoute/>}>
       <Route path='/admin' element={<AdminHeroPage/>}></Route>
+      </Route>
 
      {/* organizer  */}
-      <Route path='/organizer' element={<OrganizerHeroPage/>}>
-      <Route path='addevent' element={<AddEvent/>}></Route>
-      <Route path='viewevent' element={<ViewMyEvent/>}></Route>
-      {/* <Route path='bookedtickets' element={<MyTickets/>}></Route> */}
-      </Route>
-      <Route path='/bookingofmyevents' element={<BookingsOfMyEvents/>}></Route>
-      <Route path='/bookedtickets' element={<BookedTickets/>}></Route>
+     {/* <Route element={<PrivateRoute/>} */}
+      <Route element={<PrivateRoute />}>
+    <Route path="/organizer" element={<OrganizerHeroPage />}>
+      <Route path="addevent" element={<AddEvent />} />
+      <Route path="viewevent" element={<ViewMyEvent />} />
+    </Route>
+    <Route path="/bookedtickets" element={<BookedTickets />} />
+    <Route path="/bookingofmyevents" element={<BookingsOfMyEvents />} />
+    <Route path="/updateevent/:id" element={<UpdateEvent />} />
+    <Route path="/mytickets" element={<MyTickets />} />
+  </Route>
+       
 
-      
-      <Route path='/updateevent/:id' element={<UpdateEvent/>}></Route>
-      <Route path='/mytickets' element={<MyTickets/>}></Route>
-      {/* <Route path='bookedtickets' element={<MyTickets/>}></Route> */}
-      
     {/* user  */}
+    <Route element={<PrivateRoute/>}>
       <Route path='/user' element={<UserHero/>}>
       <Route path='viewevents' element={<ViewEvents/>}></Route>
       <Route path='userfeedback' element={<UserFeedback/>}></Route>
       </Route>
       <Route path='/mytickets' element={<MyTickets/>}></Route>
+      </Route>
     </Routes>
 
     

@@ -9,7 +9,6 @@ export const MyTickets = () => {
     const fetchTickets = async () => {
       try {
         const res = await axios.get(`/tickets/usertickets/${userId}`);
-        console.log("Fetched tickets:", res.data.data); // Debug log
         setTickets(res.data.data);
       } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -21,86 +20,212 @@ export const MyTickets = () => {
     }
   }, [userId]);
 
+  const getEventStatus = (startDate, endDate) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (end < now) return "past";
+    if (start > now) return "upcoming";
+    return "ongoing";
+  };
+
+  const getCardClass = (status) => {
+    switch (status) {
+      case "past": return "border-danger bg-light";
+      case "upcoming": return "border-primary bg-white";
+      case "ongoing": return "border-success bg-white";
+      default: return "border-secondary";
+    }
+  };
+
+  const getBadgeClass = (status) => {
+    switch (status) {
+      case "past": return "badge bg-danger";
+      case "upcoming": return "badge bg-primary";
+      case "ongoing": return "badge bg-success";
+      default: return "badge bg-secondary";
+    }
+  };
+
   return (
-    <div className="container mt-5 alert alert-secondary">
-      <h2 className="text-center mb-4 ">My Tickets</h2>
+    <div className="container mt-5">
+      <h2 className="text-center mb-4">🎟️ My Tickets</h2>
       {tickets.length === 0 ? (
-        <p className="text-center">No tickets booked yet.</p>
+        <p className="text-center text-muted">No tickets booked yet.</p>
       ) : (
-        <div className="row ">
-          {tickets.map((ticket) => (
-            <div key={ticket._id} className="col-md-6 mb-4">
-              <div className="card shadow p-3 alert alert-success">
-                <h5><strong>Event:</strong> {ticket.eventId?.eventName || "N/A"}</h5>
-                <p><strong>Quantity:</strong> {ticket.quantity}</p>
-                <p><strong>Ticket ID:</strong> {ticket._id}</p>
-                <p><strong>Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}</p>
-                <p><strong>State:</strong> {ticket.stateId?.Name || "N/A"}</p>
-                <p><strong>City:</strong> {ticket.cityId?.name || "N/A"}</p>
-                <p><strong>StartDate:</strong> {ticket.eventId?.startDate || "N/A"}</p>
-                <p><strong>EndDate:</strong> {ticket.eventId?.endDate || "N/A"}</p>
+        <div className="row">
+          {tickets.map((ticket) => {
+            const event = ticket.eventId;
+            const status = getEventStatus(event?.startDate, event?.endDate);
+            const cardClass = getCardClass(status);
+            const badgeClass = getBadgeClass(status);
 
-
+            return (
+              <div key={ticket._id} className="col-md-6 mb-4">
+                <div className={`card shadow border-3 ${cardClass}`}>
+                  {event?.eventImage && (
+                    <img
+                      src={event.eventImage}
+                      alt="Event"
+                      className="card-img-top"
+                      style={{ maxHeight: '180px', objectFit: 'cover' }}
+                    />
+                  )}
+                  <div className="card-body">
+                    <span className={badgeClass} style={{ float: 'right' }}>
+                      {status.toUpperCase()}
+                    </span>
+                    <h5 className="card-title">{event?.eventName || "Unnamed Event"}</h5>
+                    <p className="card-text">
+                      <strong>🎟 Quantity:</strong> {ticket.quantity}<br />
+                      <strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}<br />
+                      <strong>🆔 Ticket ID:</strong> {ticket._id}<br />
+                      <strong>📍 Location:</strong> {ticket.cityId?.name}, {ticket.stateId?.Name}<br />
+                      <strong>⏳ Start:</strong> {event?.startDate ? new Date(event.startDate).toLocaleDateString() : "N/A"}<br />
+                      <strong>⏱ End:</strong> {event?.endDate ? new Date(event.endDate).toLocaleDateString() : "N/A"}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
-      <a href='/user' style={{marginLeft:'500px'}}>Back to Home</a>
+      <div className="text-center mt-4">
+        <a href='/user' className="btn btn-outline-secondary">Back to Home</a>
+      </div>
     </div>
   );
 };
 
 
-// // src/pages/MyTickets.js
-// import axios from 'axios';
+
 // import React, { useEffect, useState } from 'react';
+// import axios from 'axios';
 
 // export const MyTickets = () => {
 //   const [tickets, setTickets] = useState([]);
+//   const userId = localStorage.getItem("userId");
 
 //   useEffect(() => {
-//     const userId = localStorage.getItem("id");
-
 //     const fetchTickets = async () => {
 //       try {
-//         const res = await axios.get(`/ticket/usertickets/${userId}`);
+//         const res = await axios.get(`/tickets/usertickets/${userId}`);
+//         console.log("Fetched tickets:", res.data.data);
 //         setTickets(res.data.data);
-//       } catch (err) {
-//         console.error("Error fetching tickets:", err);
+//       } catch (error) {
+//         console.error("Error fetching tickets:", error);
 //       }
 //     };
 
-//     fetchTickets();
-//   }, []);
+//     if (userId) {
+//       fetchTickets();
+//     }
+//   }, [userId]);
 
 //   return (
-//     <div className="container mt-5">
-//       <h2>My Booked Tickets</h2>
+//     <div className="container mt-5 alert alert-secondary">
+//       <h2 className="text-center mb-4">My Tickets</h2>
 //       {tickets.length === 0 ? (
-//         <p>You haven't booked any tickets yet.</p>
+//         <p className="text-center">No tickets booked yet.</p>
 //       ) : (
 //         <div className="row">
-//           {tickets.map((ticket) => (
-//             <div className="col-md-4 mb-4" key={ticket._id}>
-//               <div className="card">
-//                 <div className="card-body">
-//                   <h5 className="card-title">{ticket.eventId?.eventName}</h5>
-//                   <p className="card-text">
-//                     <strong>Event Type:</strong> {ticket.eventId?.eventType} <br />
-//                     <strong>Date:</strong> {new Date(ticket.eventId?.startDate).toLocaleDateString()} <br />
-//                     <strong>State:</strong> {ticket.stateId?.name}<br/>
-//                     <strong>City:</strong> {ticket.cityId?.name}<br/>
+//           {tickets.map((ticket) => {
+//             const isPastEvent = new Date(ticket.eventId?.endDate) < new Date();
 
+//             return (
+//               <div key={ticket._id} className="col-md-6 mb-4">
+//                 <div className={`card shadow p-3 alert ${isPastEvent ? 'alert-danger' : 'alert-success'}`}>
+//                     {event?.eventImage && (
+//           <img 
+//             src={event.eventImage} 
+//             alt="Event" 
+//             style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px" }} 
+//           />
+//         )}
+//                   <h5><strong>Event:</strong> {ticket.eventId?.eventName || "N/A"}</h5>
+//                   <p><strong>Quantity:</strong> {ticket.quantity}</p>
+//                   <p><strong>Ticket ID:</strong> {ticket._id}</p>
+//                   <p><strong>Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}</p>
+//                   <p><strong>State:</strong> {ticket.stateId?.Name || "N/A"}</p>
+//                   <p><strong>City:</strong> {ticket.cityId?.name || "N/A"}</p>
+//                   <p><strong>Start Date:</strong> 
+//   {ticket.eventId?.startDate ? new Date(ticket.eventId.startDate).toLocaleDateString() : "N/A"}
+// </p>
+// <p><strong>End Date:</strong> 
+//   {ticket.eventId?.endDate ? new Date(ticket.eventId.endDate).toLocaleDateString() : "N/A"}
+// </p>
 
-//                     <strong>Quantity:</strong> {ticket.quantity}
-//                   </p>
+//                   {/* <p><strong>Start Date:</strong> {new Date(ticket.eventId?.startDate).toLocaleDateString() || "N/A"}</p>
+//                   <p><strong>End Date:</strong> {new Date(ticket.eventId?.endDate).toLocaleDateString() || "N/A"}</p> */}
+//                   {isPastEvent && (
+//                     <p className="text-danger"><strong>Note:</strong> This event has ended.</p>
+//                   )}
 //                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+//       )}
+//       <a href='/user' className="btn btn-secondary mt-3 d-block mx-auto w-25">Back to Home</a>
+//     </div>
+//   );
+// };
+
+
+// import React, { useEffect, useState } from 'react';
+// import axios from 'axios';
+
+// export const MyTickets = () => {
+//   const [tickets, setTickets] = useState([]);
+//   const userId = localStorage.getItem("userId");
+
+//   useEffect(() => {
+//     const fetchTickets = async () => {
+//       try {
+//         const res = await axios.get(`/tickets/usertickets/${userId}`);
+//         console.log("Fetched tickets:", res.data.data); // Debug log
+//         setTickets(res.data.data);
+//       } catch (error) {
+//         console.error("Error fetching tickets:", error);
+//       }
+//     };
+
+//     if (userId) {
+//       fetchTickets();
+//     }
+//   }, [userId]);
+
+//   return (
+//     <div className="container mt-5 alert alert-secondary">
+//       <h2 className="text-center mb-4 ">My Tickets</h2>
+//       {tickets.length === 0 ? (
+//         <p className="text-center">No tickets booked yet.</p>
+//       ) : (
+//         <div className="row ">
+//           {tickets.map((ticket) => (
+//             <div key={ticket._id} className="col-md-6 mb-4">
+//               <div className="card shadow p-3 alert alert-success">
+//                 <h5><strong>Event:</strong> {ticket.eventId?.eventName || "N/A"}</h5>
+//                 <p><strong>Quantity:</strong> {ticket.quantity}</p>
+//                 <p><strong>Ticket ID:</strong> {ticket._id}</p>
+//                 <p><strong>Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}</p>
+//                 <p><strong>State:</strong> {ticket.stateId?.Name || "N/A"}</p>
+//                 <p><strong>City:</strong> {ticket.cityId?.name || "N/A"}</p>
+//                 <p><strong>StartDate:</strong> {ticket.eventId?.startDate || "N/A"}</p>
+//                 <p><strong>EndDate:</strong> {ticket.eventId?.endDate || "N/A"}</p>
+
+
 //               </div>
 //             </div>
 //           ))}
 //         </div>
 //       )}
+//       <a href='/user' style={{marginLeft:'500px'}}>Back to Home</a>
 //     </div>
 //   );
 // };
+
+
+

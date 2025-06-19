@@ -119,7 +119,18 @@ export const UpdateEvent = () => {
       </select>
     </div>
   </div>
- 
+
+   <div className="form-row">
+  <div className="form-group col-md-6">
+      <label htmlFor="inputPassword4">ZOOM Url</label>
+      <input
+        type="text"
+        className="form-control"
+        id="zoomUrl"
+        placeholder="your meetingUrl..."
+        {...register("zoomUrl")}
+      />
+    </div>
   <div className="form-group">
     <label htmlFor="inputAddress2">Number Of Seats</label>
     <input
@@ -129,6 +140,7 @@ export const UpdateEvent = () => {
       placeholder="total seats"
       {...register("numberOfSeats")}
     />
+  </div>
   </div>
   <div className="form-row">
     <div className="form-group col-md-6">
@@ -154,6 +166,17 @@ export const UpdateEvent = () => {
                 ))}
       </select>
     </div>
+     <div className="form-group col-md-12">
+      <label htmlFor="inputPassword4">Location</label>
+      <input
+        type="text"
+        className="form-control"
+        id="location"
+        placeholder="Location Url.."
+        {...register("location")}
+      />
+    </div>
+    
     <div className="form-group col-md-2">
       <label htmlFor="inputZip">Start-Date</label>
       <input type="date" className="form-control" id="startDate" 
@@ -164,6 +187,7 @@ export const UpdateEvent = () => {
       <input type="date" className="form-control" id="endDate" 
       {...register("endDate")}/>
     </div>
+    
     <div className="form-group col-md-10">
       <label htmlFor="inputZip">Add Event Photo</label>
       <input type="file" className="form-control" id='image'

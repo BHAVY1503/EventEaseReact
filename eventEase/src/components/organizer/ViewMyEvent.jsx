@@ -7,12 +7,16 @@ export const ViewMyEvent = () => {
   const [loading, setLoading] = useState(true);
   const [bookingQuantity, setBookingQuantity] = useState({});
   const [bookedTickets, setBookedTickets] = useState({});
-
+ 
+  const userId = localStorage.getItem("userId") || localStorage.getItem("organizerId");
+  console.log("id:",userId)
   const organizerId = localStorage.getItem("organizerId"); //organizerid geted
   console.log("Organizer ID:", organizerId);
+  // const userId = localStorage.getItem("userId");
+  // console.log("User Id:", userId)
 
   const getAllEvents = async () => {
-    if (!organizerId) {
+    if (!userId) {
       console.error("User ID not found in localStorage");
       setLoading(false);
       return;
@@ -48,6 +52,7 @@ export const ViewMyEvent = () => {
     try {
       const res = await axios.post(`/event/bookseat/${eventId}`, {
         userId,
+        // organizerId,
         stateId,
         cityId,
         quantity,
@@ -78,13 +83,14 @@ export const ViewMyEvent = () => {
         ) : events.length === 0 ? (
           <div className='text-center text-white'>
             <h5>No events found.</h5>
-            <p>Click <Link to="/addevent">here</Link> to add your first event!</p>
+            <p>Click <Link to="#addevent">here</Link> to add your first event!</p>
           </div>
         ) : (
           <div className='row'>
             {events.map((event) => {
               const availableSeats = event.numberOfSeats - (event.bookedSeats || 0); //for each event calclulate available seats
               const booked = bookedTickets[event._id];  //and check it has been booked
+             const eventEnded = new Date(event.endDate) < new Date(); // 👈 check if event is over
               
               return (
                 <div className='col-md-4 mb-4' key={event._id}>
@@ -103,9 +109,34 @@ export const ViewMyEvent = () => {
                         <strong>End:</strong> {new Date(event.endDate).toLocaleDateString()}<br />
                         <strong>State:</strong> {event.stateId?.Name}<br />
                         <strong>City:</strong> {event.cityId?.name}<br />
-                        <strong>Available Seats:</strong> {availableSeats}
-                      </p>
+                        {/* <strong>Location:</strong> {event?.location}<br /> */}
+                           <strong>Location:</strong>{' '}
+                        <a
+                        href={`https://www.google.com/maps?q=${event.location}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={event.location}
+                         >
+                        View on Map
+                       </a><br />
 
+                        {/* <strong>ZoomUrl:</strong> {event?.zoomUrl}<br /> */}
+
+                           {event.eventType === "ZoomMeeting" && (
+                            <>
+                           <strong>Zoom URL:</strong>{" "}
+                           <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer">
+                           {event.zoomUrl}
+                            </a><br />
+                             </>
+                            )}
+
+                        <strong>Available Seats:</strong> {availableSeats}
+                         {eventEnded && (
+                          <span className="badge bg-success mt-2">Event Ended Successfully</span>
+                        )}
+                      </p>
+                    {!eventEnded &&(
                       <div>
                         <input
                           type="number"
@@ -129,9 +160,10 @@ export const ViewMyEvent = () => {
                           Book Seat
                         </button>
                       </div>
+                     )}
 
                       {booked && (
-                        <div className="mt-2 p-2 bg-light text-dark rounded">
+                        <div className="mt-2 p-2 bg-light text-dark rounded alert alert-success">
                           <strong>Ticket Booked:</strong><br />
                           Qty: {booked.quantity}<br />
                           Ticket ID: {booked._id}<br/>

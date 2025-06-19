@@ -39,11 +39,13 @@ export const BookingsOfMyEvents = () => {
     <div className="container mt-5 alert alert-primary">
       <h2 className="text-center">Bookings of My Events</h2>
       {Object.values(groupedByEvent).map(({ event, tickets }) => (
-
+          
         <div key={event._id} className="card my-4">
           <div className="card-header bg-dark text-white">
             <h5 style={{color:"#ffffff"}}>{event.eventName} ({event.eventType})</h5>
-            <small>{new Date(event.startDate).toLocaleDateString()}</small>
+            <small>StartDate: </small><small>{new Date(event.startDate).toLocaleDateString()}</small><br/>
+            <small>EndDate: </small><small>{new Date(event.endDate).toLocaleDateString()}</small>
+
           </div>
           <div className="card-body">
             {tickets.map((ticket) => (
