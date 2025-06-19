@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import img1 from '../../assets/img/hero-bg.jpg';
 import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
+import img4 from '../../assets/img/event.webp'
 import defaultprofile from '../../assets/img/testimonials-2.jpg'
 import { Link, Outlet } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,6 +16,7 @@ import { MyTickets } from './MyTickets';
 import { BookingsOfMyEvents } from './BookingOfMyEvents';
 import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
+import { ContactUs } from '../common/ContactUs';
 
 export const OrganizerHeroPage = () => {
 
@@ -73,7 +75,9 @@ export const OrganizerHeroPage = () => {
               <li className="nav-item">
                 <a className="nav-link" href="#addevent">AddEvents</a>
                 {/* <Link to="organizer/addevent" className="nav-link">Events</Link> */}
-
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#contactus">ContactUs</a>
               </li>
               <li className="nav-item">
                 <Link to="/bookingofmyevents" className="nav-link">Tickets</Link>
@@ -93,7 +97,7 @@ export const OrganizerHeroPage = () => {
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                   <li style={{textAlign:'center'}}><a className="dropdown-item" href="/bookedtickets">MyTickets</a></li>
-                  <li style={{textAlign:'center'}}><a className="dropdown-item" href="#">OrganizerList</a></li>
+                  {/* <li style={{textAlign:'center'}}><a className="dropdown-item" href="#">OrganizerList</a></li> */}
                   <li style={{textAlign:'center'}}>
                    <Link to="/" className="btn btn-danger btn-sm" onClick={signout}>SignOut</Link>
                   </li>
@@ -124,9 +128,9 @@ export const OrganizerHeroPage = () => {
         </div>
       </nav>
       
-         <div id="carouselExample" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="2000">
+         <div id="carouselExample" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="2000" style={{marginTop:"50px"}}>
         <div className="carousel-inner" style={{ height: '500px' }}>
-          {[img2, img1, img3].map((img, index) => (
+          {[img3, img2, img1,img4].map((img, index) => (
             <div
               key={index}
               className={`carousel-item ${index === 0 ? 'active' : ''}`}
@@ -174,27 +178,46 @@ export const OrganizerHeroPage = () => {
            </div>
       
             {/* Footer */}
-            <footer className="footer bg-light py-4">
-              <div className="container">
-                <div className="row">
-                  <div className="col-lg-6 text-center text-lg-start">
-                    <ul className="list-inline mb-2">
-                      <li className="list-inline-item"><a href="#aboutus">About</a></li>
-                      <li className="list-inline-item">⋅</li>
-                      <li className="list-inline-item"><a href="#!">Contact</a></li>
-                    </ul>
-                    <p className="text-muted small mb-0">© EventEase 2025. All rights reserved.</p>
-                  </div>
-                  <div className="col-lg-6 text-center text-lg-end">
-                    <ul className="list-inline mb-0">
-                      <li className="list-inline-item me-3"><a href="#"><i className="bi-facebook fs-3" /></a></li>
-                      <li className="list-inline-item me-3"><a href="#"><i className="bi-twitter fs-3" /></a></li>
-                      <li className="list-inline-item"><a href="#"><i className="bi-instagram fs-3" /></a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </footer>
+            <footer
+                   className="text-white pt-5 pb-4"
+                   style={{
+                     background: 'linear-gradient(135deg, #1f1c2c, #928dab)',
+                     position: 'relative',
+                     zIndex: 1,
+                   }}
+                 >
+                   <div className="container">
+                     <div className="row align-items-center mb-4">
+                       <div className="col-lg-4 text-center text-lg-start mb-3 mb-lg-0">
+                         <h4 className="fw-bold" style={{color:"#ffffff"}}>EventEase</h4>
+                         <p className="text-light small mb-2">© 2025 EventEase. All rights reserved.</p>
+                       </div>
+                       <div className="col-lg-4 text-center">
+                         <ul className="list-inline mb-2">
+                           <li className="list-inline-item mx-2">
+                             <a href="#aboutus" className="text-light text-decoration-none fw-medium">About</a>
+                           </li>
+                           <li className="list-inline-item mx-2 text-light">⋅</li>
+                           <li className="list-inline-item mx-2">
+                             <a href="#contactus" className="text-light text-decoration-none fw-medium">Contact</a>
+                           </li>
+                         </ul>
+                       </div>
+                       <div className="col-lg-4 text-center text-lg-end">
+                         <ul className="list-inline mb-0">
+                           <li className="list-inline-item mx-2"><a href="#" className="text-light fs-4"><i className="bi bi-facebook"></i></a></li>
+                           <li className="list-inline-item mx-2"><a href="#" className="text-light fs-4"><i className="bi bi-twitter"></i></a></li>
+                           <li className="list-inline-item mx-2"><a href="#" className="text-light fs-4"><i className="bi bi-instagram"></i></a></li>
+                         </ul>
+                       </div>
+                     </div>
+           
+                     {/* ContactUs Form */}
+                     <div className="mt-5" id="contactus">
+                       <ContactUs />
+                     </div>
+                   </div>
+                 </footer>
       {/* <UpdateEvent/> */}
       <Outlet></Outlet>
     </div>

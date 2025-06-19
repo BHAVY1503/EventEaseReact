@@ -35,6 +35,7 @@ import { UserFeedback } from './components/user/UserFeedBack'
 import { BookingsOfMyEvents } from './components/organizer/BookingOfMyEvents'
 import MapPicker from './components/common/MapPicker'
 import PrivateRoute from './components/common/PrivateRoute'
+import { ContactUs } from './components/common/ContactUs'
 
 
 
@@ -85,6 +86,9 @@ function App() {
       </Route>
       <Route path='/mytickets' element={<MyTickets/>}></Route>
       </Route>
+
+    <Route path='/contactus' element={<ContactUs/>}></Route>
+
     </Routes>
 
     
