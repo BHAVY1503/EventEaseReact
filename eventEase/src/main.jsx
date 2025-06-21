@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // IMPORTANT
 import './index.css';     // Tailwind styles
 // import './custom.css';    // Your overrides or custom styles
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 
 

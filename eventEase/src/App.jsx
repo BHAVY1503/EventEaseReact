@@ -13,6 +13,7 @@ import './assets/styles.css'
 import '../../startbootstrap-landing-page-gh-pages/js/scripts'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// main.jsx or main.tsx
 import { SignUpModal } from './components/user/SignupModal'
 import { SignUpPageWithLanding } from './SignupPagewithLanding'
 // import { SignInModel } from './components/user/SignInModal'

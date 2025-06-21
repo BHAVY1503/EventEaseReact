@@ -5,12 +5,20 @@ export const BookingsOfMyEvents = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const organizerId = localStorage.getItem("organizerId");
-
+  // const organizerId = localStorage.getItem("organizerId");
+  const token = localStorage.getItem("token")
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`/tickets/organizer/${organizerId}`);
+        // const res = await axios.get(`/tickets/organizer/self`);
+        // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+        const res = await axios.get("/tickets/organizer/self", {
+        headers: {
+        Authorization: `Bearer ${token}`,
+         },
+        });
+
+        localStorage.setItem("token",token)
         setTickets(res.data.data);
       } catch (err) {
         console.error("Error fetching tickets:", err);
@@ -19,10 +27,10 @@ export const BookingsOfMyEvents = () => {
       }
     };
 
-    if (organizerId) {
+    if (token) {
       fetchTickets();
     }
-  }, [organizerId]);
+  }, [token]);
 
   if (loading) return <h4 className='text-center mt-4'>Loading bookings...</h4>;
   if (!tickets.length) return <h5 className='text-center mt-4'>No bookings yet.</h5>;

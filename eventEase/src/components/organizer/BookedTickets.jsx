@@ -6,11 +6,16 @@ export const BookedTickets = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      const organizerId = localStorage.getItem("organizerId");
-      if (!organizerId) return;
+      // const organizerId = localStorage.getItem("organizerId");
+      // if (!organizerId) return;
+      const token = localStorage.getItem("token")
 
       try {
-        const res = await axios.get(`/tickets/organizer/${organizerId}`);
+          const res = await axios.get("/tickets/organizer/self", {
+        headers: {
+        Authorization: `Bearer ${token}`,
+         },
+        });
         setTickets(res.data.data || []);
       } catch (error) {
         console.error("Error fetching tickets:", error);

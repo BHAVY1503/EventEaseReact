@@ -25,7 +25,6 @@ export const OrganizerSignin = () => {
     }
 
     const submitHandler = async(data)=>{
-      data.roleId = "68480b987e2eb1da1f656aef"
 
       try{
         const res = await axios.post("/organizer/signin",data)

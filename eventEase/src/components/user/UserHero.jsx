@@ -23,17 +23,23 @@ export const UserHero = () => {
 
   useEffect(()=>{
     const fatchUser = async ()=>{
-      const userId = localStorage.getItem("userId")
-      console.log("Fetched userId from localStorage:", userId);
-      if(!userId) return
+      // const userId = localStorage.getItem("userId")
+      const token = localStorage.getItem("token")
+
+      console.log("Fetched userId from localStorage:", token);
+      if(!token) return
 
       try{
-        const res = await axios.get(`/user/${userId}`)
-        const user = res.data.data
-
-        // const name = `${user.fullName}` 
-        const name = user.fullName || user.name || "Guest";
-         setuserName(name);
+        // const res = await axios.get(`/user/${token}`)
+        // const user = res.data.data
+      const res = await axios.get("/user/getuserbytoken", {
+      headers: {
+     Authorization: `Bearer ${token}`,
+     },
+    });
+    const user = res.data.data; // ✅ define user properly
+    const name = user.fullName || user.name || "Guest";
+    setuserName(name);
 
         // setuserName(name)
     }catch(error){

@@ -3,22 +3,28 @@ import axios from 'axios';
 
 export const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
-  const userId = localStorage.getItem("userId");
+  // const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
 
   useEffect(() => {
-    const fetchTickets = async () => {
+      const fetchTickets = async () => {
       try {
-        const res = await axios.get(`/tickets/usertickets/${userId}`);
+        const res = await axios.get(`/tickets/usertickets/self`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setTickets(res.data.data);
       } catch (error) {
         console.error("Error fetching tickets:", error);
       }
     };
 
-    if (userId) {
+    if (token) {
       fetchTickets();
     }
-  }, [userId]);
+  }, [token]);
 
   const getEventStatus = (startDate, endDate) => {
     const now = new Date();
@@ -84,6 +90,18 @@ export const MyTickets = () => {
                       <strong>📍 Location:</strong> {ticket.cityId?.name}, {ticket.stateId?.Name}<br />
                       <strong>⏳ Start:</strong> {event?.startDate ? new Date(event.startDate).toLocaleDateString() : "N/A"}<br />
                       <strong>⏱ End:</strong> {event?.endDate ? new Date(event.endDate).toLocaleDateString() : "N/A"}
+                       
+                              {/* <strong>Location:</strong>{" "}
+                              <a
+                                className='btn btn-sm btn-outline-primary'
+                                href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                View Directions
+                              </a><br /> */}
+                            
+                          
                     </p>
                   </div>
                 </div>
