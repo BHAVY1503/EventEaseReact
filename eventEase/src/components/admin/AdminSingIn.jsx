@@ -24,33 +24,40 @@ export const AdminSignIn = () => {
         }
     }
      
-    const submitHandler = async (data) => {
-  data.roleId = "68480e7834c48b61a046ce35";
+  const submitHandler = async (data) => {
+  // data.roleId = "68480a087e2eb1da1f656aec";
+  console.log(data)
 
   try {
     const res = await axios.post("/user/login", data);
     console.log(res); // axios response object
     console.log(res.data); // API response data
- 
-     const userRole = res.data.data.roleId.name
-    if (userRole === "Admin") {
-      alert("SignIn Successfully");
-      localStorage.setItem("id", res.data.data._id);
-      localStorage.setItem("role", userRole);
-      navigate("/admin")
+        
+    const token = res.data.token;
+  
+    if (res.status === 200) {
+      alert("Login Successfully");
+      localStorage.setItem("userId", res.data.data._id);
+      localStorage.setItem("role", res.data.data.roleId.name);
+      localStorage.setItem("token", token)
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // navigate("/")
+      //Redirect based on role
+      if (res.data.data.roleId.name === "User") {
+        navigate("/user");
+      } else if (res.data.data.roleId.name === "Admin") {
+        navigate("/admin");
+      }
     }
-    else{
-        alert("Access denied, This login is for Admin only")
-    }
-    
   } catch (err) {
-    console.error("Sginin Error:", err);
+    console.error("Login Error:", err);
     
     // Show alert based on server message or generic one
     if (err.response && err.response.data && err.response.data.message) {
       alert(err.response.data.message); // e.g., "invalid cred.." or "Email not found.."
     } else {
-      alert("Signin failed. Please check your Candidate");
+      // alert("Login failed. Please try again.");
     }
   }
 };

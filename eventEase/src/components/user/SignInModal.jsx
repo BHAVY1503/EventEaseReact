@@ -20,13 +20,15 @@ export const SignInModal = () => {
             required:{
                 value:true,
                 message:"email was required"
-            }
+            },
+             minLength: { value: 6, message: "Minimum 6 characters required" }
         }
     }
      
     const submitHandler = async (data) => {
-  data.roleId = "68480a087e2eb1da1f656aec";
+  // data.roleId = "68480a087e2eb1da1f656aec";
   console.log(data)
+  // console.log(token)
 
   try {
     const res = await axios.post("/user/login", data);

@@ -37,6 +37,10 @@ import { BookingsOfMyEvents } from './components/organizer/BookingOfMyEvents'
 import MapPicker from './components/common/MapPicker'
 import PrivateRoute from './components/common/PrivateRoute'
 import { ContactUs } from './components/common/ContactUs'
+import { GroupedByEvents } from './components/admin/GroupedByEvents'
+import { AllEventBookings } from './components/admin/AllEventsBookings'
+import { AllUsers } from './components/admin/AllUsers'
+import { AllOrganizers } from './components/admin/AllOrganizers'
 
 
 
@@ -62,7 +66,15 @@ function App() {
 
       {/* Admin  */}
       <Route element={<PrivateRoute/>}>
-      <Route path='/admin' element={<AdminHeroPage/>}></Route>
+      <Route path='/admin' element={<AdminHeroPage/>}>
+      <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
+
+      </Route>
+      <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
+      <Route path='/allusers' element={<AllUsers/>}></Route>
+      <Route path='/allorganizer' element={<AllOrganizers/>}></Route>
+
+      
       </Route>
 
      {/* organizer  */}
