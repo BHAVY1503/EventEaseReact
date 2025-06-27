@@ -8,9 +8,10 @@ const useAuth = () => {
 
   useEffect(() => {
     const id =
-      localStorage.getItem("userId") ||
-      localStorage.getItem("organizerId") ||
-      localStorage.getItem("adminId");
+    localStorage.getItem("token")
+      // localStorage.getItem("userId") ||
+      // localStorage.getItem("organizerId") ||
+      // localStorage.getItem("adminId");
 
     const role = localStorage.getItem("role");
 

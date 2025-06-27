@@ -87,6 +87,7 @@ export const MyTickets = () => {
                       <strong>🎟 Quantity:</strong> {ticket.quantity}<br />
                       <strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}<br />
                       <strong>🆔 Ticket ID:</strong> {ticket._id}<br />
+
                       <strong>📍 Location:</strong> {ticket.cityId?.name}, {ticket.stateId?.Name}<br />
                       <strong>⏳ Start:</strong> {event?.startDate ? new Date(event.startDate).toLocaleDateString() : "N/A"}<br />
                       <strong>⏱ End:</strong> {event?.endDate ? new Date(event.endDate).toLocaleDateString() : "N/A"}

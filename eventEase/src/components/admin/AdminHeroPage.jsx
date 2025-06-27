@@ -109,7 +109,7 @@ export const AdminHeroPage = () => {
       {/* Hero Carousel */}
       <div id="carouselExample" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" style={{ marginTop: "56px" }}>
         <div className="carousel-inner" style={{ height: '600px' }}>
-          {[img3, img2, img1, img4].map((img, index) => (
+          {[img2, img3, img1, img4].map((img, index) => (
             <div
               key={index}
               className={`carousel-item ${index === 0 ? 'active' : ''}`}
@@ -139,11 +139,11 @@ export const AdminHeroPage = () => {
       </div>
 
       {/* Events Section */}
-      <div id='events'><ViewEvents /></div>
+      <div id='events' ><ViewEvents /></div>
       {/* <div id='viewevent'><ViewMyEvent /></div> */}
-      <div><GroupedByEvents/></div>
-      <div id='addevent'><AddEvent /></div>
-      <div><UserFeedback /></div>
+      <div id='groupbyevent' style={{marginTop:"170px"}}><GroupedByEvents/></div>
+      <div id='addevent' style={{marginTop:"170px"}}><AddEvent /></div>
+      <div style={{marginTop:"170px"}}><UserFeedback /></div>
 
       {/* Footer */}
       <footer className="text-white pt-5 pb-4" style={{ background: 'linear-gradient(135deg, #1f1c2c, #928dab)' }}>

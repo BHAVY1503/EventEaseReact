@@ -1,5 +1,6 @@
 import axios from 'axios'
-import React from 'react'
+import { jwtDecode } from "jwt-decode";
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -23,6 +24,46 @@ export const AdminSignIn = () => {
             }
         }
     }
+
+     useEffect(() => {
+    /* global google */
+    google.accounts.id.initialize({
+      client_id: "342037145091-qvhlig4d6tn8p35ho40kc8c468mpnqug.apps.googleusercontent.com", 
+      callback: handleGoogleResponse,
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignInDiv"),
+      { theme: "filled_blue", size: "large", width: "10%" }
+    );
+  }, []);
+
+  const handleGoogleResponse = async (response) => {
+    const decoded = jwtDecode(response.credential); // optional
+    console.log("Google credential decoded:", decoded);
+
+    try {
+      const res = await axios.post("/user/googlelogin", {
+        token: response.credential,
+      });
+
+      const { token, data } = res.data;
+
+      localStorage.setItem("userId", data._id);
+      localStorage.setItem("role", data.roleId?.name || "User");
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      alert("Google Sign-In successful");
+
+      if (data.roleId?.name === "Admin") navigate("/admin");
+      else navigate("/user");
+
+    } catch (error) {
+      console.error("Google login failed:", error);
+      alert("Google login failed.");
+    }
+  };
      
   const submitHandler = async (data) => {
   // data.roleId = "68480a087e2eb1da1f656aec";
@@ -91,6 +132,9 @@ export const AdminSignIn = () => {
 
           <br/>
         </form>
+
+           <div id="googleSignInDiv" style={{ marginTop: "20px" }}></div>
+
       <small>For Register...</small><a href='/signup'>SignUp</a>
 
       </div>

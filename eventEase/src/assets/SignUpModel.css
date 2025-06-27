@@ -20,6 +20,7 @@
   max-width: 500px;
   width: 90%;
   background-image: url(./img/bg-showcase-3.jpg);
+  background-attachment: fixed;
 
 }
 #signuphd{

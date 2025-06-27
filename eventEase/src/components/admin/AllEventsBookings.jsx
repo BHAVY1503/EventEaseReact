@@ -44,7 +44,7 @@ export const AllEventBookings = () => {
   }, {});
 
   return (
-    <div className="container mt-5 alert alert-success">
+    <div className="container mt-5 alert alert-primary">
       <h2 className="text-center">All Event Bookings (Admin View)</h2>
       {Object.values(groupedByEvent).map(({ event, tickets }) => {
         if (!event) return null; // skip if event is null

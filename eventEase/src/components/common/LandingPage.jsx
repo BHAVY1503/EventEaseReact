@@ -42,6 +42,8 @@ export const LandingPage = () => {
               <li className="nav-item"><a className="nav-link" href="#">Home</a></li>
               <li className="nav-item"><a className="nav-link" href="#aboutus">About Us</a></li>
               <li className="nav-item"><a className="nav-link" href="#events">Events</a></li>
+              <li className="nav-item"><a className="nav-link" href="#contactus">Contact Us</a></li>
+
             </ul>
             <div className="d-flex">
               <Link to="/signup" className="btn btn-outline-primary sm me-2">SignUp</Link>
@@ -53,7 +55,7 @@ export const LandingPage = () => {
 
       {/* Carousel */}
       <div id="carouselExample" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" style={{marginTop:"50px"}}>
-        <div className="carousel-inner" style={{ height: '500px' }}>
+        <div className="carousel-inner" style={{ height: '500px',  }}>
           {[img4, img2, img3, img1].map((img, index) => (
             <div
               key={index}
@@ -63,6 +65,7 @@ export const LandingPage = () => {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 height: '600px',
+                backgroundAttachment:'fixed'
               }}
             >
               <div className="carousel-caption d-flex flex-column align-items-center justify-content-center h-100">
@@ -192,6 +195,7 @@ export const LandingPage = () => {
               padding: '12px 30px',
               borderRadius: '50px',
               transition: '0.3s ease-in-out',
+              backgroundAttachment:'fixed'
             }}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = '#8f94fb';
