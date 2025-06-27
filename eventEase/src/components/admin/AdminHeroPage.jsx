@@ -17,6 +17,8 @@ import { ContactUs } from '../common/ContactUs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { GroupedByEvents } from './GroupedByEvents';
+import AddStadiumForm from './AddStadiumForm';
+import ViewStadiums from './ViewStadiums';
 
 export const AdminHeroPage = () => {
   const [userName, setUserName] = useState("");
@@ -143,6 +145,10 @@ export const AdminHeroPage = () => {
       {/* <div id='viewevent'><ViewMyEvent /></div> */}
       <div id='groupbyevent' style={{marginTop:"170px"}}><GroupedByEvents/></div>
       <div id='addevent' style={{marginTop:"170px"}}><AddEvent /></div>
+      <div style={{marginTop:"170px"}}><AddStadiumForm /></div>
+      <div style={{marginTop:"170px"}}><ViewStadiums /></div>
+
+
       <div style={{marginTop:"170px"}}><UserFeedback /></div>
 
       {/* Footer */}

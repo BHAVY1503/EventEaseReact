@@ -41,6 +41,8 @@ import { GroupedByEvents } from './components/admin/GroupedByEvents'
 import { AllEventBookings } from './components/admin/AllEventsBookings'
 import { AllUsers } from './components/admin/AllUsers'
 import { AllOrganizers } from './components/admin/AllOrganizers'
+import AddStadiumForm from './components/admin/AddStadiumForm'
+import ViewStadiums from './components/admin/ViewStadiums'
 
 
 
@@ -68,6 +70,9 @@ function App() {
       <Route element={<PrivateRoute/>}>
       <Route path='/admin' element={<AdminHeroPage/>}>
       <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
+      <Route path='addstadium' element={<AddStadiumForm/>}></Route>
+      <Route path='stadiums' element={<ViewStadiums/>}></Route>
+
 
       </Route>
       <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
