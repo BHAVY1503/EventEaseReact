@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const ViewStadiums = () => {
   const [stadiums, setStadiums] = useState([]);
@@ -139,10 +140,14 @@ const ViewStadiums = () => {
                     );
                   })}
                 </div>
+                     <Link to={`/admin/editstadium/${stadium._id}`} className="btn btn-warning">
+                         Edit
+                      </Link>
               </div>
             </div>
           </div>
         ))}
+
       </div>
     </div>
   );

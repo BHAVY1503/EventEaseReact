@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const StadiumSelector = () => {
   const [stadiums, setStadiums] = useState([]);
   const navigate = useNavigate();
+   const location = useLocation();
   const token = localStorage.getItem("token");
 
+  const queryParams = new URLSearchParams(location.search);
+  const redirectTo = queryParams.get("redirectTo") || "/organizer#addevent"
+
+  console.log("redirectTo:", redirectTo);
   useEffect(() => {
     axios
       .get("/admin/stadiums", {
@@ -16,11 +21,17 @@ export const StadiumSelector = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  const selectStadium = (stadium) => {
+   const selectStadium = (stadium) => {
     localStorage.setItem("selectedStadium", JSON.stringify(stadium));
     localStorage.setItem("selectedCategory", "Indoor");
-    window.location.href = "/organizer#addevent";
+    navigate(redirectTo);
   };
+
+  // const selectStadium = (stadium) => {
+  //   localStorage.setItem("selectedStadium", JSON.stringify(stadium));
+  //   localStorage.setItem("selectedCategory", "Indoor");
+  //   window.location.href = "/organizer#addevent";
+  // };
 
   return (
     <div className="container mt-4">

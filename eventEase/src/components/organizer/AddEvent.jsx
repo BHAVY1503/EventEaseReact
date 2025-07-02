@@ -41,12 +41,13 @@ export const AddEvent = () => {
 
     if (storedStadium) {
       const parsed = JSON.parse(storedStadium);
+      if (parsed && parsed._id) {
       setSelectedStadium(parsed);
       setValue("stadiumId", parsed._id);
       setValue("latitude", parsed.location.latitude);
       setValue("longitude", parsed.location.longitude);
       setValue("numberOfSeats", parsed.totalSeats);
-
+      }
       localStorage.removeItem("selectedStadium");
     }
   }, []);
@@ -128,7 +129,7 @@ useEffect(() => {
         },
       });
       alert("Event added successfully!");
-      //  window.location.href = "/organizer#addevent";
+       window.location.href = "/organizer#viewevent";
        fetchMyEvents();  // ← refresh the list
         
 
@@ -169,6 +170,8 @@ useEffect(() => {
                   type="button"
                   className="btn btn-outline-primary form-control"
                   onClick={() => navigate("/stadiumselect")}
+                  // onClick={() => navigate("/stadiumselect?redirectTo=/organizer/addevent")}
+
                 >
                   {selectedStadium ? selectedStadium.name : "Select Stadium"}
                 </button>
@@ -180,7 +183,7 @@ useEffect(() => {
                   <input type="hidden" {...register("latitude")} value={selectedStadium.location.latitude} />
                   <input type="hidden" {...register("longitude")} value={selectedStadium.location.longitude} />
 
-                  <div className="col-md-12 mb-4">
+                  {/* <div className="col-md-12 mb-4">
                     <div className="card shadow border-0">
                       {selectedStadium.imageUrl && (
                         <img
@@ -229,7 +232,7 @@ useEffect(() => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </>
               )}
             </>
@@ -310,20 +313,20 @@ useEffect(() => {
             </select>
           </div>
           <div className="col-md-6 mb-3">
-  <label>Total Seats</label>
-  <input
-    type="number"
-    className="form-control"
-    {...register("numberOfSeats", { required: true })}
-    value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
-    onChange={(e) => {
-      if (eventCategory !== "Indoor") {
-        setValue("numberOfSeats", parseInt(e.target.value));
-      }
-    }}
-    disabled={eventCategory === "Indoor" && selectedStadium}
-  />
-</div>
+           <label>Total Seats</label>
+             <input
+               type="number"
+               className="form-control"
+               {...register("numberOfSeats", { required: true })}
+               value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
+                onChange={(e) => {
+               if (eventCategory !== "Indoor") {
+               setValue("numberOfSeats", parseInt(e.target.value));
+                }
+               }}
+               disabled={eventCategory === "Indoor" && selectedStadium}
+               />
+              </div>
 
 
           {/* <div className="col-md-6 mb-3">
