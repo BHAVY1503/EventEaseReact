@@ -27,7 +27,7 @@ export const LandingPage = () => {
   }, []);
 
   return (
-    <div>
+   <div>
       {/* Navigation */}
       <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top" id="navbar">
         <div className="container-fluid">

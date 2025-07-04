@@ -46,6 +46,7 @@ import ViewStadiums from './components/admin/ViewStadiums'
 import { StadiumSelector } from './components/organizer/StadiumSelector'
 import { SeatSelectionPage } from './components/user/SeatsSelection'
 import UpdateStadium from './components/admin/UpdateStadium'
+import { UI } from './components/common/UI'
 
 
 
@@ -60,6 +61,8 @@ function App() {
     
     <Routes>
      <Route path="/" element={<LandingPage/>}></Route>
+     {/* <Route path="/" element={<UI/>}></Route> */}
+
      {/* <Route path="/signup" element={<SignUpPageWithLanding/>}></Route> */}
      {/* <Route path='/signin' element={<SignUpPageWithLanding/>}></Route> */}
      <Route path="/signup" element={<SignUpPageWithLanding />} />
