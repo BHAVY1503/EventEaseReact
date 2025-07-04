@@ -141,6 +141,8 @@ export const ViewMyEvent = () => {
                           <>
                             <strong>State:</strong> {event.stateId?.Name}<br />
                             <strong>City:</strong> {event.cityId?.name}<br />
+                            <strong>&#8377; Price:</strong> {event?.ticketRate}<br />
+
                           </>
                         ) : (
                           <>
