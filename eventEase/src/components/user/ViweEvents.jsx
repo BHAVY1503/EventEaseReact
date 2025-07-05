@@ -173,7 +173,7 @@ export const ViewEvents = () => {
                               bookEventWithoutSeats(booking);
                             }}
                           >
-                            Book Now <small>at &#8377;{event.ticketRate} </small>
+                            Book  <small>at just &#8377;{event.ticketRate} </small>
                           </button>
                         </>
                       )

@@ -62,7 +62,15 @@ export const BookingsOfMyEvents = () => {
                   <strong>Quantity:</strong> {ticket.quantity} <br />
                   <strong>City:</strong> {ticket.cityId?.name || "N/A"}, 
                   <strong> State:</strong> {ticket.stateId?.Name || "N/A"} <br />
+                  {/* <strong>Booked at ₹:</strong> {ticket.ticketRate || "N/A"} <br /> */}
+
+
+                  <strong>Booked at:</strong>  
+                  {/* {typeof ticket.ticketRate === 'number' ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(ticket.ticketRate) : "N/A"} <br /> */}
+                      ₹{ticket.ticketRate} ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})
+
                 </p>
+
 
                 {event.eventCategory === "Indoor" && ticket.selectedSeats?.length > 0 && (
                   <div className="mb-2">
@@ -72,6 +80,9 @@ export const BookingsOfMyEvents = () => {
                         <span key={index} className="badge bg-info">{seat}</span>
                       ))}
                     </div>
+                     {/* <p className="mt-2">
+                     <strong>Total Price:</strong> ₹{ticket.ticketRate} ({ticket.selectedSeats.length} seat{ticket.selectedSeats.length > 1 ? "s" : ""})
+                     </p> */}
                   </div>
                 )}
               </div>
