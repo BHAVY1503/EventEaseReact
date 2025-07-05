@@ -17,6 +17,9 @@ import { ContactUs } from '../common/ContactUs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { GroupedByEvents } from './GroupedByEvents';
+import AddStadiumForm from './AddStadiumForm';
+import ViewStadiums from './ViewStadiums';
+import UpdateStadium from './UpdateStadium';
 
 export const AdminHeroPage = () => {
   const [userName, setUserName] = useState("");
@@ -68,6 +71,7 @@ export const AdminHeroPage = () => {
               <li className="nav-item"><a className="nav-link" href="#">Home</a></li>
               <li className="nav-item"><a className="nav-link" href="#viewevent">MyEvents</a></li>
               <li className="nav-item"><a className="nav-link" href="#addevent">AddEvents</a></li>
+              <li className="nav-item"><a className="nav-link" href="#addstadium">AddEvents</a></li>
               <li className="nav-item"><a className="nav-link" href="#contactus">ContactUs</a></li>
               <li className="nav-item"><Link to="/alleventsticket" className="nav-link">Tickets</Link></li>
               <li className="nav-item dropdown">
@@ -143,6 +147,12 @@ export const AdminHeroPage = () => {
       {/* <div id='viewevent'><ViewMyEvent /></div> */}
       <div id='groupbyevent' style={{marginTop:"170px"}}><GroupedByEvents/></div>
       <div id='addevent' style={{marginTop:"170px"}}><AddEvent /></div>
+      <div id='addstadium' style={{marginTop:"170px"}}><AddStadiumForm /></div>
+      <div style={{marginTop:"170px"}}><ViewStadiums /></div>
+      <div style={{marginTop:"170px"}}><UpdateStadium /></div>
+
+
+
       <div style={{marginTop:"170px"}}><UserFeedback /></div>
 
       {/* Footer */}

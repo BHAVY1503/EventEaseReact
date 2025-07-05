@@ -41,6 +41,11 @@ import { GroupedByEvents } from './components/admin/GroupedByEvents'
 import { AllEventBookings } from './components/admin/AllEventsBookings'
 import { AllUsers } from './components/admin/AllUsers'
 import { AllOrganizers } from './components/admin/AllOrganizers'
+import AddStadiumForm from './components/admin/AddStadiumForm'
+import ViewStadiums from './components/admin/ViewStadiums'
+import { StadiumSelector } from './components/organizer/StadiumSelector'
+import { SeatSelectionPage } from './components/user/SeatsSelection'
+import UpdateStadium from './components/admin/UpdateStadium'
 
 
 
@@ -68,8 +73,14 @@ function App() {
       <Route element={<PrivateRoute/>}>
       <Route path='/admin' element={<AdminHeroPage/>}>
       <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
+      <Route path='addstadium' element={<AddStadiumForm/>}></Route>
+      <Route path='stadiums' element={<ViewStadiums/>}></Route>
+      <Route path='editstadium/:id' element={<UpdateStadium/>}></Route>
+
+
 
       </Route>
+      {/* <Route path='/admin/stadium/edit/:id' element={<UpdateStadium/>}></Route> */}
       <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
       <Route path='/allusers' element={<AllUsers/>}></Route>
       <Route path='/allorganizer' element={<AllOrganizers/>}></Route>
@@ -84,6 +95,8 @@ function App() {
       <Route path="addevent" element={<AddEvent />} />
       <Route path="viewevent" element={<ViewMyEvent />} />
     </Route>
+      <Route path="/stadiumselect" element={<StadiumSelector />} />
+
     <Route path="/bookedtickets" element={<BookedTickets />} />
     <Route path="/bookingofmyevents" element={<BookingsOfMyEvents />} />
     <Route path="/updateevent/:id" element={<UpdateEvent />} />
@@ -98,6 +111,9 @@ function App() {
       <Route path='userfeedback' element={<UserFeedback/>}></Route>
       </Route>
       <Route path='/mytickets' element={<MyTickets/>}></Route>
+      <Route path='/select-seats/:id' element={<SeatSelectionPage/>}></Route>
+
+
       </Route>
 
     <Route path='/contactus' element={<ContactUs/>}></Route>
