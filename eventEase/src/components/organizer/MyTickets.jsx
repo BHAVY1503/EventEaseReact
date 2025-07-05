@@ -90,16 +90,18 @@ export const MyTickets = () => {
                     </span>
                     <h5 className="card-title">{event?.eventName || "Unnamed Event"}</h5>
                     <p className="card-text">
-                      <strong>🎟 Quantity:</strong> {ticket.quantity}<br />
+                      {/* <strong>🎟 Quantity:</strong> {ticket.quantity}<br /> */}
                       <strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}<br />
                       <strong>🆔 Ticket ID:</strong> {ticket._id}<br />
-                      <strong>📅 Start:</strong> {new Date(event.startDate).toLocaleDateString()}<br />
-                      <strong>📅 End:</strong> {new Date(event.endDate).toLocaleDateString()}<br />
+                      <strong>📅 Start:</strong> {new Date(event?.startDate).toLocaleDateString()}<br />
+                      <strong>📅 End:</strong> {new Date(event?.endDate).toLocaleDateString()}<br />
+                      <strong>🎟 Booked at:</strong>  ₹{ticket.ticketRate} ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})<br />
+
 
                       {!isZoom && (
                         <>
                           <strong>📍 Location:</strong> {ticket.cityId?.name}, {ticket.stateId?.Name}<br />
-                          {event.latitude && event.longitude && (
+                          {event?.latitude && event?.longitude && (
                             <a
                               href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
                               target="_blank"
