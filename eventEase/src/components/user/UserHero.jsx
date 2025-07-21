@@ -8,18 +8,31 @@ import user1 from '../../assets/img/testimonials-1.jpg';
 import user2 from '../../assets/img/testimonials-2.jpg';
 import user3 from '../../assets/img/testimonials-3.jpg';
 import defaultprofile from '../../assets/profile.jpg'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
 import { ViewEvents } from './ViweEvents';
 import { UserFeedback } from './UserFeedBack';
 import { ContactUs } from '../common/ContactUs';
 
+// shadcn/ui imports
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+import { Menu, User } from "lucide-react";
+
 export const UserHero = () => {
-
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
-
   const [userName, setuserName] = useState()
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const images = [img1, img2, img3, img4];
+
+  // Carousel auto-rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   useEffect(()=>{
     const fatchUser = async ()=>{
@@ -76,92 +89,127 @@ useEffect(() => {
 
   return (
     <div>
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top" id="navbar">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">EventEase</a>
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon" />
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="nav nav-pills me-auto mb-2 mb-lg-0">
-              <li className="nav-item"><a className="nav-link" href="#">Home</a></li>
-              <li className="nav-item"><a className="nav-link" href="#event">Events</a></li>
-              <li className="nav-item"><a className="nav-link" href="#aboutus">About Us</a></li>
-              <li className="nav-item"><a className="nav-link" href="#contact">Contact Us</a></li>
-
-
-               <li className="nav-item dropdown">
-                   <a
-                   className="nav-link dropdown-toggle"     
-                   href="#"
-                   id="navbarDropdown"
-                   role="button"
-                   data-bs-toggle="dropdown"
-                   aria-expanded="false"
-                   >
-                    Dropdown
-                    </a>
-                    <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li style={{textAlign:'center'}}><a className="dropdown-item" href="/mytickets">MyTickets</a></li>
-                    <li style={{textAlign:'center'}}><a className="dropdown-item" href="#">OrganizerList</a></li>
-                     <li style={{textAlign:'center'}}>
-                         <Link to="/" className="btn btn-danger btn-sm" onClick={signout}>SignOut</Link>
-                       </li>
-                      </ul>
-                   </li>
-            </ul>
+      {/* Modern Navigation with shadcn/ui */}
+      <nav className="bg-white shadow-sm border-b fixed top-0 w-full z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-primary">EventEase</h1>
+            </div>
             
-            <ul className="navbar-nav mb-2 mb-lg-0 align-items-center">
-                <li className="nav-item d-flex align-items-center">
-                 <img
-                    src={defaultprofile}
-                    alt="Profile"
-                   className="rounded-circle me-2"
-                   style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                  />
-                 <span className="fw-bold">{userName || "Guest"}</span>
-              </li>
-             </ul>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <NavigationMenu>
+                <NavigationMenuList className="flex space-x-6">
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-600 hover:text-primary">
+                      Home
+                    </NavigationMenuTrigger>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <a href="#event" className="text-gray-600 hover:text-primary">
+                      Events
+                    </a>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <a href="#aboutus" className="text-gray-600 hover:text-primary">
+                      About Us
+                    </a>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <a href="#contact" className="text-gray-600 hover:text-primary">
+                      Contact Us
+                    </a>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            </div>
+
+            {/* Desktop Profile and Actions */}
+            <div className="hidden md:flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-10 flex items-center space-x-2">
+                    <img
+                      src={defaultprofile}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                    <span className="font-medium">{userName || "Guest"}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <a href="/mytickets" className="w-full">MyTickets</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="#" className="w-full">OrganizerList</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/" onClick={signout} className="w-full text-red-600">
+                      SignOut
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <div className="flex flex-col space-y-4 mt-8">
+                    <a href="#" className="text-lg font-medium">Home</a>
+                    <a href="#event" className="text-lg font-medium">Events</a>
+                    <a href="#aboutus" className="text-lg font-medium">About Us</a>
+                    <a href="#contact" className="text-lg font-medium">Contact Us</a>
+                    <hr className="my-4" />
+                    <a href="/mytickets" className="text-lg font-medium">MyTickets</a>
+                    <a href="#" className="text-lg font-medium">OrganizerList</a>
+                    <Button variant="destructive" onClick={signout} className="mt-4">
+                      SignOut
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Carousel */}
-      <div id="carouselExample" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" style={{marginTop:"50px"}}>
-  <div className="carousel-inner" style={{ height: '500px' }}>
-    {[img2, img1, img4, img3].map((img, index) => (
-      <div
-        key={index}
-        className={`carousel-item ${index === 0 ? 'active' : ''}`}
-        style={{
-          backgroundImage: `url(${img})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          height: '600px',
-          // backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="carousel-caption d-flex flex-column align-items-center justify-content-center h-100">
-              <h1 style={{color:'#ffffff', float:"inline-start"}}>Welcome to!</h1><p>EventEase</p>
-              <h3 style={{color:'#ffffff'}}>DISCOVER AND BE PART OF SOMETHING AMAZING</h3>
-          {/* <Link to="/organizersignup" className="btn btn-primary mt-3"><b>Organize The Event</b></Link> */}
+      {/* Hero Carousel - Updated for Tailwind */}
+      <div className="relative mt-16" style={{ height: '600px' }}>
+        <div className="h-full">
+          {images.map((img, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                height: '600px',
+              }}
+            >
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center">
+                <h1 className="text-6xl font-bold text-white mb-2">Welcome to!</h1>
+                <p className="text-4xl text-white mb-4">EventEase</p>
+                <h3 className="text-2xl text-white text-center max-w-4xl">
+                  DISCOVER AND BE PART OF SOMETHING AMAZING
+                </h3>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-
-  <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-    <span className="carousel-control-prev-icon" aria-hidden="true" />
-    <span className="visually-hidden">Previous</span>
-  </button>
-  <button className="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-    <span className="carousel-control-next-icon" aria-hidden="true" />
-    <span className="visually-hidden">Next</span>
-  </button>
-</div>
 
  {/* view all events */}
 <div id='event'>
@@ -169,30 +217,30 @@ useEffect(() => {
 </div>
   
   {/* aboutus section */}
- <section className="features-icons bg-light text-center" id="aboutus">
-  <div className="container">
-    <h2 className="mb-4">About Us</h2>
-    <p className="lead mb-5">
-  <strong>EventEase</strong> is your all-in-one platform for discovering, organizing, and managing events with ease. 
-  Whether you're a passionate attendee or a professional organizer, EventEase connects people through seamless, innovative event experiences.
-  </p>
-    <div className="row">
-      <div className="col-lg-4">
-        <div className="features-icons-item mx-auto mb-5">
-          <h3>Total Events</h3>
-          <p className="lead mb-0 display-6">{eventStats.totalEvents}</p>
+ <section className="bg-gray-50 text-center py-16" id="aboutus">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className="text-4xl font-bold mb-6">About Us</h2>
+    <p className="text-xl text-gray-600 mb-12 max-w-4xl mx-auto">
+      <strong>EventEase</strong> is your all-in-one platform for discovering, organizing, and managing events with ease. 
+      Whether you're a passionate attendee or a professional organizer, EventEase connects people through seamless, innovative event experiences.
+    </p>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="text-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm">
+          <h3 className="text-2xl font-semibold mb-4">Total Events</h3>
+          <p className="text-5xl font-bold text-primary">{eventStats.totalEvents}</p>
         </div>
       </div>
-      <div className="col-lg-4">
-        <div className="features-icons-item mx-auto mb-5">
-          <h3>Active Events</h3>
-          <p className="lead mb-0 display-6">{eventStats.activeEvents}</p>
+      <div className="text-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm">
+          <h3 className="text-2xl font-semibold mb-4">Active Events</h3>
+          <p className="text-5xl font-bold text-primary">{eventStats.activeEvents}</p>
         </div>
       </div>
-      <div className="col-lg-4">
-        <div className="features-icons-item mx-auto mb-5">
-          <h3>Community Growth</h3>
-          <p className="lead mb-0">Join thousands of organizers!</p>
+      <div className="text-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm">
+          <h3 className="text-2xl font-semibold mb-4">Community Growth</h3>
+          <p className="text-lg text-gray-600">Join thousands of organizers!</p>
         </div>
       </div>
     </div>

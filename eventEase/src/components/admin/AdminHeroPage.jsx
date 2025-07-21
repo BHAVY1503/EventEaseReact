@@ -14,15 +14,30 @@ import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { GroupedByEvents } from './GroupedByEvents';
 import AddStadiumForm from './AddStadiumForm';
 import ViewStadiums from './ViewStadiums';
 import UpdateStadium from './UpdateStadium';
 
+// shadcn/ui imports
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+import { Menu, User } from "lucide-react";
+
 export const AdminHeroPage = () => {
   const [userName, setUserName] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const images = [img2, img3, img1, img4];
+
+  // Carousel auto-rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   useEffect(() => {
     const fetchOrganizer = async () => {
@@ -56,67 +71,124 @@ export const AdminHeroPage = () => {
 
   return (
     <div>
-      {/* Navbar */}
-      <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">EventEase</a>
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon" />
-          </button>
+      {/* Modern Navigation with shadcn/ui */}
+      <nav className="bg-white shadow-sm border-b fixed top-0 w-full z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-primary">EventEase</h1>
+            </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <NavigationMenu>
+                <NavigationMenuList className="flex space-x-6">
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-600 hover:text-primary">
+                      Home
+                    </NavigationMenuTrigger>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-600 hover:text-primary">
+                      MyEvents
+                    </NavigationMenuTrigger>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-600 hover:text-primary">
+                      AddEvents
+                    </NavigationMenuTrigger>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-600 hover:text-primary">
+                      AddStadium
+                    </NavigationMenuTrigger>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-600 hover:text-primary">
+                      ContactUs
+                    </NavigationMenuTrigger>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Link to="/alleventsticket" className="text-gray-600 hover:text-primary">
+                      Tickets
+                    </Link>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            </div>
 
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="nav nav-pills me-auto mb-2 mb-lg-0">
-              <li className="nav-item"><a className="nav-link" href="#">Home</a></li>
-              <li className="nav-item"><a className="nav-link" href="#viewevent">MyEvents</a></li>
-              <li className="nav-item"><a className="nav-link" href="#addevent">AddEvents</a></li>
-              <li className="nav-item"><a className="nav-link" href="#addstadium">AddEvents</a></li>
-              <li className="nav-item"><a className="nav-link" href="#contactus">ContactUs</a></li>
-              <li className="nav-item"><Link to="/alleventsticket" className="nav-link">Tickets</Link></li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                  Menu
-                </a>
-                <ul className="dropdown-menu">
-                  <li className="text-center">
-                    <a className="dropdown-item" href="/bookedtickets">MyTickets</a>
-                  </li>
-                  <li className="text-center">
-                    <a className="dropdown-item" href="/allusers">UserList</a>
-                  </li>
-                  <li className="text-center">
-                    <a className="dropdown-item" href="/allorganizer">OrganizerList</a>
-                  </li>
-                  <li className="text-center">
-                    <Link to="/" className="btn btn-danger btn-sm" onClick={signout}>SignOut</Link>
-                  </li>
-                </ul>
-              </li>
-            </ul>
+            {/* Desktop Profile and Actions */}
+            <div className="hidden md:flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full">
+                    <img
+                      src={defaultprofile}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <a href="/bookedtickets" className="w-full">MyTickets</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="/allusers" className="w-full">UserList</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="/allorganizer" className="w-full">OrganizerList</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/" onClick={signout} className="w-full text-red-600">
+                      SignOut
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
-            <ul className="navbar-nav mb-2 mb-lg-0 align-items-center">
-              <li className="nav-item d-flex align-items-center">
-                <img
-                  src={defaultprofile}
-                  alt="Profile"
-                  className="rounded-circle me-2"
-                  style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                />
-                <span className="fw-bold">{userName}</span>
-              </li>
-            </ul>
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <div className="flex flex-col space-y-4 mt-8">
+                    <a href="#" className="text-lg font-medium">Home</a>
+                    <a href="#viewevent" className="text-lg font-medium">MyEvents</a>
+                    <a href="#addevent" className="text-lg font-medium">AddEvents</a>
+                    <a href="#addstadium" className="text-lg font-medium">AddStadium</a>
+                    <a href="#contactus" className="text-lg font-medium">ContactUs</a>
+                    <Link to="/alleventsticket" className="text-lg font-medium">Tickets</Link>
+                    <hr className="my-4" />
+                    <a href="/bookedtickets" className="text-lg font-medium">MyTickets</a>
+                    <a href="/allusers" className="text-lg font-medium">UserList</a>
+                    <a href="/allorganizer" className="text-lg font-medium">OrganizerList</a>
+                    <Button variant="destructive" onClick={signout} className="mt-4">
+                      SignOut
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Carousel */}
-      <div id="carouselExample" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" style={{ marginTop: "56px" }}>
-        <div className="carousel-inner" style={{ height: '600px' }}>
-          {[img2, img3, img1, img4].map((img, index) => (
+      {/* Hero Carousel - Updated for Tailwind */}
+      <div className="relative mt-16" style={{ height: '600px' }}>
+        <div className="h-full">
+          {images.map((img, index) => (
             <div
               key={index}
-              className={`carousel-item ${index === 0 ? 'active' : ''}`}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
               style={{
                 backgroundImage: `url(${img})`,
                 backgroundSize: 'cover',
@@ -124,36 +196,25 @@ export const AdminHeroPage = () => {
                 height: '600px',
               }}
             >
-              <div className="carousel-caption d-flex flex-column align-items-center justify-content-center h-100">
-                <h1 style={{ color: '#fff' }}>Welcome Back!</h1>
-                <p>EventEase</p>
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center">
+                <h1 className="text-6xl font-bold text-white mb-4">Welcome Back!</h1>
+                <p className="text-2xl text-white">EventEase</p>
               </div>
             </div>
           ))}
         </div>
-
-        <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-          <span className="carousel-control-prev-icon" aria-hidden="true" />
-          <span className="visually-hidden">Previous</span>
-        </button>
-        <button className="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-          <span className="carousel-control-next-icon" aria-hidden="true" />
-          <span className="visually-hidden">Next</span>
-        </button>
       </div>
 
       {/* Events Section */}
-      <div id='events' ><ViewEvents /></div>
+      <div id='events' className="mt-16"><ViewEvents /></div>
       {/* <div id='viewevent'><ViewMyEvent /></div> */}
-      <div id='groupbyevent' style={{marginTop:"170px"}}><GroupedByEvents/></div>
-      <div id='addevent' style={{marginTop:"170px"}}><AddEvent /></div>
-      <div id='addstadium' style={{marginTop:"170px"}}><AddStadiumForm /></div>
-      <div style={{marginTop:"170px"}}><ViewStadiums /></div>
-      <div style={{marginTop:"170px"}}><UpdateStadium /></div>
+      <div id='groupbyevent' className="mt-32"><GroupedByEvents/></div>
+      <div id='addevent' className="mt-32"><AddEvent /></div>
+      <div id='addstadium' className="mt-32"><AddStadiumForm /></div>
+      <div className="mt-32"><ViewStadiums /></div>
+      <div className="mt-32"><UpdateStadium /></div>
 
-
-
-      <div style={{marginTop:"170px"}}><UserFeedback /></div>
+      <div className="mt-32"><UserFeedback /></div>
 
       {/* Footer */}
       <footer className="text-white pt-5 pb-4" style={{ background: 'linear-gradient(135deg, #1f1c2c, #928dab)' }}>

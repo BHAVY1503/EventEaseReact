@@ -10,8 +10,6 @@ import img4 from '../../assets/img/event.webp'
 import axios from 'axios';
 import { UserFeedback } from '../user/UserFeedBack';
 import { ContactUs } from './ContactUs';
-import { NavigationMenu, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 
 export const LandingPage = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });

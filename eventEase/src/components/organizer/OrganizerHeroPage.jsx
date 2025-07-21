@@ -14,9 +14,6 @@ import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
 export const OrganizerHeroPage = () => {
   const [userName, setUserName] = useState("");
 

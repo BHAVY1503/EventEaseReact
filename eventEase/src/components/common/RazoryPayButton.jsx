@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import { Button } from "@/components/ui/button";
 
 const RazorpayButton = ({ eventId, amount, onPaymentSuccess }) => {
   const loadRazorpayScript = (src) => {
@@ -70,9 +71,9 @@ const RazorpayButton = ({ eventId, amount, onPaymentSuccess }) => {
   };
 
   return (
-    <button onClick={startPayment} className="btn btn-success">
+    <Button onClick={startPayment} className="bg-green-600 hover:bg-green-700 text-white">
       Pay ₹{amount}
-    </button>
+    </Button>
   );
 };
 
