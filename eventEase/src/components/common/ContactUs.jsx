@@ -4,103 +4,125 @@ import { useForm } from 'react-hook-form';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "../../hooks/use-toast";
+import { Label } from "@/components/ui/label";
+// import { Icons } from "@/components/icons";
 
 export const ContactUs = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+  const { toast } = useToast();
 
   const submitHandler = async (data) => {
     try {
       const res = await axios.post("/contactus", data);
-      console.log(data);
-      console.log(res.data.data);
-
-      if (res.status === 201) {
-        alert("Message sent successfully.");
-      } else {
-        alert("Message not sent.");
-      }
+      toast({
+        title: "Success!",
+        description: "Your message has been sent successfully.",
+        variant: "success",
+      });
     } catch (err) {
       console.error(err);
-      alert("Sending failed: " + (err.response?.data?.message || err.message));
+      toast({
+        title: "Error",
+        description: err.response?.data?.message || "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Card className="bg-gradient-to-br from-gray-900 to-gray-700 text-white border-0 shadow-2xl">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center text-white">
-            Contact Us
+          <CardTitle className="text-2xl font-bold text-center">
+            Get in Touch
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(submitHandler)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
                 <Input
+                  id="name"
                   type="text"
-                  placeholder="Enter name"
-                  {...register("name")}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                  placeholder="Enter your name"
+                  {...register("name", { required: "Name is required" })}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
+                <Label htmlFor="company">Company / Organization</Label>
                 <Input
+                  id="company"
                   type="text"
-                  placeholder="Company / Organization"
-                  {...register("company")}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                  placeholder="Your organization"
+                  {...register("company", { required: "Company is required" })}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
+                  id="email"
                   type="email"
-                  placeholder="Email"
-                  {...register("email")}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                  placeholder="Your email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
+                <Label htmlFor="phoneNo">Phone Number</Label>
                 <Input
-                  type="text"
-                  placeholder="Phone Number"
-                  {...register("phoneNo")}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                  id="phoneNo"
+                  type="tel"
+                  placeholder="Your phone number"
+                  {...register("phoneNo", {
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^[0-9]{10}$/,
+                      message: "Please enter a valid 10-digit phone number",
+                    },
+                  })}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
+                <Label htmlFor="eventType">Event Type</Label>
                 <Input
+                  id="eventType"
                   type="text"
-                  placeholder="Event Type"
-                  {...register("eventType")}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+                  placeholder="Type of event"
+                  {...register("eventType", { required: "Event type is required" })}
                 />
               </div>
-              <div>
+              <div className="space-y-2">
+                <Label htmlFor="question">How did you hear about us?</Label>
                 <Input
+                  id="question"
                   type="text"
-                  placeholder="How did you hear about us?"
+                  placeholder="Optional"
                   {...register("question")}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
                 />
               </div>
             </div>
-            <div>
-              <textarea
-                className="flex min-h-[120px] w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                rows="4"
-                placeholder="Type your message..."
-                {...register("message")}
-                required
-              ></textarea>
+            <div className="space-y-2">
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                placeholder="Type your message here..."
+                {...register("message", { required: "Message is required" })}
+                className="min-h-[120px]"
+              />
             </div>
             <div className="flex justify-end">
-              <Button type="submit" variant="secondary" className="px-8">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && (
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Submit
               </Button>
             </div>

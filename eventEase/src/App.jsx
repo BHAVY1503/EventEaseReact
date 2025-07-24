@@ -16,7 +16,7 @@ import { SignUpPageWithLanding } from './SignupPagewithLanding'
 // import { SignInModel } from './components/user/SignInModal'
 import { SigninPageWithLanding } from './SiginPagewithLanding'
 import axios from 'axios'
-import { AdminLanding } from './AdminLanding'
+// import { AdminLanding } from './AdminLanding'
 import { OrganizerSignup } from './components/organizer/OrganizerSignup'
 import { OrganizerWithLanding } from './organizerWithlandig'
 import { OrganizerSigninLanding } from './OrganizerSiginLanding'
@@ -43,6 +43,7 @@ import ViewStadiums from './components/admin/ViewStadiums'
 import { StadiumSelector } from './components/organizer/StadiumSelector'
 import { SeatSelectionPage } from './components/user/SeatsSelection'
 import UpdateStadium from './components/admin/UpdateStadium'
+import { AdminLanding } from './AdminLanding'
 
 
 
@@ -65,6 +66,7 @@ function App() {
      <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
       <Route path='/mappicker' element={<MapPicker/>}></Route>
+      <Route path='/adminlanding' element={<AdminLanding/>}></Route>
 
       {/* Admin  */}
       <Route element={<PrivateRoute/>}>
