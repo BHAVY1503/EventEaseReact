@@ -56,9 +56,9 @@ export const UserFeedback = () => {
         </div>
 
         {/* Feedback Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 ">
           {feedbacks.map((fb, i) => (
-            <Card key={i} className="overflow-hidden">
+            <Card key={i} className="dark bg-background text-foreground overflow-hidden hover:shadow-x2 transition-all duration-300 hover:-translate-y-3">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="h-12 w-12">
@@ -69,14 +69,14 @@ export const UserFeedback = () => {
                     <h5 className="font-semibold">{fb.userName}</h5>
                   </div>
                 </div>
-                <p className="text-gray-600 italic">"{fb.message}"</p>
+                <p className="text-gray-200 italic">"{fb.message}"</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Feedback Form */}
-        <Card className="max-w-2xl mx-auto">
+        <Card className="dark bg-background text-foreground max-w-2xl mx-auto  hover:shadow-x2 transition-all duration-300 hover:-translate-y-3">
           <CardHeader>
             <CardTitle>Share Your Experience</CardTitle>
           </CardHeader>

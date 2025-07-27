@@ -102,8 +102,7 @@ useEffect(() => {
     <div>
       {/* Modern Navigation with shadcn/ui */}
       {/* <nav className="bg-white shadow-sm border-b fixed top-0 w-full z-50"> */}
-      <nav className={`fixed top-0 w-full z-50 transition-colors duration-300 ${isScrolled ? 'bg-black/20 backdrop-blur shadow-md' : 'bg-transparent'}`}>
-
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${isScrolled ? 'bg-black/20 backdrop-blur shadow-md' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -150,7 +149,7 @@ useEffect(() => {
             </div>
 
             {/* Desktop Profile and Actions */}
-            {/* <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-10 flex items-center space-x-2">
@@ -176,7 +175,7 @@ useEffect(() => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div> */}
+            </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden">
@@ -266,6 +265,8 @@ useEffect(() => {
   
  {/* About Us Section */}
 <section className="bg-gradient-to-b from-white to-gray-50 py-24" id="aboutus">
+{/* <section className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white py-12 px-4 sm:px-6" id="aboutus"> */}
+
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-16">
       <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -281,7 +282,7 @@ useEffect(() => {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
       {/* Stats Cards */}
       <div className="group">
-        <div className="bg-white rounded-xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-200">
+        <div className="bg-light rounded-xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-200">
           <div className="text-center space-y-3">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
               <Calendar className="w-6 h-6" />
@@ -324,6 +325,8 @@ useEffect(() => {
 
       {/* Features Showcase */}
       <section className="bg-gradient-to-b from-gray-50 to-white py-24">
+      {/* <section className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white py-12 px-4 sm:px-6"> */}
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {[
             { 
@@ -344,8 +347,8 @@ useEffect(() => {
           ].map((item, i) => (
             <div key={i} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-8 mb-24 last:mb-0`}>
               <div className="w-full md:w-1/2">
-                <div className="relative rounded-2xl overflow-hidden shadow-xl">
-                  <div className="aspect-w-16 aspect-h-9">
+                <div className="relative rounded-2xl overflow-hidden shadow-xl  hover:shadow-x2 transition-all duration-300 hover:-translate-y-2">
+                  <div className="aspect-w-16 aspect-h-9 ">
                     <img
                       src={item.img}
                       alt={item.heading}
