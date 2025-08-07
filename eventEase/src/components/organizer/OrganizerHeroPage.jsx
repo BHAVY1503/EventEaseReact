@@ -15,7 +15,8 @@ import {
   Instagram,
   ArrowLeft,
   ArrowRight,
-  Home
+  Home,
+  DoorOpen
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -170,6 +171,13 @@ export const OrganizerHeroPage = () => {
                   Tickets
                 </Button>
               </Link>
+                <Link to="/" onClick={signout}>
+                   <Button variant="ghost" className="text-red-400 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                              >
+                   <DoorOpen className='w-4 h-4 mr-2'/>
+                                LogOut
+                  </Button>
+                 </Link>
             </div>
 
             {/* User Profile & Actions */}
@@ -377,24 +385,8 @@ export const OrganizerHeroPage = () => {
 
         {/* User Feedback Section */}
         <section className="py-20 bg-gradient-to-b from-purple-50 to-pink-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <Badge variant="outline" className="mb-4 bg-pink-50 text-pink-700 border-pink-200">
-                Community Feedback
-              </Badge>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                What Our Users Say
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Read testimonials and feedback from our amazing event community
-              </p>
-            </div>
-            <Card className="shadow-xl border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-8">
                 <UserFeedback />
-              </CardContent>
-            </Card>
-          </div>
+          {/* </div> */}
         </section>
       </div>
 

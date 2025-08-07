@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LandingPage } from './components/common/LandingPage'; 
 // Import your admin signin component here when you create it
-// import { AdminSignin } from './components/admin/AdminSignin'; 
+import { AdminSignIn } from './components/admin/AdminSignIn'; 
 
 export const AdminLanding = () => {
   const [showModal, setShowModal] = useState(true);
@@ -10,10 +10,12 @@ export const AdminLanding = () => {
     <div>
       <LandingPage/>
       {/* Uncomment when you have AdminSignin component */}
-      {/* {showModal && <AdminSignin onClose={() => setShowModal(false)} />} */}
+      {showModal && <AdminSignIn onClose={() => setShowModal(false)} />}
     </div>
   );
 };
+// Default export
+// export default AdminSignin;
 
 // // src/pages/SignUpPageWithLanding.jsx
 // import React, { useState } from 'react';

@@ -66,7 +66,7 @@ function App() {
      <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
       <Route path='/mappicker' element={<MapPicker/>}></Route>
-      <Route path='/adminlanding' element={<AdminLanding/>}></Route>
+      {/* <Route path='/adminlanding' element={<AdminLanding/>}></Route> */}
 
       {/* Admin  */}
       <Route element={<PrivateRoute/>}>
