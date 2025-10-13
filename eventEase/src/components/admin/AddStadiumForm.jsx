@@ -133,14 +133,15 @@ const AddStadiumForm = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Add Indoor Stadium</h1>
-          <p className="text-muted-foreground">Create a new stadium with seating zones and location details</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-8">
+        {/* <div className="text-center space-y-2"> */}
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Add Indoor Stadium</h1>
+          <p className="text-slate-600">Create a new stadium with seating zones and location details</p>
         </div>
 
-        <Card>
+        <Card className="shadow-xl border-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
@@ -293,14 +294,17 @@ const AddStadiumForm = () => {
               </div>
 
               {/* Submit Button */}
+              <div className="flex justify-center pt-6">
               <Button 
                 type="submit" 
-                className="w-full" 
                 disabled={isSubmitting}
                 size="lg"
-              >
+                className="w-full md:w-auto px-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+              
                 {isSubmitting ? "Adding Stadium..." : "Add Stadium"}
               </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

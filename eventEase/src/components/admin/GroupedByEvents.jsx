@@ -68,6 +68,21 @@ export const GroupedByEvents = () => {
     }
   }, []);
 
+    // const handleDelete = async (eventId) => {
+    //   try {
+    //     await axios.delete(`/event/deleteevent/${eventId}`, {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+    //     // Refresh events after successful deletion
+    //     getAllEvents();
+    //   } catch (err) {
+    //     console.error("Error deleting event", err);
+    //     alert("Failed to delete event");
+    //   }
+    // };
+
   const handleDelete = async (eventId) => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
     

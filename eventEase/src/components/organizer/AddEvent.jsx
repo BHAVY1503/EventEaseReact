@@ -6,15 +6,13 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { MapPin, Calendar, Users, Building, Video, Upload, ChevronDown, ChevronUp } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Users, Upload, Video, Building2, DollarSign } from "lucide-react";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -29,10 +27,8 @@ export const AddEvent = () => {
   const [eventCategory, setEventCategory] = useState("");
   const [selectedStadium, setSelectedStadium] = useState(null);
   const [customZonePrices, setCustomZonePrices] = useState([]);
-  const [expandedZones, setExpandedZones] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -102,13 +98,12 @@ export const AddEvent = () => {
   }, [eventCategory, selectedStadium]);
 
   const submitHandler = async (data) => {
-    setIsSubmitting(true);
     const formData = new FormData();
     for (const [k, v] of Object.entries(data)) {
       formData.append(k, k === "image" ? v[0] : v);
     }
-    
     if (eventCategory === "Indoor" && selectedStadium) {
+      console.log("customZonePrices being sent:", customZonePrices);
       formData.append("zonePrices", JSON.stringify(customZonePrices));
     }
 
@@ -120,358 +115,310 @@ export const AddEvent = () => {
         },
       });
       alert("Event added successfully!");
-      window.location.href = "/organizer#viewevent";
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add event.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const toggleZoneExpansion = (index) => {
-    setExpandedZones(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
+       const role = localStorage.getItem("role");
+       if (role === "Admin") {
+      window.location.href = "/admin#groupbyevent";
+        } else {
+       window.location.href = "/organizer#viewevent";
+     }
+     } catch (err) {
+       console.error(err);
+     alert("Failed to add event.");
+  }
+    //   window.location.href = "/organizer#viewevent";
+    // } catch (err) {
+    //   console.error(err);
+    //   alert("Failed to add event.");
+    // }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Create New Event</h1>
-          <p className="text-gray-600">Fill in the details to create your amazing event</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Create New Event</h1>
+          <p className="text-slate-600">Fill in the details to create your event</p>
         </div>
 
-        <form onSubmit={handleSubmit(submitHandler)} className="space-y-6">
-          {/* Event Category Card */}
-          <Card className="shadow-lg border-0">
-            <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
-              <CardTitle className="flex items-center gap-2">
-                <Building className="w-5 h-5" />
-                Event Category
-              </CardTitle>
-              <CardDescription className="text-blue-100">
-                Choose the type of event you're organizing
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="eventCategory">Event Category *</Label>
-                  <Select 
-                    onValueChange={(value) => {
-                      setEventCategory(value);
-                      setSelectedStadium(null);
-                      setValue("eventCategory", value);
-                    }}
-                    value={eventCategory}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Indoor">🏢 Indoor</SelectItem>
-                      <SelectItem value="Outdoor">🌳 Outdoor</SelectItem>
-                      <SelectItem value="ZoomMeeting">💻 Zoom Meeting</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <input type="hidden" {...register("eventCategory", { required: true })} />
+        <Card className="shadow-xl border-0">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+            <CardTitle className="text-2xl">Event Information</CardTitle>
+            <CardDescription className="text-blue-100">
+              Please provide all the necessary details for your event
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit(submitHandler)} className="space-y-6">
+              {/* Event Category Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-slate-900">Event Category</h3>
                 </div>
-
-                {eventCategory === "Indoor" && (
-                  <div className="space-y-2">
-                    <Label>Stadium Selection</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => navigate("/stadiumselect")}
+                
+                <div className="grid gap-4">
+                  <div>
+                    <Label htmlFor="eventCategory" className="text-slate-700">Category Type</Label>
+                    <select
+                      id="eventCategory"
+                      className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      {...register("eventCategory", { required: true })}
+                      value={eventCategory}
+                      onChange={(e) => {
+                        setEventCategory(e.target.value);
+                        setSelectedStadium(null);
+                      }}
                     >
-                      <Building className="w-4 h-4 mr-2" />
-                      {selectedStadium ? selectedStadium.name : "Select Stadium"}
-                    </Button>
+                      <option value="">Select Category</option>
+                      <option value="Indoor">🏟️ Indoor</option>
+                      <option value="Outdoor">🌳 Outdoor</option>
+                      <option value="ZoomMeeting">💻 Zoom Meeting</option>
+                    </select>
                   </div>
-                )}
-              </div>
 
-              {selectedStadium && selectedStadium.zones && (
-                <div className="mt-6">
-                  <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Customize Zone Prices
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {selectedStadium.zones.map((zone, i) => (
-                      <Card key={i} className="border-2 hover:border-blue-300 transition-colors">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge variant="secondary" className="text-sm">
-                              Zone {String.fromCharCode(65 + i)}
-                            </Badge>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleZoneExpansion(i)}
-                            >
-                              {expandedZones[i] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                            </Button>
+                  {/* Indoor Category */}
+                  {eventCategory === "Indoor" && (
+                    <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div>
+                        <Label className="text-slate-700 mb-2 block">Stadium Selection</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full h-12 justify-start text-left font-normal"
+                          onClick={() => navigate("/stadiumselect")}
+                        >
+                          <Building2 className="w-4 h-4 mr-2" />
+                          {selectedStadium ? selectedStadium.name : "Select Stadium"}
+                        </Button>
+                      </div>
+
+                      {selectedStadium && selectedStadium.zones && (
+                        <div className="mt-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                            <Label className="text-slate-700 font-semibold">Customize Zone Prices</Label>
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`zone-${i}`}>Price (₹)</Label>
-                            <Input
-                              id={`zone-${i}`}
-                              type="number"
-                              value={customZonePrices[i] || ""}
-                              onChange={(e) => {
-                                const newPrices = [...customZonePrices];
-                                newPrices[i] = parseInt(e.target.value) || 0;
-                                setCustomZonePrices(newPrices);
-                              }}
-                              placeholder="Enter price"
-                              required
-                            />
-                          </div>
-                          {expandedZones[i] && (
-                            <div className="mt-3 pt-3 border-t">
-                              <p className="text-sm text-gray-600 mb-2">Available Seats:</p>
-                              <div className="flex flex-wrap gap-1">
-                                {zone.seatLabels?.slice(0, 10).map((label, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {label}
-                                  </Badge>
-                                ))}
-                                {zone.seatLabels?.length > 10 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{zone.seatLabels.length - 10} more
-                                  </Badge>
-                                )}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {selectedStadium.zones.map((zone, i) => (
+                              <div key={i} className="space-y-1.5">
+                                <Label htmlFor={`zone-${i}`} className="text-sm text-slate-600">
+                                  Zone {String.fromCharCode(65 + i)}
+                                </Label>
+                                <Input
+                                  id={`zone-${i}`}
+                                  type="number"
+                                  value={customZonePrices[i]}
+                                  onChange={(e) => {
+                                    const newPrices = [...customZonePrices];
+                                    newPrices[i] = parseInt(e.target.value) || 0;
+                                    setCustomZonePrices(newPrices);
+                                  }}
+                                  className="h-10"
+                                  required
+                                />
                               </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-          {/* Location Card */}
-          {eventCategory === "Outdoor" && (
-            <Card className="shadow-lg border-0">
-              <CardHeader className="bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  Location Details
-                </CardTitle>
-                <CardDescription className="text-green-100">
-                  Specify the location for your outdoor event
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="stateId">State *</Label>
-                    <Select onValueChange={(value) => setValue("stateId", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select State" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {states.map((state) => (
-                          <SelectItem key={state._id} value={state._id}>
-                            {state.Name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <input type="hidden" {...register("stateId", { required: true })} />
-                  </div>
+                  {/* Outdoor Category */}
+                  {eventCategory === "Outdoor" && (
+                    <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="stateId" className="text-slate-700">State</Label>
+                          <select
+                            id="stateId"
+                            className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            {...register("stateId", { required: true })}
+                          >
+                            <option value="">Select State</option>
+                            {states.map((state) => (
+                              <option key={state._id} value={state._id}>{state.Name}</option>
+                            ))}
+                          </select>
+                        </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="cityId">City *</Label>
-                    <Select onValueChange={(value) => setValue("cityId", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select City" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city._id} value={city._id}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <input type="hidden" {...register("cityId", { required: true })} />
-                  </div>
+                        <div>
+                          <Label htmlFor="cityId" className="text-slate-700">City</Label>
+                          <select
+                            id="cityId"
+                            className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            {...register("cityId", { required: true })}
+                          >
+                            <option value="">Select City</option>
+                            {cities.map((city) => (
+                              <option key={city._id} value={city._id}>{city.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="ticketRate">Ticket Price (₹) *</Label>
-                    <Input
-                      id="ticketRate"
-                      type="number"
-                      placeholder="Enter ticket price"
-                      {...register("ticketRate", { required: true })}
-                    />
-                  </div>
-                </div>
+                      <div>
+                        <Label htmlFor="ticketRate" className="text-slate-700">Ticket Price (₹)</Label>
+                        <Input
+                          id="ticketRate"
+                          type="number"
+                          placeholder="Enter price"
+                          className="mt-1.5"
+                          required
+                          {...register("ticketRate")}
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Location on Map</Label>
-                  <div 
-                    ref={mapContainer} 
-                    className="h-80 border-2 border-gray-200 rounded-lg shadow-inner"
-                  />
-                  <input type="hidden" {...register("latitude")} />
-                  <input type="hidden" {...register("longitude")} />
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                      <div>
+                        <Label className="text-slate-700 mb-2 block">
+                          <MapPin className="w-4 h-4 inline mr-1" />
+                          Location on Map
+                        </Label>
+                        <div 
+                          ref={mapContainer} 
+                          className="h-64 border-2 border-slate-300 rounded-lg shadow-inner"
+                        />
+                        <input type="hidden" {...register("latitude")} />
+                        <input type="hidden" {...register("longitude")} />
+                      </div>
+                    </div>
+                  )}
 
-          {/* Zoom Meeting Card */}
-          {eventCategory === "ZoomMeeting" && (
-            <Card className="shadow-lg border-0">
-              <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <Video className="w-5 h-5" />
-                  Virtual Meeting Details
-                </CardTitle>
-                <CardDescription className="text-purple-100">
-                  Provide the Zoom meeting link for your virtual event
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  <Label htmlFor="zoomUrl">Zoom Meeting URL *</Label>
-                  <Input
-                    id="zoomUrl"
-                    type="url"
-                    placeholder="https://zoom.us/j/..."
-                    {...register("zoomUrl", { required: true })}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Event Details Card */}
-          <Card className="shadow-lg border-0">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-t-lg">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Event Details
-              </CardTitle>
-              <CardDescription className="text-orange-100">
-                Basic information about your event
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="eventName">Event Name *</Label>
-                  <Input
-                    id="eventName"
-                    type="text"
-                    placeholder="Enter event name"
-                    {...register("eventName", { required: true })}
-                  />
-                  {errors.eventName && (
-                    <p className="text-sm text-red-500">Event name is required</p>
+                  {/* Zoom Meeting Category */}
+                  {eventCategory === "ZoomMeeting" && (
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                      <Label htmlFor="zoomUrl" className="text-slate-700">
+                        <Video className="w-4 h-4 inline mr-1" />
+                        Zoom Meeting URL
+                      </Label>
+                      <Input
+                        id="zoomUrl"
+                        type="url"
+                        placeholder="https://zoom.us/j/..."
+                        className="mt-1.5"
+                        {...register("zoomUrl", { required: true })}
+                      />
+                    </div>
                   )}
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="eventType">Event Type *</Label>
-                  <Select onValueChange={(value) => setValue("eventType", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Conference">Conference</SelectItem>
-                      <SelectItem value="Exhibition">Exhibition</SelectItem>
-                      <SelectItem value="Gala Dinner">Gala Dinner</SelectItem>
-                      <SelectItem value="Incentive">Incentive</SelectItem>
-                      <SelectItem value="Music consert">Music Concert</SelectItem>
-                      <SelectItem value="Meeting">Meeting</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <input type="hidden" {...register("eventType", { required: true })} />
-                </div>
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Event Details</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="eventName" className="text-slate-700">Event Name</Label>
+                    <Input
+                      id="eventName"
+                      type="text"
+                      placeholder="Enter event name"
+                      className="mt-1.5"
+                      {...register("eventName", { required: true })}
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="numberOfSeats">Total Seats *</Label>
-                  <Input
-                    id="numberOfSeats"
-                    type="number"
-                    placeholder="Enter number of seats"
-                    value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
-                    onChange={(e) => {
-                      if (eventCategory !== "Indoor") {
-                        setValue("numberOfSeats", parseInt(e.target.value));
-                      }
-                    }}
-                    disabled={eventCategory === "Indoor" && selectedStadium}
-                    {...register("numberOfSeats", { required: true })}
-                  />
-                </div>
+                  <div>
+                    <Label htmlFor="eventType" className="text-slate-700">Event Type</Label>
+                    <select
+                      id="eventType"
+                      className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      {...register("eventType", { required: true })}
+                    >
+                      <option value="">Select Type</option>
+                      <option value="Conference">Conference</option>
+                      <option value="Exhibition">Exhibition</option>
+                      <option value="Gala Dinner">Gala Dinner</option>
+                      <option value="Incentive">Incentive</option>
+                      <option value="Music consert">Music Concert</option>
+                      <option value="Meeting">Meeting</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="image">Event Image *</Label>
-                  <div className="flex items-center space-x-2">
+                  <div>
+                    <Label htmlFor="numberOfSeats" className="text-slate-700">
+                      <Users className="w-4 h-4 inline mr-1" />
+                      Total Seats
+                    </Label>
+                    <Input
+                      id="numberOfSeats"
+                      type="number"
+                      placeholder="Enter number of seats"
+                      className="mt-1.5"
+                      {...register("numberOfSeats", { required: true })}
+                      value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
+                      onChange={(e) => {
+                        if (eventCategory !== "Indoor") {
+                          setValue("numberOfSeats", parseInt(e.target.value));
+                        }
+                      }}
+                      disabled={eventCategory === "Indoor" && selectedStadium}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="startDate" className="text-slate-700">
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      Start Date
+                    </Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      className="mt-1.5"
+                      {...register("startDate", { required: true })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="endDate" className="text-slate-700">
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      End Date
+                    </Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      className="mt-1.5"
+                      {...register("endDate", { required: true })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="image" className="text-slate-700">
+                      <Upload className="w-4 h-4 inline mr-1" />
+                      Event Image
+                    </Label>
                     <Input
                       id="image"
                       type="file"
-                      accept="image/*"
+                      className="mt-1.5"
                       {...register("image", { required: true })}
-                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
-                    <Upload className="w-5 h-5 text-gray-400" />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date *</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    {...register("startDate", { required: true })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date *</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    {...register("endDate", { required: true })}
-                  />
-                </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Submit Button */}
-          <div className="flex justify-center pt-6">
-            <Button 
-              type="submit" 
-              size="lg" 
-              disabled={isSubmitting}
-              className="px-12 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-full shadow-lg transform transition hover:scale-105"
-            >
-              {isSubmitting ? "Creating Event..." : "Create Event"}
-            </Button>
-          </div>
-        </form>
+              <div className="flex justify-center pt-6">
+                <Button 
+                  type="submit" 
+                  size="lg"
+                  className="w-full md:w-auto px-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+                  Create Event
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
+
+
+
+
+//working code without ui components and better structure
 // import React, { useEffect, useRef, useState } from "react";
 // import mapboxgl from "mapbox-gl";
 // import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -790,10 +737,6 @@ export const AddEvent = () => {
 // };
 
 // export default AddEvent;
-
-
-
-
 
 
 

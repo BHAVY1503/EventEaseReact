@@ -25,7 +25,9 @@ import {
   Bell,
   Search,
   X,
-  Shield
+  Shield,
+  UserCircle2,
+  User2Icon
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -44,7 +46,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import { Input } from "@/components/ui/input";
 
 // Import your existing components
-import { AddEvent } from '../organizer/AddEvent';
+import { AddEvent }  from '../organizer/AddEvent';
 import { ViewMyEvent } from '../organizer/ViewMyEvent';
 import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
@@ -60,6 +62,7 @@ import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import defaultprofile from '../../assets/img/testimonials-2.jpg';
+import { AdminEvents } from './AdminEvents';
 
 export const AdminHeroPage = () => {
   const [userName, setUserName] = useState("");
@@ -67,6 +70,8 @@ export const AdminHeroPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  
 
   const heroImages = [img2, img3, img1, img4];
 
@@ -99,6 +104,15 @@ export const AdminHeroPage = () => {
 
     fetchAdmin();
   }, []);
+
+   // Handle navbar scroll effect
+    useEffect(() => {
+      const handleScroll = () => {
+        setIsScrolled(window.scrollY > 50);
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
   // Auto-slide carousel
   useEffect(() => {
@@ -178,7 +192,13 @@ export const AdminHeroPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    // <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
+       <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-lg' 
+          : 'bg-transparent'
+      }`}></header>
       {/* Modern Navigation Header */}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-lg border-b border-gray-200/50 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -218,6 +238,24 @@ export const AdminHeroPage = () => {
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contact Us
               </Button>
+              <Link to ="/allusers">
+               <Button 
+                variant="ghost" 
+                className="hover:bg-purple-50 hover:text-purple-700 transition-colors"
+              >
+                <UserCircle2 className="w-4 h-4 mr-2" />
+                Users
+              </Button>
+              </Link>
+              <Link to ="/allorganizer">
+               <Button 
+                variant="ghost" 
+                className="hover:bg-purple-50 hover:text-purple-700 transition-colors"
+              >
+                <User2Icon className="w-4 h-4 mr-2" />
+                Organizers
+              </Button>
+              </Link>
             </div>
 
             {/* Right side actions */}
@@ -464,6 +502,10 @@ export const AdminHeroPage = () => {
             <GroupedByEvents />
         </section>
 
+        <section id="adminevents" className="py-0 bg-gradient-to-b from-blue-50 to-blue-50">
+            <AdminEvents />
+        </section>
+
         {/* Add Event Section */}
         <section id="addevent" className="py-0 bg-gradient-to-b from-blue-50 to-purple-50">
           <AddEvent />
@@ -476,23 +518,15 @@ export const AdminHeroPage = () => {
 
         {/* View Stadiums Section */}
         <section id="viewstadiums" className="py-0 bg-gradient-to-b from-pink-50 to-orange-50">
-          <div className="container mx-auto px-4 py-16">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">
-                Venue Management
-              </Badge>
-              <h2 className="text-3xl font-bold mb-4">Stadium Management</h2>
-            </div>
             <ViewStadiums />
-          </div>
         </section>
 
         {/* Update Stadium Section */}
-        <section id="updatestadium" className="py-0 bg-gradient-to-b from-orange-50 to-yellow-50">
+        {/* <section id="updatestadium" className="py-0 bg-gradient-to-b from-orange-50 to-yellow-50">
           <div className="container mx-auto px-4 py-16">
             <UpdateStadium />
           </div>
-        </section>
+        </section> */}
 
         {/* User Feedback Section */}
         <section id="feedback" className="py-0 bg-gradient-to-b from-yellow-50 to-green-50">

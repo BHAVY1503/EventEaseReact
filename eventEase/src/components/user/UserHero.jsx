@@ -532,7 +532,7 @@ export const UserHero = () => {
         {/* User Feedback Section */}
         <section className="py-20 bg-gradient-to-b from-blue-50 to-purple-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            {/* <div className="text-center mb-16">
               <Badge variant="outline" className="mb-4 bg-purple-50 text-purple-700 border-purple-200">
                 Community Voices
               </Badge>
@@ -542,7 +542,7 @@ export const UserHero = () => {
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Hear from event organizers and attendees who trust EventEase for their event needs
               </p>
-            </div>
+            </div> */}
             <Card className="shadow-xl border-0 bg-white/60 backdrop-blur-sm">
               <CardContent className="p-8">
                 <UserFeedback />

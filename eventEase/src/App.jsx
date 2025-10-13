@@ -44,6 +44,7 @@ import { StadiumSelector } from './components/organizer/StadiumSelector'
 import { SeatSelectionPage } from './components/user/SeatsSelection'
 import UpdateStadium from './components/admin/UpdateStadium'
 import { AdminLanding } from './AdminLanding'
+import { AdminEvents } from './components/admin/AdminEvents'
 
 
 
@@ -74,11 +75,11 @@ function App() {
       <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
       <Route path='addstadium' element={<AddStadiumForm/>}></Route>
       <Route path='stadiums' element={<ViewStadiums/>}></Route>
-      <Route path='editstadium/:id' element={<UpdateStadium/>}></Route>
-
-
+      {/* <Route path='editstadium/:id' element={<UpdateStadium/>}></Route> */}
+      <Route path='adminevents' element={<AdminEvents/>}></Route>
 
       </Route>
+      <Route path='/editstadium/:id' element={<UpdateStadium/>}></Route>
       {/* <Route path='/admin/stadium/edit/:id' element={<UpdateStadium/>}></Route> */}
       <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
       <Route path='/allusers' element={<AllUsers/>}></Route>

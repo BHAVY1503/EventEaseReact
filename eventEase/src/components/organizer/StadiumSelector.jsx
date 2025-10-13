@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, Users, Loader2, Building, Ticket, Grid3X3, Eye, Map, Info, Star, Calendar, Clock } from 'lucide-react';
 import { useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const StadiumSelector = () => {
   const [stadiums, setStadiums] = useState([]);
@@ -18,15 +19,31 @@ const StadiumSelector = () => {
   const [selectedStadium, setSelectedStadium] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  // Get token from localStorage (adjust based on your auth implementation)
+  const navigate = useNavigate();
+  const location = useLocation();
+  // const navigate = useNavigate();
+
+  // Get token from localStorage 
   const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
 
   // Get redirect URL from query params (for navigation after selection)
-  const getRedirectUrl = () => {
-    if (typeof window === 'undefined') return "/organizer#addevent";
-    const queryParams = new URLSearchParams(window.location.search);
-    return queryParams.get("redirectTo") || "/organizer#addevent";
-  };
+  // const getRedirectUrl = () => {
+  //   if (typeof window === 'undefined') return "/organizer#addevent";
+  //   const queryParams = new URLSearchParams(window.location.search);
+  //   return queryParams.get("redirectTo") || "/organizer#addevent";
+  // };
+
+  //  const queryParams = new URLSearchParams(location.search);
+  //  const redirectTo = queryParams.get("redirectTo") || "/organizer/addevent";
+
+  const queryParams = new URLSearchParams(location.search);
+const role = localStorage.getItem("role");
+
+// Determine redirect target based on query param or role
+const redirectTo =
+  queryParams.get("redirectTo") ||
+  (role === "Admin" ? "/admin#events" : "/organizer#addevent");
+
 
   // Fetch stadiums from API
   useEffect(() => {
@@ -83,25 +100,36 @@ const StadiumSelector = () => {
     fetchStadiums();
   }, [token]);
 
-  // Handle stadium selection
   const selectStadium = (stadium) => {
-    try {
-      // Store selected stadium in localStorage
-      localStorage.setItem("selectedStadium", JSON.stringify(stadium));
-      localStorage.setItem("selectedCategory", "Indoor");
+  try {
+    localStorage.setItem("selectedStadium", JSON.stringify(stadium));
+    localStorage.setItem("selectedCategory", "Indoor");
+    navigate(redirectTo);
+  } catch (error) {
+    console.error("Error selecting stadium:", error);
+    alert("Failed to select stadium. Please try again.");
+  }
+};
+
+  // Handle stadium selection
+  // const selectStadium = (stadium) => {
+  //   try {
+  //     // Store selected stadium in localStorage
+  //     localStorage.setItem("selectedStadium", JSON.stringify(stadium));
+  //     localStorage.setItem("selectedCategory", "Indoor");
+  //     // navigate("/organizer/addevent");
+  //     // Navigate to the redirect URL
+  //     const redirectTo = getRedirectUrl();
+  //     window.location.href = redirectTo;
       
-      // Navigate to the redirect URL
-      const redirectTo = getRedirectUrl();
-      window.location.href = redirectTo;
+  //     // Or if using React Router:
+  //     // Navigate(redirectTo);
       
-      // Or if using React Router:
-      // navigate(redirectTo);
-      
-    } catch (error) {
-      console.error("Error selecting stadium:", error);
-      alert("Failed to select stadium. Please try again.");
-    }
-  };
+  //   } catch (error) {
+  //     console.error("Error selecting stadium:", error);
+  //     alert("Failed to select stadium. Please try again.");
+  //   }
+  // };
 
   const getZoneColorClass = (index) => {
     const colors = [
