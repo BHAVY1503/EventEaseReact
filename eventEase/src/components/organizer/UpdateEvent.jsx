@@ -142,8 +142,14 @@ export const UpdateEvent = () => {
       });
       alert("Event updated successfully!");
       // navigate(`/organizer/viewevent`);
-      navigate(`/stadiumselect?redirectTo=/updateevent/${id}`);
-
+      // navigate(`/stadiumselect?redirectTo=/updateevent/${id}`);
+      //  navigate("/organizer/viewmyevent")
+       const role = localStorage.getItem("role");
+       if (role === "Admin") {
+      window.location.href = "/admin#groupbyevent";
+        } else {
+       window.location.href = "/organizer#viewevent";
+     }
     } catch (err) {
       console.error(err);
       alert("Failed to update event.");
@@ -152,7 +158,7 @@ export const UpdateEvent = () => {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4 text-center">Update Event</h2>
+      <h3 className="mb-4 red text-center">Update Event</h3>
       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
         <div className="row">
           <div className="col-md-6 mb-3">
@@ -165,6 +171,17 @@ export const UpdateEvent = () => {
               <div className="col-md-6 mb-3">
                 <label>Choose Stadium</label>
                 <button
+                 type="button"
+                 className="btn btn-outline-primary form-control"
+                 onClick={() => {
+                 localStorage.setItem("selectedStadium", JSON.stringify(selectedStadium));
+                 localStorage.setItem("selectedCategory", eventCategory);
+                 navigate(`/stadiumselect?redirectTo=/updateevent/${id}`);
+                 }}
+                >
+                  {selectedStadium ? selectedStadium.name : "Select Stadium"}
+                </button>
+                {/* <button
                   type="button"
                   className="btn btn-outline-primary form-control"
                   onClick={() => {
@@ -174,7 +191,7 @@ export const UpdateEvent = () => {
                   }}
                 >
                   {selectedStadium ? selectedStadium.name : "Select Stadium"}
-                </button>
+                </button> */}
               </div>
               <input type="hidden" {...register("stadiumId", { required: true })} />
               <input type="hidden" {...register("latitude")} />

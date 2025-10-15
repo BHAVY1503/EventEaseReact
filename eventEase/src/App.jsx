@@ -4,22 +4,19 @@ import viteLogo from '/vite.svg'
 // import './App.css'
 import { Routes , Route} from 'react-router-dom'
 import { LandingPage } from './components/common/LandingPage'
-import "./assets/animate.min.css"
-// import "./assets/simplebar.min.css"
-import "./assets/style.css"
-import 'simplebar/dist/simplebar.min.css';
-import './assets/main.css'
-import './assets/styles.css'
+// Removed all CSS imports that might conflict with Tailwind
+// import "./assets/animate.min.css"
+// import 'simplebar/dist/simplebar.min.css';
+// import "./assets/style.css"
+// import './assets/main.css'
 import '../../startbootstrap-landing-page-gh-pages/js/scripts'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 // main.jsx or main.tsx
 import { SignUpModal } from './components/user/SignupModal'
 import { SignUpPageWithLanding } from './SignupPagewithLanding'
 // import { SignInModel } from './components/user/SignInModal'
 import { SigninPageWithLanding } from './SiginPagewithLanding'
 import axios from 'axios'
-import { AdminLanding } from './AdminLanding'
+// import { AdminLanding } from './AdminLanding'
 import { OrganizerSignup } from './components/organizer/OrganizerSignup'
 import { OrganizerWithLanding } from './organizerWithlandig'
 import { OrganizerSigninLanding } from './OrganizerSiginLanding'
@@ -46,6 +43,8 @@ import ViewStadiums from './components/admin/ViewStadiums'
 import { StadiumSelector } from './components/organizer/StadiumSelector'
 import { SeatSelectionPage } from './components/user/SeatsSelection'
 import UpdateStadium from './components/admin/UpdateStadium'
+import { AdminLanding } from './AdminLanding'
+import { AdminEvents } from './components/admin/AdminEvents'
 
 
 
@@ -68,6 +67,7 @@ function App() {
      <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
       <Route path='/mappicker' element={<MapPicker/>}></Route>
+      {/* <Route path='/adminlanding' element={<AdminLanding/>}></Route> */}
 
       {/* Admin  */}
       <Route element={<PrivateRoute/>}>
@@ -75,11 +75,11 @@ function App() {
       <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
       <Route path='addstadium' element={<AddStadiumForm/>}></Route>
       <Route path='stadiums' element={<ViewStadiums/>}></Route>
-      <Route path='editstadium/:id' element={<UpdateStadium/>}></Route>
-
-
+      {/* <Route path='editstadium/:id' element={<UpdateStadium/>}></Route> */}
+      <Route path='adminevents' element={<AdminEvents/>}></Route>
 
       </Route>
+      <Route path='/editstadium/:id' element={<UpdateStadium/>}></Route>
       {/* <Route path='/admin/stadium/edit/:id' element={<UpdateStadium/>}></Route> */}
       <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
       <Route path='/allusers' element={<AllUsers/>}></Route>

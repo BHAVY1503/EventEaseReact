@@ -6,6 +6,13 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Users, Upload, Video, Building2, DollarSign } from "lucide-react";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -95,17 +102,10 @@ export const AddEvent = () => {
     for (const [k, v] of Object.entries(data)) {
       formData.append(k, k === "image" ? v[0] : v);
     }
-    // send data as string
     if (eventCategory === "Indoor" && selectedStadium) {
       console.log("customZonePrices being sent:", customZonePrices);
       formData.append("zonePrices", JSON.stringify(customZonePrices));
     }
-    //send data as array
-    // if (eventCategory === "Indoor" && selectedStadium) {
-    //   customZonePrices.forEach((price, index) => {
-    // formData.append(`zonePrices[${index}]`, price);
-    //  });
-    //  }
 
     try {
       await axios.post("/event/addeventwithfile", formData, {
@@ -115,210 +115,310 @@ export const AddEvent = () => {
         },
       });
       alert("Event added successfully!");
-      window.location.href = "/organizer#viewevent";
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add event.");
-    }
+       const role = localStorage.getItem("role");
+       if (role === "Admin") {
+      window.location.href = "/admin#groupbyevent";
+        } else {
+       window.location.href = "/organizer#viewevent";
+     }
+     } catch (err) {
+       console.error(err);
+     alert("Failed to add event.");
+  }
+    //   window.location.href = "/organizer#viewevent";
+    // } catch (err) {
+    //   console.error(err);
+    //   alert("Failed to add event.");
+    // }
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">Add Event</h2>
-      <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label>Event Category</label>
-            <select
-              className="form-control"
-              {...register("eventCategory", { required: true })}
-              value={eventCategory}
-              onChange={(e) => {
-                setEventCategory(e.target.value);
-                setSelectedStadium(null);
-              }}
-            >
-              <option value="">Select Category</option>
-              <option value="Indoor">Indoor</option>
-              <option value="Outdoor">Outdoor</option>
-              <option value="ZoomMeeting">Zoom Meeting</option>
-            </select>
-          </div>
-
-          {eventCategory === "Indoor" && (
-            <>
-              <div className="col-md-6 mb-3">
-                <label>Choose Stadium</label>
-                <button
-                  type="button"
-                  className="btn btn-outline-primary form-control"
-                  onClick={() => navigate("/stadiumselect")}
-                >
-                  {selectedStadium ? selectedStadium.name : "Select Stadium"}
-                </button>
-              </div>
-               {selectedStadium && selectedStadium.zones && (
-               <div className="col-12 mb-4">
-               <h5>Customize Zone Prices</h5>
-                <div className="d-flex flex-wrap gap-3">
-                {selectedStadium.zones.map((zone, i) => (
-             <div key={i}>
-              <label>Zone {String.fromCharCode(65 + i)}</label>
-           <input
-            type="number"
-            className="form-control"
-            value={customZonePrices[i]}
-            onChange={(e) => {
-              const newPrices = [...customZonePrices];
-              newPrices[i] = parseInt(e.target.value) || 0;
-              setCustomZonePrices(newPrices);
-            }}
-            required
-          />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Create New Event</h1>
+          <p className="text-slate-600">Fill in the details to create your event</p>
         </div>
-      ))}
-    </div>
-  </div>
-)}
 
-{/* 
-              {selectedStadium && (
-                <>
-                  <input type="hidden" {...register("stadiumId", { required: true })} value={selectedStadium._id} />
-                  <input type="hidden" {...register("latitude")} value={selectedStadium.location.latitude} />
-                  <input type="hidden" {...register("longitude")} value={selectedStadium.location.longitude} />
-
-                  <div className="col-md-12 mb-3">
-                    <label>Override Zone Prices (optional)</label>
-                    <div className="d-flex flex-wrap gap-3">
-                      {selectedStadium.zones?.map((zone, i) => (
-                        <div key={i}>
-                          <label className="form-label">Zone {String.fromCharCode(65 + i)}</label>
-                          <input
-                            type="number"
-                            className="form-control"
-                            value={customZonePrices[i] || ""}
-                            onChange={(e) => {
-                              const updated = [...customZonePrices];
-                              updated[i] = parseInt(e.target.value);
-                              setCustomZonePrices(updated);
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
+        <Card className="shadow-xl border-0">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+            <CardTitle className="text-2xl">Event Information</CardTitle>
+            <CardDescription className="text-blue-100">
+              Please provide all the necessary details for your event
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit(submitHandler)} className="space-y-6">
+              {/* Event Category Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-slate-900">Event Category</h3>
+                </div>
+                
+                <div className="grid gap-4">
+                  <div>
+                    <Label htmlFor="eventCategory" className="text-slate-700">Category Type</Label>
+                    <select
+                      id="eventCategory"
+                      className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      {...register("eventCategory", { required: true })}
+                      value={eventCategory}
+                      onChange={(e) => {
+                        setEventCategory(e.target.value);
+                        setSelectedStadium(null);
+                      }}
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Indoor">🏟️ Indoor</option>
+                      <option value="Outdoor">🌳 Outdoor</option>
+                      <option value="ZoomMeeting">💻 Zoom Meeting</option>
+                    </select>
                   </div>
-                </>
-              )} */}
-            </>
-          )}
 
-          {eventCategory === "Outdoor" && (
-            <>
-              <div className="col-md-6 mb-3">
-                <label>State</label>
-                <select className="form-control" {...register("stateId", { required: true })}>
-                  <option value="">Select State</option>
-                  {states.map((state) => (
-                    <option key={state._id} value={state._id}>{state.Name}</option>
-                  ))}
-                </select>
+                  {/* Indoor Category */}
+                  {eventCategory === "Indoor" && (
+                    <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div>
+                        <Label className="text-slate-700 mb-2 block">Stadium Selection</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full h-12 justify-start text-left font-normal"
+                          onClick={() => navigate("/stadiumselect")}
+                        >
+                          <Building2 className="w-4 h-4 mr-2" />
+                          {selectedStadium ? selectedStadium.name : "Select Stadium"}
+                        </Button>
+                      </div>
+
+                      {selectedStadium && selectedStadium.zones && (
+                        <div className="mt-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                            <Label className="text-slate-700 font-semibold">Customize Zone Prices</Label>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {selectedStadium.zones.map((zone, i) => (
+                              <div key={i} className="space-y-1.5">
+                                <Label htmlFor={`zone-${i}`} className="text-sm text-slate-600">
+                                  Zone {String.fromCharCode(65 + i)}
+                                </Label>
+                                <Input
+                                  id={`zone-${i}`}
+                                  type="number"
+                                  value={customZonePrices[i]}
+                                  onChange={(e) => {
+                                    const newPrices = [...customZonePrices];
+                                    newPrices[i] = parseInt(e.target.value) || 0;
+                                    setCustomZonePrices(newPrices);
+                                  }}
+                                  className="h-10"
+                                  required
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Outdoor Category */}
+                  {eventCategory === "Outdoor" && (
+                    <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="stateId" className="text-slate-700">State</Label>
+                          <select
+                            id="stateId"
+                            className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            {...register("stateId", { required: true })}
+                          >
+                            <option value="">Select State</option>
+                            {states.map((state) => (
+                              <option key={state._id} value={state._id}>{state.Name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="cityId" className="text-slate-700">City</Label>
+                          <select
+                            id="cityId"
+                            className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            {...register("cityId", { required: true })}
+                          >
+                            <option value="">Select City</option>
+                            {cities.map((city) => (
+                              <option key={city._id} value={city._id}>{city.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="ticketRate" className="text-slate-700">Ticket Price (₹)</Label>
+                        <Input
+                          id="ticketRate"
+                          type="number"
+                          placeholder="Enter price"
+                          className="mt-1.5"
+                          required
+                          {...register("ticketRate")}
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-slate-700 mb-2 block">
+                          <MapPin className="w-4 h-4 inline mr-1" />
+                          Location on Map
+                        </Label>
+                        <div 
+                          ref={mapContainer} 
+                          className="h-64 border-2 border-slate-300 rounded-lg shadow-inner"
+                        />
+                        <input type="hidden" {...register("latitude")} />
+                        <input type="hidden" {...register("longitude")} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Zoom Meeting Category */}
+                  {eventCategory === "ZoomMeeting" && (
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                      <Label htmlFor="zoomUrl" className="text-slate-700">
+                        <Video className="w-4 h-4 inline mr-1" />
+                        Zoom Meeting URL
+                      </Label>
+                      <Input
+                        id="zoomUrl"
+                        type="url"
+                        placeholder="https://zoom.us/j/..."
+                        className="mt-1.5"
+                        {...register("zoomUrl", { required: true })}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="col-md-6 mb-3">
-                <label>City</label>
-                <select className="form-control" {...register("cityId", { required: true })}>
-                  <option value="">Select City</option>
-                  {cities.map((city) => (
-                    <option key={city._id} value={city._id}>{city.name}</option>
-                  ))}
-                </select>
+
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Event Details</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="eventName" className="text-slate-700">Event Name</Label>
+                    <Input
+                      id="eventName"
+                      type="text"
+                      placeholder="Enter event name"
+                      className="mt-1.5"
+                      {...register("eventName", { required: true })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="eventType" className="text-slate-700">Event Type</Label>
+                    <select
+                      id="eventType"
+                      className="w-full mt-1.5 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      {...register("eventType", { required: true })}
+                    >
+                      <option value="">Select Type</option>
+                      <option value="Conference">Conference</option>
+                      <option value="Exhibition">Exhibition</option>
+                      <option value="Gala Dinner">Gala Dinner</option>
+                      <option value="Incentive">Incentive</option>
+                      <option value="Music consert">Music Concert</option>
+                      <option value="Meeting">Meeting</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="numberOfSeats" className="text-slate-700">
+                      <Users className="w-4 h-4 inline mr-1" />
+                      Total Seats
+                    </Label>
+                    <Input
+                      id="numberOfSeats"
+                      type="number"
+                      placeholder="Enter number of seats"
+                      className="mt-1.5"
+                      {...register("numberOfSeats", { required: true })}
+                      value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
+                      onChange={(e) => {
+                        if (eventCategory !== "Indoor") {
+                          setValue("numberOfSeats", parseInt(e.target.value));
+                        }
+                      }}
+                      disabled={eventCategory === "Indoor" && selectedStadium}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="startDate" className="text-slate-700">
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      Start Date
+                    </Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      className="mt-1.5"
+                      {...register("startDate", { required: true })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="endDate" className="text-slate-700">
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      End Date
+                    </Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      className="mt-1.5"
+                      {...register("endDate", { required: true })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="image" className="text-slate-700">
+                      <Upload className="w-4 h-4 inline mr-1" />
+                      Event Image
+                    </Label>
+                    <Input
+                      id="image"
+                      type="file"
+                      className="mt-1.5"
+                      {...register("image", { required: true })}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="col-md-12 mb-3">
-                <lable>Price &#8377;</lable>
-                <input type='number'
-                 className="form-control"
-                 placeholder="&#8377; enter"
-                  required="true" {...register("ticketRate")}></input>
+
+              <div className="flex justify-center pt-6">
+                <Button 
+                  type="submit" 
+                  size="lg"
+                  className="w-full md:w-auto px-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+                  Create Event
+                </Button>
               </div>
-              <div className="col-md-12 mb-3">
-                <label>Location on Map</label>
-                <div ref={mapContainer} style={{ height: "300px", border: "1px solid #ccc", borderRadius: "8px" }} />
-                <input type="hidden" {...register("latitude")} />
-                <input type="hidden" {...register("longitude")} />
-              </div>
-            </>
-          )}
-
-          {eventCategory === "ZoomMeeting" && (
-            <div className="col-md-12 mb-3">
-              <label>Zoom Meeting URL</label>
-              <input type="url" className="form-control" {...register("zoomUrl", { required: true })} />
-            </div>
-          )}
-
-          <div className="col-md-6 mb-3">
-            <label>Event Name</label>
-            <input type="text" className="form-control" {...register("eventName", { required: true })} />
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <label>Event Type</label>
-            <select className="form-control" {...register("eventType", { required: true })}>
-              <option value="">Select Type</option>
-              <option value="Conference">Conference</option>
-              <option value="Exhibition">Exhibition</option>
-              <option value="Gala Dinner">Gala Dinner</option>
-              <option value="Incentive">Incentive</option>
-              <option value="Music consert">Music consert</option>
-              <option value="Meeting">Meeting</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <label>Total Seats</label>
-            <input
-              type="number"
-              className="form-control"
-              {...register("numberOfSeats", { required: true })}
-              value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
-              onChange={(e) => {
-                if (eventCategory !== "Indoor") {
-                  setValue("numberOfSeats", parseInt(e.target.value));
-                }
-              }}
-              disabled={eventCategory === "Indoor" && selectedStadium}
-            />
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <label>Start Date</label>
-            <input type="date" className="form-control" {...register("startDate", { required: true })} />
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <label>End Date</label>
-            <input type="date" className="form-control" {...register("endDate", { required: true })} />
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <label>Event Image</label>
-            <input type="file" className="form-control" {...register("image", { required: true })} />
-          </div>
-
-          <div className="col-md-12 text-center mt-4">
-            <button type="submit" className="btn btn-primary">Add Event</button>
-          </div>
-        </div>
-      </form>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
 
-export default AddEvent;
 
 
 
+
+//working code without ui components and better structure
 // import React, { useEffect, useRef, useState } from "react";
 // import mapboxgl from "mapbox-gl";
 // import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -336,11 +436,11 @@ export default AddEvent;
 //   const [lng, setLng] = useState(72.8777);
 //   const [lat, setLat] = useState(19.076);
 //   const [zoom] = useState(10);
-
 //   const [states, setStates] = useState([]);
 //   const [cities, setCities] = useState([]);
 //   const [eventCategory, setEventCategory] = useState("");
 //   const [selectedStadium, setSelectedStadium] = useState(null);
+//   const [customZonePrices, setCustomZonePrices] = useState([]);
 
 //   const { register, handleSubmit, setValue } = useForm();
 //   const navigate = useNavigate();
@@ -363,1004 +463,28 @@ export default AddEvent;
 //     if (storedStadium) {
 //       const parsed = JSON.parse(storedStadium);
 //       if (parsed && parsed._id) {
-//       setSelectedStadium(parsed);
-//       setValue("stadiumId", parsed._id);
-//       setValue("latitude", parsed.location.latitude);
-//       setValue("longitude", parsed.location.longitude);
-//       setValue("numberOfSeats", parsed.totalSeats);
+//         setSelectedStadium(parsed);
+//         setValue("stadiumId", parsed._id);
+//         setValue("latitude", parsed.location.latitude);
+//         setValue("longitude", parsed.location.longitude);
+//         setValue("numberOfSeats", parsed.totalSeats);
+//         if (parsed.zones) {
+//           const defaultPrices = parsed.zones.map((z) => z.price);
+//           setCustomZonePrices(defaultPrices);
+//         }
 //       }
 //       localStorage.removeItem("selectedStadium");
 //     }
 //   }, []);
 
 //   useEffect(() => {
-//     if (
-//       !mapContainer.current ||
-//       map.current ||
-//       eventCategory === "ZoomMeeting" ||
-//       (eventCategory === "Indoor" && selectedStadium)
-//     )
-//       return;
+//     if (!mapContainer.current || map.current || eventCategory === "ZoomMeeting" || (eventCategory === "Indoor" && selectedStadium)) return;
 
 //     map.current = new mapboxgl.Map({
 //       container: mapContainer.current,
 //       style: "mapbox://styles/mapbox/streets-v11",
 //       center: [lng, lat],
 //       zoom,
-//     });
-
-//     const marker = new mapboxgl.Marker({ draggable: true })
-//       .setLngLat([lng, lat])
-//       .addTo(map.current);
-
-//     marker.on("dragend", () => {
-//       const pos = marker.getLngLat();
-//       setLng(pos.lng);
-//       setLat(pos.lat);
-//       setValue("latitude", pos.lat);
-//       setValue("longitude", pos.lng);
-//     });
-
-//     const geo = new MapboxGeocoder({
-//       accessToken: mapboxgl.accessToken,
-//       mapboxgl,
-//     });
-//     map.current.addControl(geo);
-//     geo.on("result", (e) => {
-//       const [lng2, lat2] = e.result.center;
-//       setLng(lng2);
-//       setLat(lat2);
-//       setValue("latitude", lat2);
-//       setValue("longitude", lng2);
-//       marker.setLngLat([lng2, lat2]);
-//     });
-//   }, [eventCategory, selectedStadium]);
-
-//   const [myEvents, setMyEvents] = useState([]);
-
-// const fetchMyEvents = async () => {
-//   try {
-//     const res = await axios.get(`/event/geteventbyorganizerid`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//     setMyEvents(res.data.data);
-//   } catch (error) {
-//     console.error("Error fetching events:", error);
-//   }
-// };
-
-// useEffect(() => {
-//   fetchMyEvents();
-// }, []);
-
-
-//   const submitHandler = async (data) => {
-//     const formData = new FormData();
-//     for (const [k, v] of Object.entries(data)) {
-//       formData.append(k, k === "image" ? v[0] : v);
-//     }
-
-//     try {
-//       await axios.post("/event/addeventwithfile", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       alert("Event added successfully!");
-//        window.location.href = "/organizer#viewevent";
-//        fetchMyEvents();  // ← refresh the list
-        
-
-//     } catch (err) {
-//       console.error(err);
-//       alert("Failed to add event.");
-//     }
-//   };
-
-//   return (
-//     <div className="container mt-4">
-//       <h2 className="mb-4 text-center">Add Event</h2>
-//       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
-//         <div className="row">
-//           <div className="col-md-6 mb-3">
-//             <label>Event Category</label>
-//             <select
-//               className="form-control"
-//               {...register("eventCategory", { required: true })}
-//               value={eventCategory}
-//               onChange={(e) => {
-//                 setEventCategory(e.target.value);
-//                 setSelectedStadium(null);
-//               }}
-//             >
-//               <option value="">Select Category</option>
-//               <option value="Indoor">Indoor</option>
-//               <option value="Outdoor">Outdoor</option>
-//               <option value="ZoomMeeting">Zoom Meeting</option>
-//             </select>
-//           </div>
-
-//           {eventCategory === "Indoor" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>Choose Stadium</label>
-//                 <button
-//                   type="button"
-//                   className="btn btn-outline-primary form-control"
-//                   onClick={() => navigate("/stadiumselect")}
-//                   // onClick={() => navigate("/stadiumselect?redirectTo=/organizer/addevent")}
-
-//                 >
-//                   {selectedStadium ? selectedStadium.name : "Select Stadium"}
-//                 </button>
-//               </div>
-
-//               {selectedStadium && (
-//                 <>
-//                   <input type="hidden" {...register("stadiumId", { required: true })} value={selectedStadium._id} />
-//                   <input type="hidden" {...register("latitude")} value={selectedStadium.location.latitude} />
-//                   <input type="hidden" {...register("longitude")} value={selectedStadium.location.longitude} />
-
-//                   {/* <div className="col-md-12 mb-4">
-//                     <div className="card shadow border-0">
-//                       {selectedStadium.imageUrl && (
-//                         <img
-//                           src={selectedStadium.imageUrl}
-//                           className="card-img-top"
-//                           alt={selectedStadium.name}
-//                           style={{ height: "250px", objectFit: "cover" }}
-//                         />
-//                       )}
-//                       <div className="card-body">
-//                         <h4>{selectedStadium.name}</h4>
-//                         <p>Location: {selectedStadium.location.address}</p>
-//                         <p>Total Seats: {selectedStadium.totalSeats}</p>
-
-//                         <div className="accordion" id="zoneAccordion">
-//                           {selectedStadium.zones.map((zone, i) => (
-//                             <div className="accordion-item" key={i}>
-//                               <h2 className="accordion-header" id={`heading${i}`}>
-//                                 <button
-//                                   className="accordion-button collapsed"
-//                                   type="button"
-//                                   data-bs-toggle="collapse"
-//                                   data-bs-target={`#collapse${i}`}
-//                                 >
-//                                   Zone {String.fromCharCode(65 + i)} — ₹{zone.price}
-//                                 </button>
-//                               </h2>
-//                               <div
-//                                 id={`collapse${i}`}
-//                                 className="accordion-collapse collapse"
-//                                 aria-labelledby={`heading${i}`}
-//                                 data-bs-parent="#zoneAccordion"
-//                               >
-//                                 <div className="accordion-body">
-//                                   <div className="d-flex flex-wrap gap-2">
-//                                     {zone.seatLabels.map((label, index) => (
-//                                       <span key={index} className="badge bg-secondary">
-//                                         {label}
-//                                       </span>
-//                                     ))}
-//                                   </div>
-//                                 </div>
-//                               </div>
-//                             </div>
-//                           ))}
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div> */}
-//                 </>
-//               )}
-//             </>
-//           )}
-
-//           {eventCategory === "Outdoor" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>State</label>
-//                 <select className="form-control" {...register("stateId", { required: true })}>
-//                   <option value="">Select State</option>
-//                   {states.map((state) => (
-//                     <option key={state._id} value={state._id}>
-//                       {state.Name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-6 mb-3">
-//                 <label>City</label>
-//                 <select className="form-control" {...register("cityId", { required: true })}>
-//                   <option value="">Select City</option>
-//                   {cities.map((city) => (
-//                     <option key={city._id} value={city._id}>
-//                       {city.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-12 mb-3">
-//                 <label>Location on Map</label>
-//                 <div
-//                   ref={mapContainer}
-//                   style={{
-//                     height: "300px",
-//                     border: "1px solid #ccc",
-//                     borderRadius: "8px",
-//                   }}
-//                 />
-//                 <input type="hidden" {...register("latitude")} />
-//                 <input type="hidden" {...register("longitude")} />
-//               </div>
-//             </>
-//           )}
-
-//           {eventCategory === "ZoomMeeting" && (
-//             <div className="col-md-12 mb-3">
-//               <label>Zoom Meeting URL</label>
-//               <input
-//                 type="url"
-//                 className="form-control"
-//                 {...register("zoomUrl", { required: true })}
-//               />
-//             </div>
-//           )}
-
-//           {/* Common Fields */}
-//           <div className="col-md-6 mb-3">
-//             <label>Event Name</label>
-//             <input
-//               type="text"
-//               className="form-control"
-//               {...register("eventName", { required: true })}
-//             />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>Event Type</label>
-//             <select className="form-control" {...register("eventType", { required: true })}>
-//               <option value="">Select Type</option>
-//               <option value="Conference">Conference</option>
-//               <option value="Exhibition">Exhibition</option>
-//               <option value="Gala Dinner">Gala Dinner</option>
-//               <option value="Incentive">Incentive</option>
-//               <option value="Music consert">Music consert</option>
-//               <option value="Meeting">Meeting</option>
-//               <option value="Other">Other</option>
-//             </select>
-//           </div>
-//           <div className="col-md-6 mb-3">
-//            <label>Total Seats</label>
-//              <input
-//                type="number"
-//                className="form-control"
-//                {...register("numberOfSeats", { required: true })}
-//                value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
-//                 onChange={(e) => {
-//                if (eventCategory !== "Indoor") {
-//                setValue("numberOfSeats", parseInt(e.target.value));
-//                 }
-//                }}
-//                disabled={eventCategory === "Indoor" && selectedStadium}
-//                />
-//               </div>
-
-
-//           {/* <div className="col-md-6 mb-3">
-//             <label>Total Seats</label>
-//             <input
-//               type="number"
-//               className="form-control"
-//               {...register("numberOfSeats", { required: true })}
-//             />
-//           </div> */}
-
-//           <div className="col-md-6 mb-3">
-//             <label>Start Date</label>
-//             <input
-//               type="date"
-//               className="form-control"
-//               {...register("startDate", { required: true })}
-//             />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>End Date</label>
-//             <input
-//               type="date"
-//               className="form-control"
-//               {...register("endDate", { required: true })}
-//             />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>Event Image</label>
-//             <input
-//               type="file"
-//               className="form-control"
-//               {...register("image", { required: true })}
-//             />
-//           </div>
-
-//           <div className="col-md-12 text-center mt-4">
-//             <button type="submit" className="btn btn-primary">
-//               Add Event
-//             </button>
-//           </div>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-
-
-
-// import React, { useEffect, useRef, useState } from "react";
-// import mapboxgl from "mapbox-gl";
-// import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-// import "mapbox-gl/dist/mapbox-gl.css";
-// import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import axios from "axios";
-// import { useForm } from "react-hook-form";
-// import { useNavigate } from "react-router-dom";
-
-// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// export const AddEvent = () => {
-//   const mapContainer = useRef(null);
-//   const map = useRef(null);
-//   const [lng, setLng] = useState(72.8777);
-//   const [lat, setLat] = useState(19.076);
-//   const [zoom] = useState(10);
-
-//   const [states, setStates] = useState([]);
-//   const [cities, setCities] = useState([]);
-//   const [eventCategory, setEventCategory] = useState("");
-//   const [selectedStadium, setSelectedStadium] = useState(null);
-
-//   const { register, handleSubmit, watch, setValue } = useForm();
-//   const navigate = useNavigate();
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     axios.get("/state/getallstates").then((r) => setStates(r.data.data));
-//     axios.get("/city/getallcitys").then((r) => setCities(r.data.data));
-//   }, []);
-
-//   useEffect(() => {
-//     const storedCategory = localStorage.getItem("selectedCategory");
-//     const storedStadium = localStorage.getItem("selectedStadium");
-
-//     if (storedCategory) {
-//       setEventCategory(storedCategory);
-//       localStorage.removeItem("selectedCategory");
-//     }
-
-//     if (storedStadium) {
-//       const parsed = JSON.parse(storedStadium);
-//       setSelectedStadium(parsed);
-//       setValue("stadiumId", parsed._id);
-//       localStorage.removeItem("selectedStadium");
-//     }
-//   }, []);
-
-//   useEffect(() => {
-//     if (!mapContainer.current || map.current || eventCategory === "ZoomMeeting") return;
-
-//     map.current = new mapboxgl.Map({
-//       container: mapContainer.current,
-//       style: "mapbox://styles/mapbox/streets-v11",
-//       center: [lng, lat],
-//       zoom,
-//     });
-
-//     const marker = new mapboxgl.Marker({ draggable: true })
-//       .setLngLat([lng, lat])
-//       .addTo(map.current);
-
-//     marker.on("dragend", () => {
-//       const pos = marker.getLngLat();
-//       setLng(pos.lng);
-//       setLat(pos.lat);
-//       setValue("latitude", pos.lat);
-//       setValue("longitude", pos.lng);
-//     });
-
-//     const geo = new MapboxGeocoder({
-//       accessToken: mapboxgl.accessToken,
-//       mapboxgl,
-//     });
-//     map.current.addControl(geo);
-//     geo.on("result", (e) => {
-//       const [lng2, lat2] = e.result.center;
-//       setLng(lng2);
-//       setLat(lat2);
-//       setValue("latitude", lat2);
-//       setValue("longitude", lng2);
-//       marker.setLngLat([lng2, lat2]);
-//     });
-//   }, [eventCategory]);
-
-//   const submitHandler = async (data) => {
-//     const formData = new FormData();
-//     for (const [k, v] of Object.entries(data)) {
-//       formData.append(k, k === "image" ? v[0] : v);
-//     }
-
-//     try {
-//       await axios.post("/event/addeventwithfile", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       alert("Event added!");
-//       navigate("/organizer");
-//     } catch (err) {
-//       console.error(err);
-//       alert("Failed to add event.");
-//     }
-//   };
-
-//   return (
-//     <div className="container mt-4">
-//       <h2 className="mb-4 text-center">Add Event</h2>
-//       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
-//         <div className="row">
-//           {/* Event Category */}
-//           <div className="col-md-6 mb-3">
-//             <label>Event Category</label>
-//             <select
-//               className="form-control"
-//               {...register("eventCategory", { required: true })}
-//               value={eventCategory}
-//               onChange={(e) => {
-//                 setEventCategory(e.target.value);
-//                 setSelectedStadium(null);
-//               }}
-//             >
-//               <option value="">Select Category</option>
-//               <option value="Indoor">Indoor</option>
-//               <option value="Outdoor">Outdoor</option>
-//               <option value="ZoomMeeting">Zoom Meeting</option>
-//             </select>
-//           </div>
-
-//           {/* Stadium Selection */}
-//           {eventCategory === "Indoor" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>Choose Stadium</label>
-//                 <button
-//                   type="button"
-//                   className="btn btn-outline-primary form-control"
-//                   onClick={() => navigate("/stadiumselect")}
-//                 >
-//                   {selectedStadium ? selectedStadium.name : "Select Stadium"}
-//                 </button>
-//                 {selectedStadium && (
-//                   <input
-//                     type="hidden"
-//                     value={selectedStadium._id}
-//                     {...register("stadiumId", { required: true })}
-//                   />
-//                 )}
-//               </div>
-
-//               {selectedStadium && (
-//                 <div className="col-md-12 mb-4">
-//                   <div className="card shadow border-0">
-//                     {selectedStadium.imageUrl && (
-//                       <img
-//                         src={selectedStadium.imageUrl}
-//                         className="card-img-top"
-//                         alt={selectedStadium.name}
-//                         style={{ height: "250px", objectFit: "cover" }}
-//                       />
-//                     )}
-//                     <div className="card-body">
-//                       <h4 className="card-title">{selectedStadium.name}</h4>
-//                       <p className="card-text">Total Seats: {selectedStadium.totalSeats}</p>
-
-//                       <div className="accordion mt-4" id="zoneAccordion">
-//                         {selectedStadium.zones.map((zone, index) => (
-//                           <div className="accordion-item" key={index}>
-//                             <h2 className="accordion-header" id={`heading${index}`}>
-//                               <button
-//                                 className="accordion-button collapsed"
-//                                 type="button"
-//                                 data-bs-toggle="collapse"
-//                                 data-bs-target={`#collapse${index}`}
-//                                 aria-expanded="false"
-//                                 aria-controls={`collapse${index}`}
-//                               >
-//                                 Zone {String.fromCharCode(65 + index)} — ₹{zone.price}
-//                               </button>
-//                             </h2>
-//                             <div
-//                               id={`collapse${index}`}
-//                               className="accordion-collapse collapse"
-//                               aria-labelledby={`heading${index}`}
-//                               data-bs-parent="#zoneAccordion"
-//                             >
-//                               <div className="accordion-body">
-//                                 <div className="card">
-//                                   <div className="card-body p-2">
-//                                     <div className="d-flex flex-wrap gap-2">
-//                                       {zone.seatLabels.map((label, i) => (
-//                                         <span key={i} className="badge bg-secondary">
-//                                           {label}
-//                                         </span>
-//                                       ))}
-//                                     </div>
-//                                   </div>
-//                                 </div>
-//                               </div>
-//                             </div>
-//                           </div>
-//                         ))}
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               )}
-//             </>
-//           )}
-
-//           {/* Map and Location */}
-//           {eventCategory !== "ZoomMeeting" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>State</label>
-//                 <select className="form-control" {...register("stateId", { required: true })}>
-//                   <option value="">Select State</option>
-//                   {states.map((s) => (
-//                     <option key={s._id} value={s._id}>
-//                       {s.Name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-6 mb-3">
-//                 <label>City</label>
-//                 <select className="form-control" {...register("cityId", { required: true })}>
-//                   <option value="">Select City</option>
-//                   {cities.map((c) => (
-//                     <option key={c._id} value={c._id}>
-//                       {c.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-12 mb-3">
-//                 <label>Location on Map</label>
-//                 <div
-//                   ref={mapContainer}
-//                   style={{
-//                     height: "300px",
-//                     border: "1px solid #ccc",
-//                     borderRadius: "8px",
-//                   }}
-//                 />
-//                 <input type="hidden" {...register("latitude")} />
-//                 <input type="hidden" {...register("longitude")} />
-//               </div>
-//             </>
-//           )}
-
-//           {/* Zoom URL */}
-//           {eventCategory === "ZoomMeeting" && (
-//             <div className="col-md-12 mb-3">
-//               <label>Zoom Meeting URL</label>
-//               <input
-//                 type="url"
-//                 className="form-control"
-//                 {...register("zoomUrl", { required: true })}
-//               />
-//             </div>
-//           )}
-
-//           {/* Common Fields */}
-//           <div className="col-md-6 mb-3">
-//             <label>Event Name</label>
-//             <input
-//               type="text"
-//               className="form-control"
-//               {...register("eventName", { required: true })}
-//             />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>Upload Image</label>
-//             <input
-//               type="file"
-//               className="form-control"
-//               {...register("image", { required: true })}
-//             />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>Start Date</label>
-//             <input
-//               type="date"
-//               className="form-control"
-//               {...register("startDate", { required: true })}
-//             />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>End Date</label>
-//             <input
-//               type="date"
-//               className="form-control"
-//               {...register("endDate", { required: true })}
-//             />
-//           </div>
-
-//           <div className="col-md-12 text-center">
-//             <button type="submit" className="btn btn-primary mt-3">
-//               Add Event
-//             </button>
-//           </div>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-
-
-
-// import React, { useEffect, useRef, useState } from "react";
-// import mapboxgl from "mapbox-gl";
-// import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-// import "mapbox-gl/dist/mapbox-gl.css";
-// import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import axios from "axios";
-// import { useForm } from "react-hook-form";
-// import { useNavigate } from "react-router-dom";
-
-// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// export const AddEvent = () => {
-//   const mapContainer = useRef(null);
-//   const map = useRef(null);
-//   const [lng, setLng] = useState(72.8777);
-//   const [lat, setLat] = useState(19.076);
-//   const [zoom] = useState(10);
-
-//   const [states, setStates] = useState([]);
-//   const [cities, setCities] = useState([]);
-//   const [eventCategory, setEventCategory] = useState("");
-//   const [stadiums, setStadiums] = useState([]);
-//   const [selectedStadium, setSelectedStadium] = useState(null);
-
-//   const { register, handleSubmit, watch, setValue } = useForm();
-//   const navigate = useNavigate();
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     axios.get("/state/getallstates").then((r) => setStates(r.data.data));
-//     axios.get("/city/getallcitys").then((r) => setCities(r.data.data));
-//   }, []);
-
-//   useEffect(() => {
-//     if (eventCategory === "Indoor") {
-//       axios
-//         .get("/admin/stadiums", {
-//           headers: { Authorization: `Bearer ${token}` },
-//         })
-//         .then((res) => setStadiums(res.data));
-//     }
-//   }, [eventCategory]);
-
-//   const stadiumId = watch("stadiumId");
-//   useEffect(() => {
-//     setSelectedStadium(stadiums.find((s) => s._id === stadiumId) || null);
-//   }, [stadiums, stadiumId]);
-
-//   useEffect(() => {
-//     if (!mapContainer.current || map.current || eventCategory === "ZoomMeeting")
-//       return;
-
-//     map.current = new mapboxgl.Map({
-//       container: mapContainer.current,
-//       style: "mapbox://styles/mapbox/streets-v11",
-//       center: [lng, lat],
-//       zoom,
-//     });
-
-//     const marker = new mapboxgl.Marker({ draggable: true })
-//       .setLngLat([lng, lat])
-//       .addTo(map.current);
-
-//     marker.on("dragend", () => {
-//       const pos = marker.getLngLat();
-//       setLng(pos.lng);
-//       setLat(pos.lat);
-//       setValue("latitude", pos.lat);
-//       setValue("longitude", pos.lng);
-//     });
-
-//     const geo = new MapboxGeocoder({
-//       accessToken: mapboxgl.accessToken,
-//       mapboxgl,
-//     });
-//     map.current.addControl(geo);
-//     geo.on("result", (e) => {
-//       const [lng2, lat2] = e.result.center;
-//       setLng(lng2);
-//       setLat(lat2);
-//       setValue("latitude", lat2);
-//       setValue("longitude", lng2);
-//       marker.setLngLat([lng2, lat2]);
-//     });
-//   }, [eventCategory]);
-
-//   const submitHandler = async (data) => {
-//     const formData = new FormData();
-//     for (const [k, v] of Object.entries(data)) {
-//       formData.append(k, k === "image" ? v[0] : v);
-//     }
-//     if (eventCategory === "Indoor") {
-//       formData.append("stadiumId", data.stadiumId);
-//     }
-
-//     try {
-//       await axios.post("/event/addeventwithfile", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       alert("Event added!");
-//       navigate("/organizer");
-//     } catch (err) {
-//       console.error(err);
-//       alert("Failed to add event.");
-//     }
-//   };
-
-//   return (
-//     <div className="container mt-4">
-//       <h2 className="mb-4 text-center">Add Event</h2>
-//       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
-//         <div className="row">
-
-//           {/* Event Category */}
-//           <div className="col-md-6 mb-3">
-//             <label>Event Category</label>
-//             <select
-//               className="form-control"
-//               {...register("eventCategory", { required: true })}
-//               onChange={(e) => setEventCategory(e.target.value)}
-//             >
-//               <option value="">Select Category</option>
-//               <option value="Indoor">Indoor</option>
-//               <option value="Outdoor">Outdoor</option>
-//               <option value="ZoomMeeting">Zoom Meeting</option>
-//             </select>
-//           </div>
-
-//           {/* Stadium Selection for Indoor */}
-//           {eventCategory === "Indoor" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>Choose Stadium</label>
-//                 <select
-//                   className="form-control"
-//                   {...register("stadiumId", { required: true })}
-//                 >
-//                   <option value="">Select Stadium</option>
-//                   {stadiums.map((s) => (
-//                     <option key={s._id} value={s._id}>
-//                       {s.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-
-//               {selectedStadium && (
-//                 <div className="col-md-12 mb-4">
-//                   <div className="card shadow border-0">
-//                     {selectedStadium.imageUrl && (
-//                       <img
-//                         src={selectedStadium.imageUrl}
-//                         className="card-img-top"
-//                         alt={selectedStadium.name}
-//                         style={{ height: "250px", objectFit: "cover" }}
-//                       />
-//                     )}
-//                     <div className="card-body">
-//                       <h4 className="card-title">{selectedStadium.name}</h4>
-//                       <p className="card-text">Total Seats: {selectedStadium.totalSeats}</p>
-//                       <div className="card-text">
-//                         <h5>Zones</h5>
-//                         {selectedStadium.zones.map((zone, index) => (
-//                           <div key={index} className="mb-3">
-//                             <h6>
-//                               Zone {String.fromCharCode(65 + index)} - ₹{zone.price}
-//                             </h6>
-//                             <div className="d-flex flex-wrap gap-2">
-//                               {zone.seatLabels.map((label, i) => (
-//                                 <span key={i} className="badge bg-secondary">{label}</span>
-//                               ))}
-//                             </div>
-//                           </div>
-//                         ))}
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               )}
-//             </>
-//           )}
-
-//           {/* Location: only for non-Zoom */}
-//           {eventCategory !== "ZoomMeeting" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>State</label>
-//                 <select
-//                   className="form-control"
-//                   {...register("stateId", { required: true })}
-//                 >
-//                   <option value="">Select State</option>
-//                   {states.map((s) => (
-//                     <option key={s._id} value={s._id}>
-//                       {s.Name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-6 mb-3">
-//                 <label>City</label>
-//                 <select
-//                   className="form-control"
-//                   {...register("cityId", { required: true })}
-//                 >
-//                   <option value="">Select City</option>
-//                   {cities.map((c) => (
-//                     <option key={c._id} value={c._id}>
-//                       {c.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-12 mb-3">
-//                 <label>Location on Map</label>
-//                 <div
-//                   ref={mapContainer}
-//                   style={{
-//                     height: "300px",
-//                     border: "1px solid #ccc",
-//                     borderRadius: "8px",
-//                   }}
-//                 />
-//                 <input type="hidden" {...register("latitude")} />
-//                 <input type="hidden" {...register("longitude")} />
-//               </div>
-//             </>
-//           )}
-
-//           {/* Zoom Meeting URL */}
-//           {eventCategory === "ZoomMeeting" && (
-//             <div className="col-md-12 mb-3">
-//               <label>Zoom Meeting URL</label>
-//               <input
-//                 type="url"
-//                 className="form-control"
-//                 {...register("zoomUrl", { required: true })}
-//               />
-//             </div>
-//           )}
-
-//           {/* Common Fields */}
-//           <div className="col-md-6 mb-3">
-//             <label>Event Name</label>
-//             <input
-//               type="text"
-//               className="form-control"
-//               {...register("eventName", { required: true })}
-//             />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>Upload Image</label>
-//             <input
-//               type="file"
-//               className="form-control"
-//               {...register("image", { required: true })}
-//             />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>Start Date</label>
-//             <input
-//               type="date"
-//               className="form-control"
-//               {...register("startDate", { required: true })}
-//             />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>End Date</label>
-//             <input
-//               type="date"
-//               className="form-control"
-//               {...register("endDate", { required: true })}
-//             />
-//           </div>
-
-//           <div className="col-md-12 text-center">
-//             <button type="submit" className="btn btn-primary mt-3">
-//               Add Event
-//             </button>
-//           </div>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-
-// import React, { useEffect, useRef, useState } from "react";
-// import mapboxgl from "mapbox-gl";
-// import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-// import "mapbox-gl/dist/mapbox-gl.css";
-// import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import axios from "axios";
-// import { useForm } from "react-hook-form";
-// import { useNavigate } from "react-router-dom";
-
-// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// export const AddEvent = () => {
-//   const mapContainer = useRef(null);
-//   const map = useRef(null);
-//   const [lng, setLng] = useState(72.8777);
-//   const [lat, setLat] = useState(19.0760);
-//   const [zoom] = useState(10);
-
-//   const [states, setStates] = useState([]);
-//   const [cities, setCities] = useState([]);
-//   const [eventCategory, setEventCategory] = useState("");
-//   const [stadiums, setStadiums] = useState([]);
-//   const [selectedStadium, setSelectedStadium] = useState(null);
-
-//   const { register, handleSubmit, watch, setValue } = useForm();
-//   const navigate = useNavigate();
-//   const token = localStorage.getItem("token");
-
-//   // Fetch states & cities
-//   useEffect(() => {
-//     axios.get("/state/getallstates").then(r => setStates(r.data.data));
-//     axios.get("/city/getallcitys").then(r => setCities(r.data.data));
-//   }, []);
-
-//   // Fetch stadiums when category is Indoor
-//   useEffect(() => {
-//     if (eventCategory === "Indoor") {
-//       axios.get("/admin/stadiums", {
-//         headers: { Authorization: `Bearer ${token}` }
-//       }).then(res => setStadiums(res.data));
-//     }
-//   }, [eventCategory]);
-
-//   // When stadiumId changes, find selected stadium
-//   const stadiumId = watch("stadiumId");
-//   useEffect(() => {
-//     setSelectedStadium(stadiums.find(s => s._id === stadiumId) || null);
-//   }, [stadiums, stadiumId]);
-
-//   // Initialize map only if category is not ZoomMeeting
-//   useEffect(() => {
-//     if (!mapContainer.current || map.current || eventCategory === "ZoomMeeting") return;
-
-//     map.current = new mapboxgl.Map({
-//       container: mapContainer.current,
-//       style: "mapbox://styles/mapbox/streets-v11",
-//       center: [lng, lat],
-//       zoom
 //     });
 
 //     const marker = new mapboxgl.Marker({ draggable: true })
@@ -1377,7 +501,7 @@ export default AddEvent;
 
 //     const geo = new MapboxGeocoder({ accessToken: mapboxgl.accessToken, mapboxgl });
 //     map.current.addControl(geo);
-//     geo.on("result", e => {
+//     geo.on("result", (e) => {
 //       const [lng2, lat2] = e.result.center;
 //       setLng(lng2);
 //       setLat(lat2);
@@ -1385,26 +509,34 @@ export default AddEvent;
 //       setValue("longitude", lng2);
 //       marker.setLngLat([lng2, lat2]);
 //     });
-//   }, [eventCategory]);
+//   }, [eventCategory, selectedStadium]);
 
-//   const submitHandler = async data => {
+//   const submitHandler = async (data) => {
 //     const formData = new FormData();
 //     for (const [k, v] of Object.entries(data)) {
 //       formData.append(k, k === "image" ? v[0] : v);
 //     }
-//     if (eventCategory === "Indoor") {
-//       formData.append("stadiumId", data.stadiumId);
+//     // send data as string
+//     if (eventCategory === "Indoor" && selectedStadium) {
+//       console.log("customZonePrices being sent:", customZonePrices);
+//       formData.append("zonePrices", JSON.stringify(customZonePrices));
 //     }
+//     //send data as array
+//     // if (eventCategory === "Indoor" && selectedStadium) {
+//     //   customZonePrices.forEach((price, index) => {
+//     // formData.append(`zonePrices[${index}]`, price);
+//     //  });
+//     //  }
 
 //     try {
 //       await axios.post("/event/addeventwithfile", formData, {
 //         headers: {
 //           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`
-//         }
+//           Authorization: `Bearer ${token}`,
+//         },
 //       });
-//       alert("Event added!");
-//       navigate("/organizer");
+//       alert("Event added successfully!");
+//       window.location.href = "/organizer#viewevent";
 //     } catch (err) {
 //       console.error(err);
 //       alert("Failed to add event.");
@@ -1413,16 +545,20 @@ export default AddEvent;
 
 //   return (
 //     <div className="container mt-4">
-//       <h2>Add Event</h2>
-//       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded">
+//       <h2 className="mb-4 text-center">Add Event</h2>
+//       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
 //         <div className="row">
-//           {/* Category selection */}
 //           <div className="col-md-6 mb-3">
 //             <label>Event Category</label>
-//             <select className="form-control" {...register("eventCategory", { required: true })}
+//             <select
+//               className="form-control"
+//               {...register("eventCategory", { required: true })}
+//               value={eventCategory}
 //               onChange={(e) => {
 //                 setEventCategory(e.target.value);
-//               }}>
+//                 setSelectedStadium(null);
+//               }}
+//             >
 //               <option value="">Select Category</option>
 //               <option value="Indoor">Indoor</option>
 //               <option value="Outdoor">Outdoor</option>
@@ -1430,51 +566,100 @@ export default AddEvent;
 //             </select>
 //           </div>
 
-//           {/* Stadium Selection */}
 //           {eventCategory === "Indoor" && (
 //             <>
 //               <div className="col-md-6 mb-3">
 //                 <label>Choose Stadium</label>
-//                 <select className="form-control" {...register("stadiumId", { required: true })}>
-//                   <option>Select stadium</option>
-//                   {stadiums.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-//                 </select>
+//                 <button
+//                   type="button"
+//                   className="btn btn-outline-primary form-control"
+//                   onClick={() => navigate("/stadiumselect")}
+//                 >
+//                   {selectedStadium ? selectedStadium.name : "Select Stadium"}
+//                 </button>
 //               </div>
+//                {selectedStadium && selectedStadium.zones && (
+//                <div className="col-12 mb-4">
+//                <h5>Customize Zone Prices</h5>
+//                 <div className="d-flex flex-wrap gap-3">
+//                 {selectedStadium.zones.map((zone, i) => (
+//              <div key={i}>
+//               <label>Zone {String.fromCharCode(65 + i)}</label>
+//            <input
+//             type="number"
+//             className="form-control"
+//             value={customZonePrices[i]}
+//             onChange={(e) => {
+//               const newPrices = [...customZonePrices];
+//               newPrices[i] = parseInt(e.target.value) || 0;
+//               setCustomZonePrices(newPrices);
+//             }}
+//             required
+//           />
+//         </div>
+//       ))}
+//     </div>
+//   </div>
+// )}
+
+// {/* 
 //               {selectedStadium && (
-//                 <div className="col-md-12">
-//                   <h5>Stadium: {selectedStadium.name}</h5>
-//                   <p>Total Seats: {selectedStadium.totalSeats}</p>
-//                   {selectedStadium.zones.map((zone, index) => (
-//                     <div key={index}>
-//                       <strong>Zone {String.fromCharCode(65 + index)} - ₹{zone.price}</strong>
-//                       <div className="d-flex flex-wrap gap-2 mb-2">
-//                         {zone.seatLabels.map((label, i) => (
-//                           <span key={i} className="badge bg-secondary">{label}</span>
-//                         ))}
-//                       </div>
+//                 <>
+//                   <input type="hidden" {...register("stadiumId", { required: true })} value={selectedStadium._id} />
+//                   <input type="hidden" {...register("latitude")} value={selectedStadium.location.latitude} />
+//                   <input type="hidden" {...register("longitude")} value={selectedStadium.location.longitude} />
+
+//                   <div className="col-md-12 mb-3">
+//                     <label>Override Zone Prices (optional)</label>
+//                     <div className="d-flex flex-wrap gap-3">
+//                       {selectedStadium.zones?.map((zone, i) => (
+//                         <div key={i}>
+//                           <label className="form-label">Zone {String.fromCharCode(65 + i)}</label>
+//                           <input
+//                             type="number"
+//                             className="form-control"
+//                             value={customZonePrices[i] || ""}
+//                             onChange={(e) => {
+//                               const updated = [...customZonePrices];
+//                               updated[i] = parseInt(e.target.value);
+//                               setCustomZonePrices(updated);
+//                             }}
+//                           />
+//                         </div>
+//                       ))}
 //                     </div>
-//                   ))}
-//                 </div>
-//               )}
+//                   </div>
+//                 </>
+//               )} */}
 //             </>
 //           )}
 
-//           {/* Location selection (Only for non-Zoom) */}
-//           {eventCategory !== "ZoomMeeting" && (
+//           {eventCategory === "Outdoor" && (
 //             <>
 //               <div className="col-md-6 mb-3">
 //                 <label>State</label>
 //                 <select className="form-control" {...register("stateId", { required: true })}>
-//                   <option>Select State</option>
-//                   {states.map(s => <option key={s._id} value={s._id}>{s.Name}</option>)}
+//                   <option value="">Select State</option>
+//                   {states.map((state) => (
+//                     <option key={state._id} value={state._id}>{state.Name}</option>
+//                   ))}
 //                 </select>
 //               </div>
 //               <div className="col-md-6 mb-3">
 //                 <label>City</label>
 //                 <select className="form-control" {...register("cityId", { required: true })}>
-//                   <option>Select City</option>
-//                   {cities.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+//                   <option value="">Select City</option>
+//                   {cities.map((city) => (
+//                     <option key={city._id} value={city._id}>{city.name}</option>
+//                   ))}
 //                 </select>
+//               </div>
+//               <div className="col-md-12 mb-3">
+//                 <lable>Price &#8377;</lable>
+//                 <input type='number'
+//                  className="form-control"
+//                  placeholder="&#8377; enter"
+//                   required="true" {...register("ticketRate")}></input>
 //               </div>
 //               <div className="col-md-12 mb-3">
 //                 <label>Location on Map</label>
@@ -1485,7 +670,6 @@ export default AddEvent;
 //             </>
 //           )}
 
-//           {/* Zoom URL */}
 //           {eventCategory === "ZoomMeeting" && (
 //             <div className="col-md-12 mb-3">
 //               <label>Zoom Meeting URL</label>
@@ -1493,286 +677,67 @@ export default AddEvent;
 //             </div>
 //           )}
 
-//           {/* Common Fields */}
 //           <div className="col-md-6 mb-3">
 //             <label>Event Name</label>
 //             <input type="text" className="form-control" {...register("eventName", { required: true })} />
 //           </div>
+
 //           <div className="col-md-6 mb-3">
-//             <label>Upload Image</label>
-//             <input type="file" className="form-control" {...register("image", { required: true })} />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>Start Date</label>
-//             <input type="date" className="form-control" {...register("startDate", { required: true })} />
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <label>End Date</label>
-//             <input type="date" className="form-control" {...register("endDate", { required: true })} />
-//           </div>
-//           <div className="col-md-12 text-center">
-//             <button type="submit" className="btn btn-primary mt-3">Add Event</button>
-//           </div>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-
-
-
-
-
-
-// import React, { useEffect, useRef, useState } from 'react';
-// import mapboxgl from 'mapbox-gl';
-// import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-// import 'mapbox-gl/dist/mapbox-gl.css';
-// import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-// import axios from 'axios';
-// import { useForm } from 'react-hook-form';
-// import { useNavigate } from 'react-router-dom';
-
-// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// export const AddEvent = () => {
-//   const mapContainer = useRef(null);
-//   const map = useRef(null);
-//   const [lng, setLng] = useState(72.8777);
-//   const [lat, setLat] = useState(19.0760);
-//   const [zoom] = useState(10);
-//   const [states, setStates] = useState([]);
-//   const [cities, setCities] = useState([]);
-//   const [eventCategory, setEventCategory] = useState("");
-//   const [selectedSeats, setSelectedSeats] = useState([]);
-//   const [totalSeats, setTotalSeats] = useState(100);
-//   const { register, handleSubmit, setValue, watch } = useForm();
-//   const navigate = useNavigate();
-
-//   const getAllStates = async () => {
-//     const res = await axios.get('/state/getallstates');
-//     setStates(res.data.data);
-//   };
-
-//   const getAllCities = async () => {
-//     const res = await axios.get('/city/getallcitys');
-//     setCities(res.data.data);
-//   };
-
-//   useEffect(() => {
-//     getAllStates();
-//     getAllCities();
-//   }, []);
-
-//   useEffect(() => {
-//     if (map.current) return;
-//     map.current = new mapboxgl.Map({
-//       container: mapContainer.current,
-//       style: 'mapbox://styles/mapbox/streets-v11',
-//       center: [lng, lat],
-//       zoom: zoom,
-//     });
-//     const marker = new mapboxgl.Marker({ draggable: true })
-//       .setLngLat([lng, lat])
-//       .addTo(map.current);
-//     marker.on('dragend', () => {
-//       const lngLat = marker.getLngLat();
-//       setLng(lngLat.lng);
-//       setLat(lngLat.lat);
-//       setValue("latitude", lngLat.lat);
-//       setValue("longitude", lngLat.lng);
-//     });
-//     setValue("latitude", lat);
-//     setValue("longitude", lng);
-//     const geocoder = new MapboxGeocoder({
-//       accessToken: mapboxgl.accessToken,
-//       mapboxgl: mapboxgl,
-//       marker: false
-//     });
-//     map.current.addControl(geocoder);
-//     geocoder.on('result', (e) => {
-//       const [newLng, newLat] = e.result.center;
-//       setLng(newLng);
-//       setLat(newLat);
-//       setValue("latitude", newLat);
-//       setValue("longitude", newLng);
-//       marker.setLngLat([newLng, newLat]);
-//       map.current.flyTo({ center: [newLng, newLat], zoom: 13 });
-//     });
-//   }, []);
-
-//   const token = localStorage.getItem("token");
-
-//   const submitHandler = async (data) => {
-//     data.selectedSeats = selectedSeats;
-//     const formData = new FormData();
-//     for (const key in data) {
-//       if (key === "image") {
-//         formData.append(key, data[key][0]);
-//       } else {
-//         formData.append(key, data[key]);
-//       }
-//     }
-//     try {
-//       const res = await axios.post("/event/addeventwithfile", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       alert("Event added successfully!");
-//       navigate("/organizer");
-//     } catch (err) {
-//       console.error("Event creation failed:", err);
-//       alert("Failed to add event");
-//     }
-//   };
-
-//   const generateSeats = () => {
-//     const rows = 20;
-//     const cols = 20;
-//     const seats = [];
-//     for (let r = 0; r < rows; r++) {
-//       for (let c = 0; c < cols; c++) {
-//         const seatNo = `${String.fromCharCode(65 + r)}${c + 1}`;
-//         if (seats.length < totalSeats) seats.push(seatNo);
-//       }
-//     }
-//     return seats;
-//   };
-
-//   const toggleSeat = (seat) => {
-//     setSelectedSeats((prev) =>
-//       prev.includes(seat) ? prev.filter((s) => s !== seat) : [...prev, seat]
-//     );
-//   };
-
-//   const showZoom = watch("eventCategory") === "ZoomMeeting";
-//   const isIndoor = watch("eventCategory") === "Indoor";
-
-//   return (
-//     <div className="container mt-4">
-//       <h2 className="text-center mb-4">Add Event</h2>
-//       <form onSubmit={handleSubmit(submitHandler)} className="shadow p-4 border rounded bg-light alert alert-primary">
-//         <div className="row">
-//           <div className="col-md-6 mb-3">
-//             <label>Event Name</label>
-//             <input type="text" className="form-control" {...register("eventName")} required />
-//           </div>
-//             <div className="col-md-6 mb-3">
-//               <label>Event Type</label>
-//               <select className="form-control" {...register("eventType")} required>
-//                 <option value="">Select Type</option>
-//                 <option value="Conference">Conference</option>
-//                 <option value="Exhibition">Exhibition</option>
-//                 <option value="Gala Dinner">Gala Dinner</option>
-//                 <option value="Incentive">Incentive</option>
-//                 <option value="Music Consert">Music Consert</option>
-//                 <option value="Meeting">Meeting</option>
-//                 <option value="Other">Other</option>
-//               </select>
-//             </div>
-//           <div className="col-md-6 mb-3">
-//             <label>Event Category</label>
-//             <select className="form-control" {...register("eventCategory")}
-//               onChange={(e) => setEventCategory(e.target.value)} required>
+//             <label>Event Type</label>
+//             <select className="form-control" {...register("eventType", { required: true })}>
 //               <option value="">Select Type</option>
-//               <option value="Indoor">Indoor</option>
-//               <option value="Outdoor">Outdoor</option>
-//               <option value="ZoomMeeting">Zoom Meeting</option>
+//               <option value="Conference">Conference</option>
+//               <option value="Exhibition">Exhibition</option>
+//               <option value="Gala Dinner">Gala Dinner</option>
+//               <option value="Incentive">Incentive</option>
+//               <option value="Music consert">Music consert</option>
+//               <option value="Meeting">Meeting</option>
 //               <option value="Other">Other</option>
 //             </select>
 //           </div>
 
-//           {showZoom && (
-//             <div className="col-md-12 mb-3">
-//               <label>Zoom URL</label>
-//               <input type="text" className="form-control" {...register("zoomUrl")} />
-//             </div>
-//           )}
-
 //           <div className="col-md-6 mb-3">
-//             <label>Number of Seats</label>
-//             <input type="number" className="form-control" {...register("numberOfSeats", {
-//               onChange: (e) => setTotalSeats(parseInt(e.target.value))
-//             })} required />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>State</label>
-//             <select className="form-control" {...register("stateId")} required>
-//               <option value="">Select State</option>
-//               {states.map((state) => (
-//                 <option key={state._id} value={state._id}>{state.Name}</option>
-//               ))}
-//             </select>
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>City</label>
-//             <select className="form-control" {...register("cityId")} required>
-//               <option value="">Select City</option>
-//               {cities.map((city) => (
-//                 <option key={city._id} value={city._id}>{city.name}</option>
-//               ))}
-//             </select>
+//             <label>Total Seats</label>
+//             <input
+//               type="number"
+//               className="form-control"
+//               {...register("numberOfSeats", { required: true })}
+//               value={eventCategory === "Indoor" && selectedStadium ? selectedStadium.totalSeats : undefined}
+//               onChange={(e) => {
+//                 if (eventCategory !== "Indoor") {
+//                   setValue("numberOfSeats", parseInt(e.target.value));
+//                 }
+//               }}
+//               disabled={eventCategory === "Indoor" && selectedStadium}
+//             />
 //           </div>
 
 //           <div className="col-md-6 mb-3">
 //             <label>Start Date</label>
-//             <input type="date" className="form-control" {...register("startDate")} required />
+//             <input type="date" className="form-control" {...register("startDate", { required: true })} />
 //           </div>
+
 //           <div className="col-md-6 mb-3">
 //             <label>End Date</label>
-//             <input type="date" className="form-control" {...register("endDate")} required />
+//             <input type="date" className="form-control" {...register("endDate", { required: true })} />
 //           </div>
 
-//           <div className="col-md-12 mb-3">
-//             <label>Upload Image</label>
-//             <input type="file" className="form-control" {...register("image")} required />
+//           <div className="col-md-6 mb-3">
+//             <label>Event Image</label>
+//             <input type="file" className="form-control" {...register("image", { required: true })} />
 //           </div>
 
-//           <input type="hidden" {...register("latitude")} />
-//           <input type="hidden" {...register("longitude")} />
-
-//           <div className="col-md-12 mb-4">
-//             <label>Select Event Location on Map or Search</label>
-//             <div ref={mapContainer} style={{ height: '300px', borderRadius: "10px", border: '1px solid #ccc' }} />
-//           </div>
-
-//           {isIndoor && (
-//             <div className="col-md-12 mb-3">
-//               <label>Select Your Seats (Max {totalSeats})</label>
-//               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(20, 1fr)', gap: '4px', maxHeight: '400px', overflowY: 'auto' }}>
-//                 {generateSeats().map((seat) => (
-//                   <div
-//                     key={seat}
-//                     onClick={() => toggleSeat(seat)}
-//                     style={{
-//                       padding: '6px',
-//                       borderRadius: '4px',
-//                       textAlign: 'center',
-//                       cursor: 'pointer',
-//                       backgroundColor: selectedSeats.includes(seat) ? '#28a745' : '#eee'
-//                     }}
-//                   >
-//                     {seat}
-//                   </div>
-//                 ))}
-//               </div>
-//               <p className="mt-2">Selected Seats: {selectedSeats.join(", ")}</p>
-//             </div>
-//           )}
-
-//           <div className="col-md-12 text-center">
-//             <button type="submit" className="btn btn-primary mt-3">Add Event</button>
+//           <div className="col-md-12 text-center mt-4">
+//             <button type="submit" className="btn btn-primary">Add Event</button>
 //           </div>
 //         </div>
 //       </form>
 //     </div>
 //   );
 // };
+
+// export default AddEvent;
+
 
 
 

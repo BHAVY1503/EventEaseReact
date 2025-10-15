@@ -1,5 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 export const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -16,7 +26,6 @@ export const MyTickets = () => {
         console.error("Error fetching tickets:", error);
       }
     };
-
     if (token) fetchTickets();
   }, [token]);
 
@@ -29,21 +38,16 @@ export const MyTickets = () => {
     return "ongoing";
   };
 
-  const getCardClass = (status) => {
+  const getBadgeStyle = (status) => {
     switch (status) {
-      case "past": return "border-danger bg-light";
-      case "upcoming": return "border-primary bg-white";
-      case "ongoing": return "border-success bg-white";
-      default: return "border-secondary";
-    }
-  };
-
-  const getBadgeClass = (status) => {
-    switch (status) {
-      case "past": return "badge bg-danger";
-      case "upcoming": return "badge bg-primary";
-      case "ongoing": return "badge bg-success";
-      default: return "badge bg-secondary";
+      case "past":
+        return "bg-destructive";
+      case "upcoming":
+        return "bg-primary";
+      case "ongoing":
+        return "bg-green-600";
+      default:
+        return "bg-muted";
     }
   };
 
@@ -58,100 +62,281 @@ export const MyTickets = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">🎟️ My Tickets</h2>
+    <TooltipProvider>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h2 className="text-3xl font-bold text-center mb-6">🎟️ My Tickets</h2>
+
       {tickets.length === 0 ? (
-        <p className="text-center text-muted">No tickets booked yet.</p>
+        <p className="text-center text-muted-foreground">No tickets booked yet.</p>
       ) : (
-        <div className="row">
+        <div className=" grid grid-cols-1 sm:grid-cols-2 gap-6">
           {tickets.map((ticket) => {
             const event = ticket.eventId;
             const status = getEventStatus(event?.startDate, event?.endDate);
-            const cardClass = getCardClass(status);
-            const badgeClass = getBadgeClass(status);
+            const groupedSeats = groupSeatsByZone(ticket.selectedSeats);
             const isIndoor = event?.eventCategory === "Indoor";
             const isZoom = event?.eventCategory === "ZoomMeeting";
-            const groupedSeats = groupSeatsByZone(ticket.selectedSeats);
 
             return (
-              <div key={ticket._id} className="col-md-6 mb-4">
-                <div className={`card shadow border-3 ${cardClass}`}>
-                  {event?.eventImage && (
-                    <img
-                      src={event.eventImage}
-                      alt="Event"
-                      className="card-img-top"
-                      style={{ maxHeight: '180px', objectFit: 'cover' }}
-                    />
+              <Card key={ticket._id} className="shadow-md">
+                {event?.eventImage && (
+                  <img
+                    src={event.eventImage}
+                    alt="Event"
+                    className="w-full h-48 object-cover rounded-t-md"
+                  />
+                )}
+                <CardHeader className="flex justify-between items-start">
+                  <CardTitle>{event?.eventName || "Unnamed Event"}</CardTitle>
+                  <Badge className={getBadgeStyle(status)}>
+                    {status.toUpperCase()}
+                  </Badge>
+                </CardHeader>
+                <Separator />
+                <CardContent className="space-y-2 text-sm">
+                  <p><strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}</p>
+                  <p><strong>🆔 Ticket ID:</strong> {ticket._id}</p>
+                  <p><strong>📅 Start:</strong> {new Date(event?.startDate).toLocaleDateString()}</p>
+                  <p><strong>📅 End:</strong> {new Date(event?.endDate).toLocaleDateString()}</p>
+                  <p>
+                    <strong>💵 Booked at:</strong> ₹{ticket.ticketRate} ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})
+                  </p>
+
+                  {!isZoom && (
+                    <>
+                      <p>
+                        <strong>📍 Location:</strong>{" "}
+                        {ticket.cityId?.name}, {ticket.stateId?.Name}
+                      </p>
+                      {event?.latitude && event?.longitude && (
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="mt-1"
+                        >
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            📍 View Directions
+                          </a>
+                        </Button>
+                      )}
+                    </>
                   )}
-                  <div className="card-body">
-                    <span className={badgeClass} style={{ float: 'right' }}>
-                      {status.toUpperCase()}
-                    </span>
-                    <h5 className="card-title">{event?.eventName || "Unnamed Event"}</h5>
-                    <p className="card-text">
-                      {/* <strong>🎟 Quantity:</strong> {ticket.quantity}<br /> */}
-                      <strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}<br />
-                      <strong>🆔 Ticket ID:</strong> {ticket._id}<br />
-                      <strong>📅 Start:</strong> {new Date(event?.startDate).toLocaleDateString()}<br />
-                      <strong>📅 End:</strong> {new Date(event?.endDate).toLocaleDateString()}<br />
-                      <strong>🎟 Booked at:</strong>  ₹{ticket.ticketRate} ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})<br />
 
-
-                      {!isZoom && (
-                        <>
-                          <strong>📍 Location:</strong> {ticket.cityId?.name}, {ticket.stateId?.Name}<br />
-                          {event?.latitude && event?.longitude && (
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline-primary mt-2"
-                            >
-                              📍 View Directions
-                            </a>
-                          )}
-                        </>
-                      )}
-
-                      {isZoom && event.zoomUrl && (
-                        <>
-                          <strong>🔗 Zoom URL:</strong>{" "}
-                          <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer">
-                            Join Meeting
-                          </a><br />
-                        </>
-                      )}
+                  {isZoom && event.zoomUrl && (
+                    <p>
+                      <strong>🔗 Zoom URL:</strong>{" "}
+                      <a
+                        href={event.zoomUrl}
+                        className="underline text-blue-500"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Join Meeting
+                      </a>
                     </p>
+                  )}
 
-                    {isIndoor && ticket.selectedSeats?.length > 0 && (
-                      <div className="mb-2">
-                        <strong>🎯 Selected Seats by Zone:</strong>
-                        {Object.entries(groupedSeats).map(([zone, seats]) => (
-                          <div key={zone} className="mt-2">
-                            <strong>Zone {zone}:</strong>
-                            <div className="d-flex flex-wrap gap-2 mt-1">
-                              {seats.map((s, i) => (
-                                <span key={i} className="badge bg-info">{s}</span>
-                              ))}
-                            </div>
+                  {isIndoor && ticket.selectedSeats?.length > 0 && (
+                    <div>
+                      <strong>🎯 Selected Seats by Zone:</strong>
+                      {Object.entries(groupedSeats).map(([zone, seats]) => (
+                        <div key={zone} className="mt-2">
+                          <div className="font-medium text-sm">Zone {zone}</div>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {seats.map((s, i) => (
+                              <Tooltip key={i}>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="outline" className="bg-muted text-sm">
+                                    {s}
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Seat {s} in Zone {zone}
+                                </TooltipContent>
+                              </Tooltip>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             );
           })}
         </div>
       )}
-      <div className="text-center mt-4">
-        <a href='/user' className="btn btn-outline-secondary">Back to Home</a>
+
+      <div className="text-center mt-6">
+        <Button variant="outline" asChild>
+          <a href="/user">Back to Home</a>
+        </Button>
       </div>
     </div>
+    </TooltipProvider>
   );
 };
+
+
+// import React, { useEffect, useState } from 'react';
+// import axios from 'axios';
+
+// export const MyTickets = () => {
+//   const [tickets, setTickets] = useState([]);
+//   const token = localStorage.getItem("token");
+
+//   useEffect(() => {
+//     const fetchTickets = async () => {
+//       try {
+//         const res = await axios.get(`/tickets/usertickets/self`, {
+//           headers: { Authorization: `Bearer ${token}` },
+//         });
+//         setTickets(res.data.data);
+//       } catch (error) {
+//         console.error("Error fetching tickets:", error);
+//       }
+//     };
+
+//     if (token) fetchTickets();
+//   }, [token]);
+
+//   const getEventStatus = (startDate, endDate) => {
+//     const now = new Date();
+//     const start = new Date(startDate);
+//     const end = new Date(endDate);
+//     if (end < now) return "past";
+//     if (start > now) return "upcoming";
+//     return "ongoing";
+//   };
+
+//   const getCardClass = (status) => {
+//     switch (status) {
+//       case "past": return "border-danger bg-light";
+//       case "upcoming": return "border-primary bg-white";
+//       case "ongoing": return "border-success bg-white";
+//       default: return "border-secondary";
+//     }
+//   };
+
+//   const getBadgeClass = (status) => {
+//     switch (status) {
+//       case "past": return "badge bg-danger";
+//       case "upcoming": return "badge bg-primary";
+//       case "ongoing": return "badge bg-success";
+//       default: return "badge bg-secondary";
+//     }
+//   };
+
+//   const groupSeatsByZone = (seats) => {
+//     const zoneMap = {};
+//     seats?.forEach((label) => {
+//       const zone = label[0];
+//       if (!zoneMap[zone]) zoneMap[zone] = [];
+//       zoneMap[zone].push(label);
+//     });
+//     return zoneMap;
+//   };
+
+//   return (
+//     <div className="container mt-5">
+//       <h2 className="text-center mb-4">🎟️ My Tickets</h2>
+//       {tickets.length === 0 ? (
+//         <p className="text-center text-muted">No tickets booked yet.</p>
+//       ) : (
+//         <div className="row">
+//           {tickets.map((ticket) => {
+//             const event = ticket.eventId;
+//             const status = getEventStatus(event?.startDate, event?.endDate);
+//             const cardClass = getCardClass(status);
+//             const badgeClass = getBadgeClass(status);
+//             const isIndoor = event?.eventCategory === "Indoor";
+//             const isZoom = event?.eventCategory === "ZoomMeeting";
+//             const groupedSeats = groupSeatsByZone(ticket.selectedSeats);
+
+//             return (
+//               <div key={ticket._id} className="col-md-6 mb-4">
+//                 <div className={`card shadow border-3 ${cardClass}`}>
+//                   {event?.eventImage && (
+//                     <img
+//                       src={event.eventImage}
+//                       alt="Event"
+//                       className="card-img-top"
+//                       style={{ maxHeight: '180px', objectFit: 'cover' }}
+//                     />
+//                   )}
+//                   <div className="card-body">
+//                     <span className={badgeClass} style={{ float: 'right' }}>
+//                       {status.toUpperCase()}
+//                     </span>
+//                     <h5 className="card-title">{event?.eventName || "Unnamed Event"}</h5>
+//                     <p className="card-text">
+//                       {/* <strong>🎟 Quantity:</strong> {ticket.quantity}<br /> */}
+//                       <strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}<br />
+//                       <strong>🆔 Ticket ID:</strong> {ticket._id}<br />
+//                       <strong>📅 Start:</strong> {new Date(event?.startDate).toLocaleDateString()}<br />
+//                       <strong>📅 End:</strong> {new Date(event?.endDate).toLocaleDateString()}<br />
+//                       <strong>🎟 Booked at:</strong>  ₹{ticket.ticketRate} ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})<br />
+
+
+//                       {!isZoom && (
+//                         <>
+//                           <strong>📍 Location:</strong> {ticket.cityId?.name}, {ticket.stateId?.Name}<br />
+//                           {event?.latitude && event?.longitude && (
+//                             <a
+//                               href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
+//                               target="_blank"
+//                               rel="noopener noreferrer"
+//                               className="btn btn-sm btn-outline-primary mt-2"
+//                             >
+//                               📍 View Directions
+//                             </a>
+//                           )}
+//                         </>
+//                       )}
+
+//                       {isZoom && event.zoomUrl && (
+//                         <>
+//                           <strong>🔗 Zoom URL:</strong>{" "}
+//                           <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer">
+//                             Join Meeting
+//                           </a><br />
+//                         </>
+//                       )}
+//                     </p>
+
+//                     {isIndoor && ticket.selectedSeats?.length > 0 && (
+//                       <div className="mb-2">
+//                         <strong>🎯 Selected Seats by Zone:</strong>
+//                         {Object.entries(groupedSeats).map(([zone, seats]) => (
+//                           <div key={zone} className="mt-2">
+//                             <strong>Zone {zone}:</strong>
+//                             <div className="d-flex flex-wrap gap-2 mt-1">
+//                               {seats.map((s, i) => (
+//                                 <span key={i} className="badge bg-info">{s}</span>
+//                               ))}
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+//       )}
+//       <div className="text-center mt-4">
+//         <a href='/user' className="btn btn-outline-secondary">Back to Home</a>
+//       </div>
+//     </div>
+//   );
+// };
 
 
 
