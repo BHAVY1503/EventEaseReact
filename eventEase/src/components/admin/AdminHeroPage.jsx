@@ -27,7 +27,8 @@ import {
   X,
   Shield,
   UserCircle2,
-  User2Icon
+  User2Icon,
+  InboxIcon
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -63,6 +64,7 @@ import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import defaultprofile from '../../assets/img/testimonials-2.jpg';
 import { AdminEvents } from './AdminEvents';
+import { AdminInbox } from './AdminInbox';
 
 export const AdminHeroPage = () => {
   const [userName, setUserName] = useState("");
@@ -147,12 +149,14 @@ export const AdminHeroPage = () => {
 
   // Sidebar navigation items
   const sidebarItems = [
+     
     { 
       id: 'events', 
       label: 'All Events', 
       icon: Calendar, 
       description: 'View all platform events' 
     },
+ 
     { 
       id: 'groupbyevent', 
       label: 'Grouped Events', 
@@ -382,13 +386,23 @@ export const AdminHeroPage = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={signout} 
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4 mr-3" />
-                    Sign Out
+                 
+                  <DropdownMenuItem asChild>
+                    <Link to="/admininbox" className="flex items-center cursor-pointer">
+                      <InboxIcon className="w-4 h-4 mr-3 text-blue-600" />
+                      <span>Inbox</span>
+                    </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator/>
+                  <DropdownMenuItem asChild  onClick={signout} 
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer">
+                    <Link to="/" className="flex items-center cursor-pointer ">
+                      <LogOut className="w-4 h-4 mr-3  text-red-600" />
+                      <span className=' hover:text-red-700'>SignOut</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -502,6 +516,15 @@ export const AdminHeroPage = () => {
             <GroupedByEvents />
         </section>
 
+        {/* Admin Inbox Section */}
+      {/* <section id="inbox" className="py-8 bg-gradient-to-b from-green-50 to-green-100">
+       <div className="container mx-auto px-4">
+       <h2 className="text-3xl font-bold mb-6">Admin Inbox</h2>
+       <AdminInbox />
+        </div>
+       </section> */}
+
+
         <section id="adminevents" className="py-0 bg-gradient-to-b from-blue-50 to-blue-50">
             <AdminEvents />
         </section>
@@ -577,13 +600,18 @@ export const AdminHeroPage = () => {
                     Organizer Management
                   </Button>
                 </Link>
-                <Button 
+                <Link to="/admininbox">
+                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
+                    Support Center
+                  </Button>
+                </Link>
+                {/* <Button 
                   variant="ghost" 
                   className="text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                  onClick={() => scrollToSection('contactus')}
+                  onClick={() => scrollToSection('/admininbox')}
                 >
                   Support Center
-                </Button>
+                </Button> */}
               </div>
             </div>
             
@@ -619,7 +647,7 @@ export const AdminHeroPage = () => {
           </div>
 
           {/* Contact Form Section */}
-          <div id="contactus" className="border-t border-white/10 pt-16">
+          {/* <div id="contactus" className="border-t border-white/10 pt-16">
             <div className="text-center mb-12">
               <Badge variant="outline" className="mb-4 bg-white/10 text-white border-white/20">
                 Get In Touch
@@ -636,7 +664,7 @@ export const AdminHeroPage = () => {
                 <ContactUs />
               </CardContent>
             </Card>
-          </div>
+          </div> */}
 
           {/* Footer Bottom */}
           <div className="border-t border-white/10 mt-16 pt-8 text-center">

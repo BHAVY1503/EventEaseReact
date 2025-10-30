@@ -45,6 +45,7 @@ import { SeatSelectionPage } from './components/user/SeatsSelection'
 import UpdateStadium from './components/admin/UpdateStadium'
 import { AdminLanding } from './AdminLanding'
 import { AdminEvents } from './components/admin/AdminEvents'
+import { AdminInbox } from './components/admin/AdminInbox'
 
 
 
@@ -84,6 +85,8 @@ function App() {
       <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
       <Route path='/allusers' element={<AllUsers/>}></Route>
       <Route path='/allorganizer' element={<AllOrganizers/>}></Route>
+      <Route path='/admininbox' element={<AdminInbox/>}></Route>
+
 
       
       </Route>
