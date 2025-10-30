@@ -392,6 +392,7 @@ export const AddEvent = () => {
                       type="file"
                       className="mt-1.5"
                       {...register("image", { required: true })}
+                      //  onChange={(e) => setValue("image", e.target.files)}
                     />
                   </div>
                 </div>
