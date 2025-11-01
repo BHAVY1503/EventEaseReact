@@ -3,15 +3,15 @@ import { Link, Outlet } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DarkModeToggle } from '@/contexts/DarkModeContext';
+
+// Import images (make sure these paths are correct in your project)
 import img1 from '../../assets/img/hero-bg.jpg';
 import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
-import img4 from '../../assets/img/event.webp'
-import axios from 'axios';
+import img4 from '../../assets/img/event.webp';
 import { UserFeedback } from '../user/UserFeedBack';
-import { ContactUs } from './ContactUs';
-import { NavigationMenu, NavigationMenuItem, NavigationMenuList, NavigationMenuTrigger } from "../ui/navigation-menu"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 
 export const LandingPage = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
@@ -22,26 +22,22 @@ export const LandingPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("/event/geteventstats");
-        setEventStats(res.data);
+        const res = await fetch("/event/geteventstats");
+        const data = await res.json();
+        setEventStats(data);
       } catch (err) {
         console.error("Failed to fetch event stats", err);
       }
     };
-
     fetchStats();
   }, []);
 
-  // Handle navbar scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Auto-advance carousel
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % images.length);
@@ -50,11 +46,11 @@ export const LandingPage = () => {
   }, [images.length]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       {/* Enhanced Navigation */}
       <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-lg' 
+          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-lg' 
           : 'bg-transparent'
       }`}>
         <div className="container mx-auto flex h-20 items-center justify-between px-6">
@@ -63,7 +59,7 @@ export const LandingPage = () => {
               <Ticket className="h-6 w-6 text-white" />
             </div>
             <span className={`font-bold text-2xl transition-colors ${
-              isScrolled ? 'text-gray-900' : 'text-white'
+              isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
             }`}>EventEase</span>
           </Link>
           
@@ -75,7 +71,7 @@ export const LandingPage = () => {
                 href={`#${item.toLowerCase()}`} 
                 className={`text-sm font-medium transition-all duration-200 hover:scale-105 ${
                   isScrolled 
-                    ? 'text-gray-700 hover:text-blue-600' 
+                    ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400' 
                     : 'text-white/90 hover:text-white'
                 }`}
               >
@@ -88,23 +84,23 @@ export const LandingPage = () => {
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className={isScrolled ? 'text-gray-900' : 'text-white'}>
+                <Button variant="ghost" size="icon" className={isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'}>
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-80">
+              <SheetContent className="w-80 bg-white dark:bg-gray-900">
                 <nav className="flex flex-col space-y-6 mt-8">
                   {['Home', 'Features', 'Events', 'About'].map((item) => (
                     <a 
                       key={item}
                       href={`#${item.toLowerCase()}`} 
-                      className="text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                      className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       {item}
                     </a>
                   ))}
-                  <div className="flex flex-col space-y-3 pt-6 border-t">
-                    <Button variant="outline" size="lg" asChild>
+                  <div className="flex flex-col space-y-3 pt-6 border-t dark:border-gray-700">
+                    <Button variant="outline" size="lg" asChild className="dark:border-gray-700 dark:hover:bg-gray-800">
                       <Link to="/signin">Sign In</Link>
                     </Button>
                     <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600" asChild>
@@ -118,12 +114,13 @@ export const LandingPage = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <DarkModeToggle />
             <Button 
               variant="ghost" 
               size="lg"
               className={`font-medium transition-all ${
                 isScrolled 
-                  ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' 
+                  ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800' 
                   : 'text-white hover:text-blue-200 hover:bg-white/10'
               }`}
               asChild
@@ -164,7 +161,7 @@ export const LandingPage = () => {
         
         {/* Hero Content */}
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8">
+          <div className="inline-flex items-center px-4 py-2 bg-white/10 dark:bg-white/20 backdrop-blur-md rounded-full border border-white/20 mb-8">
             <Star className="h-4 w-4 text-yellow-400 mr-2" />
             <span className="text-white/90 text-sm font-medium">Trusted by 10,000+ event organizers</span>
           </div>
@@ -192,7 +189,7 @@ export const LandingPage = () => {
             <Button 
               variant="outline" 
               size="lg"
-              className="border-white/30 text-white hover:bg-white/10 backdrop-blur-md font-semibold px-8 py-4 rounded-full text-lg"
+              className="border-white/30 text-gray-700 hover:bg-white/10 backdrop-blur-md font-semibold px-8 py-4 rounded-full text-lg dark:text-gray-100 "
               asChild
             >
               <Link to="/events">Browse Events</Link>
@@ -231,13 +228,13 @@ export const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gray-50" id="features">
+      <section className="py-24 bg-gray-50 dark:bg-gray-800" id="features">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Everything you need to succeed
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Powerful tools and features designed to make event management effortless and ticket sales seamless.
             </p>
           </div>
@@ -281,15 +278,15 @@ export const LandingPage = () => {
                 color: "from-indigo-500 to-indigo-600"
               }
             ].map((feature, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg">
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg dark:bg-gray-900 dark:border-gray-700">
                 <CardHeader>
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
                     {feature.icon}
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-900">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-gray-600 text-base leading-relaxed">
+                  <CardDescription className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
@@ -300,7 +297,7 @@ export const LandingPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white" id="about">
+      <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -347,13 +344,16 @@ export const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-24 bg-white" id="events">
+      {/* <section className="py-24 bg-white dark:bg-gray-800" id="events"> */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-800" id="events">
+      {/* <section className="py-20 bg-gradient-to-br  via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="events"> */}
+
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Get started in 3 simple steps
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               From concept to sold-out event, our platform guides you through every step of the journey.
             </p>
           </div>
@@ -383,7 +383,7 @@ export const LandingPage = () => {
               }
             ].map((step, index) => (
               <div key={index} className="relative group">
-                <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border border-gray-100">
+                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border border-gray-100 dark:border-gray-700">
                   <div className="relative h-48 rounded-2xl overflow-hidden mb-6">
                     <img 
                       src={step.image} 
@@ -396,12 +396,12 @@ export const LandingPage = () => {
                     </div>
                   </div>
                   
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{step.title}</h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">{step.description}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{step.description}</p>
                   
                   <ul className="space-y-2">
                     {step.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600">
+                      <li key={idx} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                         {feature}
                       </li>
@@ -411,31 +411,19 @@ export const LandingPage = () => {
                 
                 {/* Connecting line */}
                 {index < 2 && (
-                  <div className="hidden lg:block absolute top-24 -right-6 w-12 h-px bg-gradient-to-r from-blue-300 to-purple-300 z-10" />
+                  <div className="hidden lg:block absolute top-24 -right-6 w-12 h-px bg-gradient-to-r from-blue-300 to-purple-300 dark:from-blue-600 dark:to-purple-600 z-10" />
                 )}
               </div>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              What our customers say
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Don't just take our word for it - hear from event organizers who've transformed their events with EventEase.
-            </p>
-          </div>
-          <UserFeedback />
-        </div>
+        <section id="feedback" className="py-20 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800">
+                      <UserFeedback/>
+                    </section>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-blue-950 dark:via-purple-950 dark:to-indigo-950 text-white relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 opacity-20" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='6' cy='6' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
@@ -492,7 +480,7 @@ export const LandingPage = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white py-16">
+      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-16">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
             {/* Brand Section */}
@@ -503,7 +491,7 @@ export const LandingPage = () => {
                 </div>
                 <span className="font-bold text-2xl">EventEase</span>
               </div>
-              <p className="text-gray-400 mb-6 leading-relaxed">
+              <p className="text-gray-400 dark:text-gray-500 mb-6 leading-relaxed">
                 The modern platform for creating, managing, and selling tickets to unforgettable events.
               </p>
               <div className="flex space-x-4">
@@ -511,9 +499,9 @@ export const LandingPage = () => {
                   <a 
                     key={social}
                     href="#" 
-                    className="w-10 h-10 bg-gray-800 hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="w-10 h-10 bg-gray-800 dark:bg-gray-900 hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
                   >
-                    <i className={`bi bi-${social} text-lg`}></i>
+                    <span className="sr-only">{social}</span>
                   </a>
                 ))}
               </div>
@@ -525,7 +513,7 @@ export const LandingPage = () => {
               <ul className="space-y-3">
                 {['Create Events', 'Sell Tickets', 'Event Analytics', 'Mobile App'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block">
+                    <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block">
                       {link}
                     </a>
                   </li>
@@ -539,7 +527,7 @@ export const LandingPage = () => {
               <ul className="space-y-3">
                 {['Help Center', 'Contact Us', 'API Documentation', 'System Status'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block">
+                    <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block">
                       {link}
                     </a>
                   </li>
@@ -550,12 +538,12 @@ export const LandingPage = () => {
             {/* Newsletter */}
             <div>
               <h4 className="text-lg font-semibold mb-6">Stay Updated</h4>
-              <p className="text-gray-400 mb-4">Get the latest updates and event tips.</p>
+              <p className="text-gray-400 dark:text-gray-500 mb-4">Get the latest updates and event tips.</p>
               <div className="flex">
                 <input 
                   type="email" 
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-lg focus:outline-none focus:border-blue-500 text-white"
+                  className="flex-1 px-4 py-3 bg-gray-800 dark:bg-gray-950 border border-gray-700 dark:border-gray-800 rounded-l-lg focus:outline-none focus:border-blue-500 text-white"
                 />
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 rounded-r-lg">
                   Subscribe
@@ -564,12 +552,12 @@ export const LandingPage = () => {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8">
+          <div className="border-t border-gray-800 dark:border-gray-900 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 text-sm mb-4 md:mb-0">
+              <p className="text-gray-400 dark:text-gray-500 text-sm mb-4 md:mb-0">
                 © 2025 EventEase. All rights reserved. | Privacy Policy | Terms of Service
               </p>
-              <div className="flex items-center space-x-6 text-sm text-gray-400">
+              <div className="flex items-center space-x-6 text-sm text-gray-400 dark:text-gray-500">
                 <span className="flex items-center">
                   <Shield className="h-4 w-4 mr-1" />
                   Secure Platform
@@ -579,17 +567,19 @@ export const LandingPage = () => {
                   99.9% Uptime
                 </span>
               </div>
+               
             </div>
           </div>
-
-          {/* Contact Form Integration */}
-          <div className="mt-16 pt-16 border-t border-gray-800" id="contactus">
-            <ContactUs />
-          </div>
         </div>
+        
       </footer>
-
       <Outlet />
     </div>
   );
 };
+
+
+
+
+
+

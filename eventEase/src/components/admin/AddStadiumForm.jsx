@@ -133,12 +133,14 @@ const AddStadiumForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+    // <div className=" bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 ">
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-700 dark:via-black dark:to-black ">
+
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
         {/* <div className="text-center space-y-2"> */}
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Add Indoor Stadium</h1>
-          <p className="text-slate-600">Create a new stadium with seating zones and location details</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2 dark:text-gray-100">Add Indoor Stadium</h1>
+          <p className="text-slate-600 dark:text-gray-100">Create a new stadium with seating zones and location details</p>
         </div>
 
         <Card className="shadow-xl border-0">

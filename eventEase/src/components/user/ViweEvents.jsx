@@ -176,23 +176,26 @@ export const ViewEvents = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
+    // <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
+
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
             Discover Amazing Events
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed dark:text-gray-100">
             Find and book your next unforgettable experience from our curated collection of events.
           </p>
         </div>
 
         {/* Filters Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6 mb-8">
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 p-6 mb-8 dark:bg-gray-800 ">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-slate-900">Filter Events</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
@@ -214,7 +217,7 @@ export const ViewEvents = () => {
               />
             </div>
             <Select value={filterEventType} onValueChange={setFilterEventType}>
-              <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20">
+              <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:text-gray-100">
                 <SelectValue placeholder="All Event Types" />
               </SelectTrigger>
               <SelectContent>
@@ -283,7 +286,7 @@ export const ViewEvents = () => {
               return (
                 <Card 
                   key={event._id} 
-                  className="group cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden"
+                  className="group cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-gray-950 text-gray-100"
                   onClick={() => handleEventClick(event)}
                 >
                   {/* Event Image */}
@@ -291,7 +294,7 @@ export const ViewEvents = () => {
                     <img
                       src={event.eventImgUrl}
                       alt={event.eventName}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500 dark:text-gray-100"
                     />
                     <div className="absolute top-3 right-3">
                       <Badge variant={eventStatus.variant} className="shadow-lg">
@@ -307,14 +310,14 @@ export const ViewEvents = () => {
                   </div>
 
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <CardTitle className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100">
                       {event.eventName}
                     </CardTitle>
                   </CardHeader>
 
                   <CardContent className="space-y-3 pb-4">
                     {/* Date Info */}
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
                       <Calendar className="w-4 h-4 mr-2 text-blue-500" />
                       <span>
                         {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
@@ -323,31 +326,31 @@ export const ViewEvents = () => {
 
                     {/* Location Info */}
                     {event.eventCategory === "ZoomMeeting" && event.zoomUrl ? (
-                      <div className="flex items-center text-sm text-blue-600">
+                      <div className="flex items-center text-sm text-blue-600 dark:text-gray-100">
                         <ExternalLink className="w-4 h-4 mr-2" />
                         <span className="truncate">Join Zoom Meeting</span>
                       </div>
                     ) : event.eventCategory === "Indoor" && event.stadiumId?.location?.address ? (
-                      <div className="flex items-center text-sm text-slate-600">
+                      <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
                         <MapPin className="w-4 h-4 mr-2 text-green-500" />
                         <span className="truncate">{event.stadiumId.location.address}</span>
                       </div>
                     ) : event.cityId?.name ? (
-                      <div className="flex items-center text-sm text-slate-600">
+                      <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
                         <MapPin className="w-4 h-4 mr-2 text-green-500" />
                         <span>{event.cityId.name}, {event.stateId?.Name || event.stateId?.name}</span>
                       </div>
                     ) : null}
 
                     {/* Available Seats */}
-                    <div className="flex items-center text-sm text-slate-600">
+                    <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
                       <Users className="w-4 h-4 mr-2 text-purple-500" />
                       <span>{availableSeats} seats available</span>
                     </div>
 
                     {/* Ticket Rate */}
                     {event.ticketRate && (
-                      <div className="flex items-center text-sm font-semibold text-slate-900">
+                      <div className="flex items-center text-sm font-semibold text-slate-600 dark:text-gray-100">
                         <Ticket className="w-4 h-4 mr-2 text-orange-500" />
                         <span>₹{event.ticketRate.toLocaleString()}</span>
                       </div>
@@ -390,13 +393,13 @@ export const ViewEvents = () => {
       {/* Enhanced Drawer */}
       {selectedEvent && (
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerContent className="max-w-md mx-auto bg-white/95 backdrop-blur-sm border-white/50">
+          <DrawerContent className="max-w-md mx-auto bg-white/95 backdrop-blur-sm border-white/50 dark:bg-gray-950">
             <DrawerHeader className="border-b border-slate-100">
               <DrawerTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {selectedEvent.eventName}
               </DrawerTitle>
               <DrawerDescription>
-                <div className="text-sm text-slate-600 space-y-2 mt-3">
+                <div className="text-sm text-slate-600 space-y-2 mt-3 dark:text-gray-100">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-blue-500" /> 
                     {new Date(selectedEvent.startDate).toLocaleDateString()} - {new Date(selectedEvent.endDate).toLocaleDateString()}

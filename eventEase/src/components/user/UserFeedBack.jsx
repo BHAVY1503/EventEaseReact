@@ -48,17 +48,19 @@ export const UserFeedback = () => {
   };
 
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+    {/* <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100"> */}
+
+      {/* <div className="container mx-auto px-4"> */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight">What People Are Saying</h2>
-          <p className="text-gray-500 mt-2">Hear from our amazing community</p>
+          <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">What People Are Saying</h2>
+          <p className="text-gray-500 mt-2 dark:text-gray-100">Hear from our amazing community</p>
         </div>
 
         {/* Feedback Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 ">
           {feedbacks.map((fb, i) => (
-            <Card key={i} className="dark bg-background text-foreground overflow-hidden hover:shadow-x2 transition-all duration-300 hover:-translate-y-3">
+            <Card key={i} className="dark shadow-lg bg-background text-foreground overflow-hidden hover:shadow-x2 transition-all duration-300 hover:-translate-y-3">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="h-12 w-12">
@@ -119,7 +121,7 @@ export const UserFeedback = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
-    </section>
+      {/* </div> */}
+     </section>
   );
 };

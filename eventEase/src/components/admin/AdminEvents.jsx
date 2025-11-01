@@ -88,7 +88,7 @@ export const AdminEvents = () => {
             </div>
             <CardContent className="p-4 space-y-3">
               <div>
-                <h3 className="font-bold text-lg text-gray-900">{event.eventName}</h3>
+                <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{event.eventName}</h3>
                 <Badge variant="outline" className="mb-2">
                   {event.eventType}
                 </Badge>
@@ -137,7 +137,7 @@ export const AdminEvents = () => {
               )}
             </CardContent>
 
-            <CardFooter className="p-4 bg-gray-50 flex space-x-2">
+            <CardFooter className="p-4 bg-gray-50 flex space-x-2 dark:bg-gray-800">
               <Button variant="outline" size="sm" className="flex-1" asChild>
                 <a href={`/updateevent/${event._id}`}>
                   <Edit className="w-4 h-4 mr-1" />
