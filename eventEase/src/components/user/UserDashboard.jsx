@@ -1,37 +1,37 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket } from "lucide-react";
+import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket, ChevronDown, LogOut } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DarkModeToggle } from '@/contexts/DarkModeContext';
+import axios from 'axios';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Import images (make sure these paths are correct in your project)
 import img1 from '../../assets/img/hero-bg.jpg';
 import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
+import defaultprofile from "../../assets/profile.jpg";
+
 import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
 
-export const LandingPage = () => {
+export const UserDashboard = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const images = [img4, img2, img3, img1];
 
   useEffect(() => {
@@ -59,6 +59,38 @@ export const LandingPage = () => {
     }, 5000);
     return () => clearInterval(timer);
   }, [images.length]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found");
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await axios.get("/user/getuserbytoken", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const user = res.data.data;
+        setUserName(user.fullName || user.name || "Guest");
+        setError("");
+      } catch (err) {
+        console.error("Error fetching user:", err);
+        setError("Failed to load user data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const signout = () => {
+    if (window.confirm("Are you sure you want to sign out?")) {
+      localStorage.clear();
+      window.location.href = "/signin";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
@@ -114,14 +146,77 @@ export const LandingPage = () => {
                       {item}
                     </a>
                   ))}
-                  <div className="flex flex-col space-y-3 pt-6 border-t dark:border-gray-700">
+                  {/* <div className="flex flex-col space-y-3 pt-6 border-t dark:border-gray-700">
                     <Button variant="outline" size="lg" asChild className="dark:border-gray-700 dark:hover:bg-gray-800">
                       <Link to="/signin">Sign In</Link>
                     </Button>
                     <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600" asChild>
                       <Link to="/signup">Get Started</Link>
                     </Button>
+                  </div> */}
+                   {/* Profile */}
+            <div className="flex items-center space-x-3">
+              {error && (
+                <Alert className="w-64 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+                  <AlertDescription className="text-red-800 dark:text-red-300">
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Card className="p-2 border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="w-9 h-9">
+                        <AvatarImage src={defaultprofile} />
+                        <AvatarFallback 
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold flex items-center justify-center"
+                        >
+                          {userName ? userName.charAt(0).toUpperCase() : "G"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="hidden sm:block text-left">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {loading ? "Loading..." : userName || "Guest"}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Event Explorer
+                        </p>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    </div>
+                  </Card>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-white/95 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700"
+                >
+                  <div className="px-3 py-2 border-b dark:border-gray-700">
+                    <p className="text-sm font-medium dark:text-white">
+                      {userName}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Event Explorer
+                    </p>
                   </div>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/mytickets"
+                      className="flex items-center hover:bg-red-50 dark:hover:bg-gray-800"
+                    >
+                      <Ticket className="w-4 h-4 mr-3 text-red-600" />
+                      My Tickets
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={signout}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-gray-800"
+                  >
+                    <LogOut className="w-4 h-4 mr-3 text-red-600" /> Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -130,25 +225,53 @@ export const LandingPage = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <DarkModeToggle />
-            <Button 
-              variant="ghost" 
-              size="lg"
-              className={`font-medium transition-all ${
-                isScrolled 
-                  ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800' 
-                  : 'text-white hover:text-blue-200 hover:bg-white/10'
-              }`}
-              asChild
-            >
-              <Link to="/signin">Sign In</Link>
-            </Button>
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-              asChild
-            >
-              <Link to="/signup">Get Started</Link>
-            </Button>
+            
+            {loading ? (
+              <div className="animate-pulse">
+                <div className="h-10 w-32 bg-gray-200 rounded-md"></div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                {error ? (
+                  <Alert className="border-red-200 bg-red-50">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback 
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold flex items-center justify-center"
+                          >
+                            {userName ? userName.charAt(0).toUpperCase() : "G"}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <div className="px-3 py-2 border-b">
+                        <p className="text-sm font-medium">{userName}</p>
+                        <p className="text-xs text-gray-500">Event Explorer</p>
+                      </div>
+                      <DropdownMenuItem asChild>
+                        <Link to="/mytickets" className="flex items-center cursor-pointer">
+                          <Ticket className="w-4 h-4 mr-3 text-blue-600" />
+                          My Tickets
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={signout}
+                        className="text-red-600 cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -491,56 +614,79 @@ export const LandingPage = () => {
 
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-blue-950 dark:via-purple-950 dark:to-indigo-950 text-white relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-20" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='6' cy='6' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }} />
-        </div>
-        
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-              Ready to create your 
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> next event?</span>
+              {userName ? (
+                <>
+                  Welcome Back, 
+                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    {userName}
+                  </span>
+                </>
+              ) : (
+                <>
+                  Ready to create your 
+                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    next event?
+                  </span>
+                </>
+              )}
             </h2>
             <p className="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed">
-              Join thousands of successful event organizers and start selling tickets in minutes, not days.
+              {userName 
+                ? "Explore and book amazing events happening near you."
+                : "Join thousands of successful event organizers and start selling tickets in minutes."
+              }
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-              <Button 
-                size="lg" 
-                className="bg-white text-blue-900 hover:bg-gray-100 font-bold px-10 py-4 rounded-full text-lg shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105"
-                asChild
-              >
-                <Link to="/organizersignup">
-                  Start Creating Events
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-white/30 text-white hover:bg-white/10 backdrop-blur-md font-semibold px-10 py-4 rounded-full text-lg"
-                asChild
-              >
-                <Link to="/signin">Sign In to Dashboard</Link>
-              </Button>
-            </div>
-            
-            <div className="flex flex-wrap justify-center items-center gap-8 text-white/70">
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
-                <span>No setup fees</span>
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
-                <span>24/7 support</span>
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
-                <span>Cancel anytime</span>
-              </div>
+              {userName ? (
+                // Logged in user actions
+                <>
+                  <Button 
+                    size="lg" 
+                    className="bg-white text-blue-900 hover:bg-gray-100 font-bold px-10 py-4 rounded-full shadow-2xl"
+                    asChild
+                  >
+                    <Link to="/mytickets">
+                      View My Tickets
+                      <Ticket className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="border-white/30 text-white hover:bg-white/10"
+                    onClick={() => scrollToSection('events')}
+                  >
+                    Explore Events
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                // Guest user actions
+                <>
+                  <Button 
+                    size="lg" 
+                    className="bg-white text-blue-900 hover:bg-gray-100 font-bold px-10 py-4 rounded-full shadow-2xl"
+                    asChild
+                  >
+                    <Link to="/organizersignup">
+                      Start Creating Events
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="border-white/30 text-white hover:bg-white/10"
+                    asChild
+                  >
+                    <Link to="/signin">Sign In</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -644,9 +790,3 @@ export const LandingPage = () => {
     </div>
   );
 };
-
-
-
-
-
-

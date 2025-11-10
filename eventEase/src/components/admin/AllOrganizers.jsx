@@ -245,7 +245,7 @@ export const AllOrganizers = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredOrganizers.map((org, index) => (
-                    <TableRow key={org._id} className="hover:bg-gray-200 transition-colors border-gray-100">
+                    <TableRow key={org._id} className="hover:bg-gray-200 transition-colors border-gray-100  dark:hover:bg-gray-900">
                       <TableCell className="font-medium text-gray-600 dark:text-gray-100 border-gray-100">
                         {index + 1}
                       </TableCell>

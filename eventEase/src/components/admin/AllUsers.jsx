@@ -249,7 +249,7 @@ export const AllUsers = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user, index) => (
-                    <TableRow key={user._id} className="hover:bg-gray-200 transition-colors dark:text-gray-100 border-gray-100">
+                    <TableRow key={user._id} className="hover:bg-gray-200 transition-colors dark:text-gray-100 dark:hover:bg-gray-900 border-gray-100">
                       <TableCell className="font-medium text-gray-600 dark:text-gray-100 border-gray-100">
                         {index + 1}
                       </TableCell>
