@@ -120,7 +120,9 @@ export const AllUsers = () => {
   }
 
   return (
-    <div className="w-full space-y-6">
+    // <div className="w-full space-y-6">
+      <div className="w-full space-y-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors">
+
       {/* Header Section */}
       <div className="space-y-2">
         <div className="flex items-center space-x-3">
@@ -140,11 +142,13 @@ export const AllUsers = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+        {/* <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white "> */}
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
+
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-sm font-medium text-blue-600">Total Users</p>
                 <p className="text-3xl font-bold text-blue-600">{users.length}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -154,11 +158,13 @@ export const AllUsers = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
+        {/* <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white */}
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
+
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Users</p>
+                <p className="text-sm font-medium text-green-600">Active Users</p>
                 <p className="text-3xl font-bold text-green-600">{users.length}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -168,11 +174,13 @@ export const AllUsers = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
+        {/* <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white"> */}
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
+
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Filtered</p>
+                <p className="text-sm font-medium text-purple-600">Filtered</p>
                 <p className="text-3xl font-bold text-purple-600">{filteredUsers.length}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -184,8 +192,10 @@ export const AllUsers = () => {
       </div>
 
       {/* Main Content Card */}
-      <Card className="border-gray-200 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+      {/* <Card className="border-gray-200 shadow-lg"> */}
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
+
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <CardTitle className="text-2xl">All Users</CardTitle>
@@ -228,18 +238,19 @@ export const AllUsers = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold">#</TableHead>
-                    <TableHead className="font-semibold">User</TableHead>
-                    <TableHead className="font-semibold">Contact</TableHead>
-                    <TableHead className="font-semibold">Role</TableHead>
-                    <TableHead className="font-semibold text-right">Actions</TableHead>
+                  {/* <TableRow className="bg-gray-50"> */}
+                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors border-gray-100">
+                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">#</TableHead>
+                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">User</TableHead>
+                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">Contact</TableHead>
+                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">Role</TableHead>
+                    <TableHead className="font-semibold text-right text-gray-800 dark:text-gray-200">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user, index) => (
-                    <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
-                      <TableCell className="font-medium text-gray-600">
+                    <TableRow key={user._id} className="hover:bg-gray-200 transition-colors dark:text-gray-100 dark:hover:bg-gray-900 border-gray-100">
+                      <TableCell className="font-medium text-gray-600 dark:text-gray-100 border-gray-100">
                         {index + 1}
                       </TableCell>
                       <TableCell>
@@ -250,8 +261,8 @@ export const AllUsers = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-semibold text-gray-900">{user.fullName}</p>
-                            <div className="flex items-center text-sm text-gray-500">
+                            <p className="font-semibold text-gray-900 dark:text-gray-100">{user.fullName}</p>
+                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-100">
                               <Mail className="w-3 h-3 mr-1" />
                               {user.email}
                             </div>
@@ -259,7 +270,7 @@ export const AllUsers = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center text-sm text-gray-600">
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-100">
                           <Phone className="w-4 h-4 mr-2 text-gray-400" />
                           {user.phoneNumber || 'N/A'}
                         </div>

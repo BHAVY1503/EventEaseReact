@@ -46,6 +46,7 @@ import UpdateStadium from './components/admin/UpdateStadium'
 import { AdminLanding } from './AdminLanding'
 import { AdminEvents } from './components/admin/AdminEvents'
 import { AdminInbox } from './components/admin/AdminInbox'
+import { UserDashboard } from './components/user/UserDashboard'
 
 
 
@@ -109,7 +110,9 @@ function App() {
 
     {/* user  */}
     <Route element={<PrivateRoute/>}>
-      <Route path='/user' element={<UserHero/>}>
+      {/* <Route path='/user' element={<UserHero/>}> */}
+      <Route path='/user' element={<UserDashboard/>}>
+
       <Route path='viewevents' element={<ViewEvents/>}></Route>
       <Route path='userfeedback' element={<UserFeedback/>}></Route>
       </Route>

@@ -212,11 +212,11 @@ export const AdminInbox = () => {
                   {/* Header: Name, Role, and Time */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg ">
                         {msg.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <h4 className="font-bold text-lg text-gray-900">{msg.name}</h4>
+                        <h4 className="font-bold text-lg text-gray-900 dark:text-gray-100">{msg.name}</h4>
                         <Badge className={`${getRoleBadgeColor(msg.senderRole)} text-xs`}>
                           {msg.senderRole || "Guest"}
                         </Badge>

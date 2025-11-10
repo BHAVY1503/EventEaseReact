@@ -54,14 +54,14 @@ export const BookingsOfMyEvents = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Bookings of My Events</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8 ">Bookings of My Events</h1>
           <Alert className="max-w-md mx-auto">
             <Ticket className="h-4 w-4" />
-            <AlertDescription className="text-lg">
+            <AlertDescription className="text-lg ">
               No bookings yet for your events.
             </AlertDescription>
           </Alert>
-          <Button variant="outline" className="mt-6">
+          <Button href="" variant="outline" className="mt-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
@@ -81,13 +81,13 @@ export const BookingsOfMyEvents = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Bookings of My Events</h1>
-        <p className="text-gray-600">Manage and view all bookings for your events</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-gray-50">Bookings of My Events</h1>
+        <p className="text-gray-600 dark:text-gray-400">Manage and view all bookings for your events</p>
       </div>
       
       <div className="space-y-6">
         {Object.values(groupedByEvent).map(({ event, tickets }) => (
-          <Card key={event._id} className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <Card key={event._id} className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark-to-gray-900 border-gray-300">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center justify-between">
                 <div>

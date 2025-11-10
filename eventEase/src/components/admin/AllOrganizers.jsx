@@ -122,7 +122,9 @@ export const AllOrganizers = () => {
   }
 
   return (
-    <div className="w-full space-y-6">
+    // <div className="w-full space-y-6">
+      <div className="w-full space-y-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors">
+
       {/* Header Section */}
       <div className="space-y-2">
         <div className="flex items-center space-x-3">
@@ -142,11 +144,11 @@ export const AllOrganizers = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
+        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white  dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Organizers</p>
+                <p className="text-sm font-medium text-purple-600">Total Organizers</p>
                 <p className="text-3xl font-bold text-purple-600">{organizers.length}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -156,11 +158,11 @@ export const AllOrganizers = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+        <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white  dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Organizers</p>
+                <p className="text-sm font-medium text-pink-600">Active Organizers</p>
                 <p className="text-3xl font-bold text-pink-600">{organizers.length}</p>
               </div>
               <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
@@ -170,11 +172,11 @@ export const AllOrganizers = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50 to-white">
+        <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50 to-white  dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Filtered</p>
+                <p className="text-sm font-medium text-indigo-600">Filtered</p>
                 <p className="text-3xl font-bold text-indigo-600">{filteredOrganizers.length}</p>
               </div>
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -186,8 +188,10 @@ export const AllOrganizers = () => {
       </div>
 
       {/* Main Content Card */}
-      <Card className="border-gray-200 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
+      {/* <Card className="border-gray-200 shadow-lg"> */}
+      <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
+        
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b  dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <CardTitle className="text-2xl">All Organizers</CardTitle>
@@ -204,7 +208,7 @@ export const AllOrganizers = () => {
           {/* Search Bar */}
           <div className="mt-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 hover:bg-slate-400" />
               <Input
                 type="text"
                 placeholder="Search by name, email, organization, or phone..."
@@ -230,19 +234,19 @@ export const AllOrganizers = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold">#</TableHead>
-                    <TableHead className="font-semibold">Organizer</TableHead>
-                    <TableHead className="font-semibold">Organization</TableHead>
-                    <TableHead className="font-semibold">Contact</TableHead>
-                    <TableHead className="font-semibold">Role</TableHead>
-                    <TableHead className="font-semibold text-right">Actions</TableHead>
+                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-gray-100">
+                    <TableHead className="font-semibold  text-gray-800 dark:text-gray-200 ">#</TableHead>
+                    <TableHead className="font-semibold  text-gray-800 dark:text-gray-200">Organizer</TableHead>
+                    <TableHead className="font-semibold  text-gray-800 dark:text-gray-200">Organization</TableHead>
+                    <TableHead className="font-semibold  text-gray-800 dark:text-gray-200">Contact</TableHead>
+                    <TableHead className="font-semibold  text-gray-800 dark:text-gray-200">Role</TableHead>
+                    <TableHead className="font-semibold text-right  text-gray-800 dark:text-gray-200">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredOrganizers.map((org, index) => (
-                    <TableRow key={org._id} className="hover:bg-gray-50 transition-colors">
-                      <TableCell className="font-medium text-gray-600">
+                    <TableRow key={org._id} className="hover:bg-gray-200 transition-colors border-gray-100  dark:hover:bg-gray-900">
+                      <TableCell className="font-medium text-gray-600 dark:text-gray-100 border-gray-100">
                         {index + 1}
                       </TableCell>
                       <TableCell>
@@ -253,9 +257,9 @@ export const AllOrganizers = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-semibold text-gray-900">{org.name}</p>
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Mail className="w-3 h-3 mr-1" />
+                            <p className="font-semibold text-gray-900 dark:text-gray-100">{org.name}</p>
+                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-100">
+                              <Mail className="w-3 h-3 mr-1 dark:text-gray-100" />
                               {org.email}
                             </div>
                           </div>
@@ -263,7 +267,7 @@ export const AllOrganizers = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg flex items-center justify-center dark:text-gray-100">
                             <Building2 className="w-4 h-4 text-purple-600" />
                           </div>
                           <span className="font-medium text-gray-700">
@@ -272,7 +276,7 @@ export const AllOrganizers = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center text-sm text-gray-600">
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-100">
                           <Phone className="w-4 h-4 mr-2 text-gray-400" />
                           {org.PhoneNo || 'N/A'}
                         </div>

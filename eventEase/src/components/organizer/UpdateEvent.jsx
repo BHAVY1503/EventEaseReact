@@ -157,9 +157,10 @@ export const UpdateEvent = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h3 className="mb-4 red text-center">Update Event</h3>
-      <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
+    <div className="container mt-4  dark:text-gray-900 ">
+      {/* <h3 className="mb-4 red text-center">Update Event</h3> */}
+          <h1 className="text-4xl font-bold text-slate-900 mb-2 dark:text-gray-100 ">Update Event</h1>
+      <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow dark:bg-gray-900">
         <div className="row">
           <div className="col-md-6 mb-3">
             <label>Event Category</label>

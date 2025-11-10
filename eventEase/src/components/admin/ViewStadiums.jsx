@@ -138,8 +138,10 @@ const ViewStadiums = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
-        <div className="container mx-auto px-4">
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
+      {/* <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors"> */}
+
+        <div className="container mx-auto px-4 ">
           <h1 className="text-5xl font-bold text-center text-slate-900 mb-4">
             Stadium Overview
           </h1>
@@ -150,12 +152,17 @@ const ViewStadiums = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
+    // <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+
+
       <div className="container mx-auto px-4">
+        {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-slate-100 dark:border-gray-700"> */}
+
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-slate-900 mb-2">Stadium Overview</h1>
-          <p className="text-lg text-slate-600">Browse and manage all stadiums</p>
+          <h1 className="text-5xl font-bold text-slate-900 mb-2 dark:text-gray-100">Stadium Overview</h1>
+          <p className="text-lg text-slate-600 dark:text-gray-100">Browse and manage all stadiums</p>
         </div>
 
         {/* Error Message */}
@@ -167,7 +174,7 @@ const ViewStadiums = () => {
 
         {/* Filters Section */}
         {stadiums.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-slate-100">
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-slate-100 dark:bg-gray-800 dark:boarder-gray-700">
             <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               <Search className="w-5 h-5 text-blue-600" />
               Filter Stadiums
@@ -303,7 +310,7 @@ const ViewStadiums = () => {
                       e.target.src = "https://via.placeholder.com/500x300?text=No+Image";
                     }}
                   />
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg flex items-center gap-1 text-sm font-semibold">
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg flex items-center gap-1 text-sm font-semibold dark:text-gray-900">
                     <Users className="w-4 h-4 text-blue-600" />
                     {stadium.totalSeats} seats
                   </div>

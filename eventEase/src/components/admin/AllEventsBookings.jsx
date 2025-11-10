@@ -44,8 +44,10 @@ export const AllEventBookings = () => {
   }, {});
 
   return (
-    <div className="container mt-5 alert alert-primary">
-      <h2 className="text-center">All Event Bookings (Admin View)</h2>
+    // <div className="container mt-5 alert alert-primary">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+
+      <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">All Event Bookings (Admin View)</h2>
       {Object.values(groupedByEvent).map(({ event, tickets }) => {
         if (!event) return null; // skip if event is null
         return (
@@ -71,7 +73,7 @@ export const AllEventBookings = () => {
         );
       })}
       <div className="text-center mt-3">
-        <a href='/admin' className='btn btn-outline-dark'>Back to Admin Home</a>
+        <a href='/admin' className='btn btn-outline-dark dark:bg-white'>Back to Admin Home</a>
       </div>
     </div>
   );
