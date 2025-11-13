@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket, ChevronDown, LogOut } from "lucide-react";
+import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket, ChevronDown, LogOut, Badge } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DarkModeToggle } from '@/contexts/DarkModeContext';
 import axios from 'axios';
@@ -24,6 +24,7 @@ import defaultprofile from "../../assets/profile.jpg";
 
 import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
+import { ContactUs } from '../common/ContactUs';
 
 export const UserDashboard = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
@@ -440,52 +441,7 @@ export const UserDashboard = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      {/* <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Trusted by event creators worldwide
-            </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Join thousands of successful event organizers who have chosen EventEase as their go-to platform.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { 
-                number: eventStats.totalEvents || "500+", 
-                label: "Events Created",
-                icon: <Calendar className="h-8 w-8" />
-              },
-              { 
-                number: eventStats.activeEvents || "150+", 
-                label: "Active Events",
-                icon: <Zap className="h-8 w-8" />
-              },
-              { 
-                number: "1M+", 
-                label: "Tickets Sold",
-                icon: <Ticket className="h-8 w-8" />
-              },
-              { 
-                number: "10K+", 
-                label: "Happy Organizers",
-                icon: <Users className="h-8 w-8" />
-              }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="w-20 h-20 mx-auto mb-4 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
-                  {stat.icon}
-                </div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
-                <div className="text-lg text-white/80">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
+
 
       {/* How It Works Section */}
       {/* <section className="py-24 bg-white dark:bg-gray-800" id="events"> */}
@@ -561,12 +517,12 @@ export const UserDashboard = () => {
             ))}
           </div>
         </div>
-        <section id="feedback" className="py-20 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800">
-                      <UserFeedback/>
-                    </section>
+        <section id="feedback" className="py-10 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800">
+         <UserFeedback/>
+        </section>
       </section>
 
-      <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
+      {/* <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -610,10 +566,10 @@ export const UserDashboard = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-blue-950 dark:via-purple-950 dark:to-indigo-950 text-white relative overflow-hidden">
+      {/* <section className="py-24 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-blue-950 dark:via-purple-950 dark:to-indigo-950 text-white relative overflow-hidden">
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
@@ -690,7 +646,7 @@ export const UserDashboard = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Enhanced Footer */}
       <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-16">
@@ -764,6 +720,27 @@ export const UserDashboard = () => {
               </div>
             </div>
           </div>
+            
+             {/* Contact Form Section */}
+          <div id="contactus" className="border-t border-white/10 dark:border-gray-700 pt-16 scroll-mt-16">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="mb-4 bg-white/10 text-white border-white/20 dark:bg-transparent dark:border-gray-700">
+                Get In Touch
+              </Badge>
+              <h3 className="text-3xl font-bold mb-4 text-white dark:text-gray-100">
+                Contact Us
+              </h3>
+              <p className="text-gray-300 dark:text-gray-400 max-w-2xl mx-auto">
+                Have questions or need support? We're here to help you create amazing events.
+              </p>
+            </div>
+            <Card className="bg-white/5 dark:bg-gray-800/60 backdrop-blur-md border-white/10 dark:border-gray-700 shadow-2xl">
+              <CardContent className="p-8">
+                <ContactUs />
+              </CardContent>
+            </Card>
+          </div>
+
           
           <div className="border-t border-gray-800 dark:border-gray-900 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
