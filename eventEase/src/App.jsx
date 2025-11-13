@@ -47,6 +47,7 @@ import { AdminLanding } from './AdminLanding'
 import { AdminEvents } from './components/admin/AdminEvents'
 import { AdminInbox } from './components/admin/AdminInbox'
 import { UserDashboard } from './components/user/UserDashboard'
+import { AdminDashboard } from './components/admin/AdminDashboard'
 
 
 
@@ -73,7 +74,7 @@ function App() {
 
       {/* Admin  */}
       <Route element={<PrivateRoute/>}>
-      <Route path='/admin' element={<AdminHeroPage/>}>
+      <Route path='/admin' element={<AdminDashboard/>}>
       <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
       <Route path='addstadium' element={<AddStadiumForm/>}></Route>
       <Route path='stadiums' element={<ViewStadiums/>}></Route>

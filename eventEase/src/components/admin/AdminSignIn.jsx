@@ -177,13 +177,13 @@ export const AdminSignIn = () => {
             </div>
           </div>
 
-          <div className="flex justify-center items-center min-h-[48px] my-4">
+          {/* <div className="flex justify-center items-center min-h-[48px] my-4">
             <div 
               id="googleSignInDiv"
               className="w-full max-w-[300px] mx-auto"
               style={{ minHeight: '48px' }}
             />
-          </div>
+          </div> */}
 
           <div className="text-center space-y-2">
             <p className="text-sm text-gray-500">
