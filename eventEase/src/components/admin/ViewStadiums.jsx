@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { MapPin, Users, ExternalLink, Edit, Eye, X, Search, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const ViewStadiums = () => {
   const [stadiums, setStadiums] = useState([]);
@@ -73,7 +74,7 @@ const ViewStadiums = () => {
     }
 
     if (filterCity) {
-      result = result.filter((s) => s.location?.city === filterCity);
+      result = result.filter((s) => s.name.toLowerCase().includes(filterCity.toLocaleLowerCase()));
     }
 
     if (filterName) {
@@ -153,7 +154,7 @@ const ViewStadiums = () => {
 
   return (
     // <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-20 pb-12">
-    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
 
 
       <div className="container mx-auto px-4">
@@ -191,11 +192,12 @@ const ViewStadiums = () => {
                   placeholder="Search by name..."
                   value={filterName}
                   onChange={(e) => setFilterName(e.target.value)}
-                  className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
-              {/* State Filter */}
+               
+              {/* State Filter
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-slate-700 mb-2">
                   State
@@ -217,7 +219,7 @@ const ViewStadiums = () => {
                 </select>
               </div>
 
-              {/* City Filter */}
+              City Filter
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-slate-700 mb-2">
                   City
@@ -235,7 +237,9 @@ const ViewStadiums = () => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
+
+             
 
               {/* Clear Button */}
               <div className="flex flex-col justify-end">

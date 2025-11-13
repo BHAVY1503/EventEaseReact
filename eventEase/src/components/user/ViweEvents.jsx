@@ -98,7 +98,7 @@ const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
           <Calendar className="w-4 h-4 mr-2 text-blue-500" />
           <span>
             {new Date(event.startDate).toLocaleDateString()}
-            {" — "}
+            {" – "}
             {new Date(event.endDate).toLocaleDateString()}
           </span>
         </div>
@@ -181,10 +181,45 @@ export const ViewEvents = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [pendingPayment, setPendingPayment] = useState(null);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   const navigate = useNavigate();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Load Razorpay script
+  useEffect(() => {
+    const loadRazorpay = () => {
+      // Check if script is already loaded
+      if (window.Razorpay) {
+        setRazorpayLoaded(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => {
+        console.log('Razorpay SDK loaded successfully');
+        setRazorpayLoaded(true);
+      };
+      script.onerror = () => {
+        console.error('Failed to load Razorpay SDK');
+        setError('Payment system unavailable. Please refresh the page.');
+      };
+      document.body.appendChild(script);
+
+      return () => {
+        // Cleanup: remove script when component unmounts
+        const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+        if (existingScript && existingScript.parentNode) {
+          existingScript.parentNode.removeChild(existingScript);
+        }
+      };
+    };
+
+    loadRazorpay();
+  }, []);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -253,6 +288,54 @@ export const ViewEvents = () => {
       setIsDrawerOpen(false);
     } catch (err) {
       alert("Booking failed: " + (err.response?.data?.message || "Unknown error"));
+    }
+  };
+
+  const handlePayment = (eventDetails, quantity) => {
+    if (!razorpayLoaded || !window.Razorpay) {
+      alert('Payment system is still loading. Please wait a moment and try again.');
+      return;
+    }
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: quantity * (eventDetails.ticketRate || 0) * 100,
+      currency: "INR",
+      name: "EventEase",
+      description: `Booking for ${eventDetails.eventName}`,
+      handler: async function (response) {
+        try {
+          const booking = {
+            eventId: eventDetails._id,
+            organizerId: eventDetails.organizerId,
+            quantity: quantity,
+            selectedSeats: [],
+            stateId: eventDetails.stateId?._id || eventDetails.stateId,
+            cityId: eventDetails.cityId?._id || eventDetails.cityId,
+            paymentId: response.razorpay_payment_id
+          };
+          await bookEventWithoutSeats(booking);
+        } catch (error) {
+          console.error("Booking failed:", error);
+          alert("Payment successful but booking failed. Please contact support.");
+        }
+      },
+      prefill: {
+        name: "Guest User",
+        email: "",
+        contact: ""
+      },
+      theme: {
+        color: "#3B82F6"
+      }
+    };
+
+    try {
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Error opening Razorpay:", error);
+      alert("Failed to open payment gateway. Please try again.");
     }
   };
 
@@ -368,12 +451,14 @@ export const ViewEvents = () => {
                 </SelectTrigger>
                 <SelectContent className="dark:bg-gray-800">
                   <SelectItem value="all">All Event Types</SelectItem>
-                  <SelectItem value="Seminar">Seminar</SelectItem>
-                  <SelectItem value="Workshop">Workshop</SelectItem>
-                  <SelectItem value="ZoomMeeting">Zoom Meeting</SelectItem>
-                  <SelectItem value="Concert">Concert</SelectItem>
-                  <SelectItem value="Indoor">Indoor</SelectItem>
-                  <SelectItem value="Outdoor">Outdoor</SelectItem>
+                  <SelectItem value="Conference">Conference</SelectItem>
+                  <SelectItem value="Exhibition">Exhibition</SelectItem>
+                  <SelectItem value="Gala Dinner">Gala Dinner</SelectItem>
+                  <SelectItem value="Incentive">Incentive</SelectItem>
+                  <SelectItem value="Music consert">Music consert</SelectItem>
+                  <SelectItem value="Meeting">Meeting</SelectItem>
+                  <SelectItem value="ZoomMeeting">ZoomMeeting</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -436,7 +521,7 @@ export const ViewEvents = () => {
                   </Carousel>
                 </section>
 
-                {/* Ended Events Section - NOW WITH CAROUSEL */}
+                {/* Ended Events Section */}
                 {endedEvents.length > 0 && (
                   <section className="mt-12">
                     <div className="flex items-center justify-between mb-4">
@@ -476,7 +561,7 @@ export const ViewEvents = () => {
           </div>
         </div>
 
-        {/* Drawer - Keep existing drawer code */}
+        {/* Drawer */}
         {selectedEvent && (
           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
             <DrawerContent className="max-w-md mx-auto bg-white/95 backdrop-blur-sm border-white/50 dark:bg-gray-950">
@@ -587,6 +672,7 @@ export const ViewEvents = () => {
                         </Select>
 
                         <Button
+                          disabled={!razorpayLoaded}
                           onClick={() => {
                             if (!isAuthenticated) {
                               setPendingPayment({
@@ -612,42 +698,17 @@ export const ViewEvents = () => {
                               return;
                             }
 
-                            const options = {
-                              key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-                              amount: (ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0) * 100,
-                              currency: "INR",
-                              name: "EventEase",
-                              description: `Booking for ${selectedEvent.eventName}`,
-                              handler: async function (response) {
-                                try {
-                                  const booking = {
-                                    eventId: selectedEvent._id,
-                                    organizerId: selectedEvent.organizerId,
-                                    quantity: ticketQuantities[selectedEvent._id] || 1,
-                                    selectedSeats: [],
-                                    stateId: selectedEvent.stateId?._id || selectedEvent.stateId,
-                                    cityId: selectedEvent.cityId?._id || selectedEvent.cityId,
-                                    paymentId: response.razorpay_payment_id
-                                  };
-                                  await bookEventWithoutSeats(booking);
-                                } catch (error) {
-                                  console.error("Booking failed:", error);
-                                  alert("Payment successful but booking failed. Please contact support.");
-                                }
-                              },
-                              prefill: {
-                                name: "Guest User",
-                                email: "",
-                                contact: ""
-                              }
-                            };
-
-                            const paymentObject = new window.Razorpay(options);
-                            paymentObject.open();
+                            handlePayment(selectedEvent, ticketQuantities[selectedEvent._id] || 1);
                           }}
                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 rounded-md font-semibold"
                         >
-                          {isAuthenticated ? `Pay ₹${(ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)}` : "Sign in to Book"}
+                          {!razorpayLoaded ? (
+                            "Loading Payment..."
+                          ) : isAuthenticated ? (
+                            `Pay ₹${((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}`
+                          ) : (
+                            "Sign in to Book"
+                          )}
                         </Button>
                       </div>
                     );
@@ -672,7 +733,7 @@ export const ViewEvents = () => {
           pendingPayment={pendingPayment}
           onLoginSuccess={(token, userData) => {
             setIsAuthenticated(true);
-            if (pendingPayment) {
+            if (pendingPayment && razorpayLoaded && window.Razorpay) {
               const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: pendingPayment.amount * 100,
@@ -695,15 +756,26 @@ export const ViewEvents = () => {
                   name: userData.fullName || userData.name || "Guest User",
                   email: userData.email || "",
                   contact: userData.phone || ""
+                },
+                theme: {
+                  color: "#3B82F6"
                 }
               };
 
-              const paymentObject = new window.Razorpay(options);
-              paymentObject.open();
+              try {
+                const paymentObject = new window.Razorpay(options);
+                paymentObject.open();
+              } catch (error) {
+                console.error("Error opening Razorpay:", error);
+                alert("Failed to open payment gateway. Please try again.");
+              }
             }
             setShowSignInModal(false);
           }}
-          onClose={() => setShowSignInModal(false)}
+          onClose={() => {
+            setShowSignInModal(false);
+            setPendingPayment(null);
+          }}
         />
       )}
     </>
@@ -711,6 +783,11 @@ export const ViewEvents = () => {
 };
 
 export default ViewEvents;
+
+
+
+
+
 
 
 

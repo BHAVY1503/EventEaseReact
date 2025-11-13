@@ -134,8 +134,9 @@ const AddStadiumForm = () => {
 
   return (
     // <div className=" bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 ">
-      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-700 dark:via-black dark:to-black ">
-
+      // <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-700 dark:via-black dark:to-black ">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
+       
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
         {/* <div className="text-center space-y-2"> */}

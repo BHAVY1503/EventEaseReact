@@ -62,7 +62,7 @@ export const AdminEvents = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 space-y-8">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
     <div className="flex items-center justify-center space-x-2">
               <BarChart3 className="w-8 h-8 text-blue-600" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

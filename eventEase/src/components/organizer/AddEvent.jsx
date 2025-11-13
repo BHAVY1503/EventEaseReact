@@ -137,12 +137,12 @@ export const AddEvent = () => {
 
   return (
     // <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
-    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
 
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-900 mb-2 dark:text-gray-100">Create New Event</h1>
-          <p className="text-slate-600">Fill in the details to create your event</p>
+          <p className="text-gray-800 dark:text-gray-400">Fill in the details to create your event</p>
         </div>
 
         <Card className="shadow-xl border-0">
