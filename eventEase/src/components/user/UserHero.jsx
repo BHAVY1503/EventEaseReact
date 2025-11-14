@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { DarkModeToggle } from "@/contexts/DarkModeContext";
 
 // Custom Components
-import { ViewEvents } from "./ViweEvents";
+import  ViewEvents  from "./ViweEvents";
 import { UserFeedback } from "./UserFeedBack";
 import { ContactUs } from "../common/ContactUs";
 

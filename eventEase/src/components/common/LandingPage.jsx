@@ -13,7 +13,7 @@ import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import { UserFeedback } from '../user/UserFeedBack';
-import { ViewEvents } from '../user/ViweEvents';
+import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from './ContactUs';
 
 export const LandingPage = () => {
@@ -648,7 +648,7 @@ export const LandingPage = () => {
         </div>
         
       </footer>
-      <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
+      {/* <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -692,7 +692,7 @@ export const LandingPage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
       <Outlet />
     </div>
   );

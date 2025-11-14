@@ -44,7 +44,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import { AddEvent } from "../organizer/AddEvent";
 import { ViewMyEvent } from "../organizer/ViewMyEvent";
 import { UserFeedback } from "../user/UserFeedBack";
-import { ViewEvents } from "../user/ViweEvents";
+import  ViewEvents  from "../user/ViweEvents";
 import { ContactUs } from "../common/ContactUs";
 import { GroupedByEvents } from "./GroupedByEvents";
 import AddStadiumForm from "./AddStadiumForm";

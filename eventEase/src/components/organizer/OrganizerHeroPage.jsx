@@ -46,7 +46,7 @@ import { DarkModeToggle } from "@/contexts/DarkModeContext";
 import { AddEvent } from './AddEvent';
 import { ViewMyEvent } from './ViewMyEvent';
 import { UserFeedback } from '../user/UserFeedBack';
-import { ViewEvents } from '../user/ViweEvents';
+import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
 
 // Import your existing images

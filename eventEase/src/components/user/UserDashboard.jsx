@@ -23,7 +23,7 @@ import img4 from '../../assets/img/event.webp';
 import defaultprofile from "../../assets/profile.jpg";
 
 import { UserFeedback } from '../user/UserFeedBack';
-import { ViewEvents } from '../user/ViweEvents';
+import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
 
 export const UserDashboard = () => {
