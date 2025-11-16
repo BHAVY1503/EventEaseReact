@@ -477,7 +477,7 @@ export const LandingPage = () => {
         </div>
       </section> */}
 
-      {/* CTA Section */}
+      {/* CTA Section
       <section className="py-24 bg-gradient-to-br from-indigo-700 via-purple-600 to-blue-600 dark:from-indigo-900 dark:via-purple-800 dark:to-blue-800 text-white relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 opacity-20" style={{
@@ -532,10 +532,12 @@ export const LandingPage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Enhanced Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-16">
+        <section id="" className="py-00 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800 overflow-hidden">
+
+      {/* <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-0"> */}
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
             {/* Brand Section */}
@@ -647,52 +649,9 @@ export const LandingPage = () => {
           </div>
         </div>
         
-      </footer>
-      {/* <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Trusted by event creators worldwide
-            </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Join thousands of successful event organizers who have chosen EventEase as their go-to platform.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { 
-                number: eventStats.totalEvents || "500+", 
-                label: "Events Created",
-                icon: <Calendar className="h-8 w-8" />
-              },
-              { 
-                number: eventStats.activeEvents || "150+", 
-                label: "Active Events",
-                icon: <Zap className="h-8 w-8" />
-              },
-              { 
-                number: "1M+", 
-                label: "Tickets Sold",
-                icon: <Ticket className="h-8 w-8" />
-              },
-              { 
-                number: "10K+", 
-                label: "Happy Organizers",
-                icon: <Users className="h-8 w-8" />
-              }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="w-20 h-20 mx-auto mb-4 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
-                  {stat.icon}
-                </div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
-                <div className="text-lg text-white/80">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
+      {/* </footer> */}
+      </section>
+      
       <Outlet />
     </div>
   );

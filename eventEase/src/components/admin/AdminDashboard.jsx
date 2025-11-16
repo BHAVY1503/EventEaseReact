@@ -55,6 +55,7 @@ import { AddEvent } from "../organizer/AddEvent";
 import AddStadiumForm from "./AddStadiumForm";
 import ViewStadiums from "./ViewStadiums";
 import { UserFeedback } from "../user/UserFeedBack";
+import PendingEventsBadge from "./PendingEventsBadge";
 
 export const AdminDashboard = () => {
   const [userName, setUserName] = useState("");
@@ -281,6 +282,7 @@ export const AdminDashboard = () => {
 
               {/* Right Side Actions */}
               <div className="flex items-center space-x-4">
+                 <PendingEventsBadge onNavigate={scrollToSection} />
                 <DarkModeToggle />
 
                 {/* Error Alert */}
@@ -369,7 +371,7 @@ export const AdminDashboard = () => {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="text-white border-white/50 hover:bg-white hover:text-gray-900"
+                    className="text-black border-white/50 hover:bg-gray-800 hover:text-gray-900 dark:text-white bg-white "
                     onClick={() => scrollToSection("events")}
                   >
                     <Calendar className="w-5 h-5 mr-2" /> View Events

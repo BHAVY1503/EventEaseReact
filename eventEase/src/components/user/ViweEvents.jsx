@@ -284,7 +284,7 @@ const ViewEvents = () => {
         }
       );
 
-      setBookingInfo("Booking successful! 🎉");
+      alert("Booking successful! 🎉");
       navigate(`/mytickets/${userId}`);
       getAllEvents();
       setIsDrawerOpen(false);
@@ -850,7 +850,7 @@ const ViewEvents = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg text-center">
             <h3 className="text-lg font-semibold mb-2 text-red-600">Email Not Verified</h3>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-sm text-gray-700 dark:text-gray-700 mb-4">
               Please verify your email before booking tickets. Check your inbox for the verification link.
             </p>
 
