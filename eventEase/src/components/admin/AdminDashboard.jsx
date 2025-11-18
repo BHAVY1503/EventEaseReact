@@ -56,6 +56,7 @@ import AddStadiumForm from "./AddStadiumForm";
 import ViewStadiums from "./ViewStadiums";
 import { UserFeedback } from "../user/UserFeedBack";
 import PendingEventsBadge from "./PendingEventsBadge";
+import { RefundNotificationBadge } from "./RefundNotificationBadge";
 
 export const AdminDashboard = () => {
   const [userName, setUserName] = useState("");
@@ -144,7 +145,8 @@ export const AdminDashboard = () => {
   const quickLinks = [
     { to: "/allusers", label: "Users", icon: UserCircle2 },
     { to: "/allorganizer", label: "Organizers", icon: Users },
-    { to: "/alleventsticket", label: "Tickets", icon: Ticket },
+    { to: "/alleventsticket", label: "Tickets", icon: Ticket  },
+    { to: "/refunds", label: "Refund Requests", icon: Ticket , showRefundBadge: true}, 
     { to: "/admininbox", label: "Inbox", icon: Inbox },
   ];
 
@@ -216,6 +218,28 @@ export const AdminDashboard = () => {
               )}
               <div className="space-y-1">
                 {quickLinks.map((link) => (
+                 <Link key={link.to} to={link.to}>
+                 <Button
+                 variant="ghost"
+                 className={`w-full ${
+                 sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                 } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
+                  title={sidebarCollapsed ? link.label : ""}
+                  >
+                 <link.icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
+
+                 {!sidebarCollapsed && (
+                 <span className="text-sm font-medium flex items-center gap-2">
+                  {link.label}
+
+                 {link.showRefundBadge && <RefundNotificationBadge />}
+                </span>
+                 )}
+               </Button>
+               </Link>
+                ))}
+
+                {/* {quickLinks.map((link) => (
                   <Link key={link.to} to={link.to}>
                     <Button
                       variant="ghost"
@@ -228,7 +252,7 @@ export const AdminDashboard = () => {
                       {!sidebarCollapsed && <span className="text-sm font-medium">{link.label}</span>}
                     </Button>
                   </Link>
-                ))}
+                ))} */}
               </div>
             </div>
           </div>
