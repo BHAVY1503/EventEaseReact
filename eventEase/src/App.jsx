@@ -49,6 +49,9 @@ import { AdminInbox } from './components/admin/AdminInbox'
 import { UserDashboard } from './components/user/UserDashboard'
 import { AdminDashboard } from './components/admin/AdminDashboard'
 import { VerifyPage } from './components/common/VerifyPage'
+import { VerifyOrganizer } from './components/common/VerifyOrganizer'
+import { OrganizerDashboard } from './components/organizer/OrganizerDashboard'
+import { AdminRefundRequests } from './components/admin/AdminRefundRequests'
 
 
 
@@ -72,6 +75,8 @@ function App() {
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
       <Route path='/mappicker' element={<MapPicker/>}></Route>
       <Route path="/verify/:token" element={<VerifyPage />} />
+      <Route path="/organizer/verify/:token" element={<VerifyOrganizer />} />
+
       {/* <Route path='/adminlanding' element={<AdminLanding/>}></Route> */}
 
       {/* Admin  */}
@@ -90,6 +95,7 @@ function App() {
       <Route path='/allusers' element={<AllUsers/>}></Route>
       <Route path='/allorganizer' element={<AllOrganizers/>}></Route>
       <Route path='/admininbox' element={<AdminInbox/>}></Route>
+      <Route path="/refunds" element={<AdminRefundRequests />} />
 
 
       
@@ -98,7 +104,7 @@ function App() {
      {/* organizer  */}
      {/* <Route element={<PrivateRoute/>} */}
       <Route element={<PrivateRoute />}>
-    <Route path="/organizer" element={<OrganizerHeroPage />}>
+    <Route path="/organizer" element={<OrganizerDashboard />}>
       <Route path="addevent" element={<AddEvent />} />
       <Route path="viewevent" element={<ViewMyEvent />} />
     </Route>

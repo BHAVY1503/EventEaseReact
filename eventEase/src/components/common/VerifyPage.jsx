@@ -13,7 +13,7 @@ export function VerifyPage() {
 
     async function verify() {
       try {
-        const res = await axios.get(`/verify/${token}`);
+        const res = await axios.get(`/organizer/verify/${token}`);
         alert(res.data.message);
         localStorage.setItem("isVerified", "true");
         navigate("/user");
