@@ -190,7 +190,7 @@ export const BookedTickets = () => {
               return (
                 <Card 
                   key={ticket._id} 
-                  className="shadow-lg border hover:shadow-xl transition-shadow overflow-hidden"
+                  className="shadow-lg border hover:shadow-xl transition-shadow overflow-hidden bg-white"
                   id={`invoice-${ticket._id}`}
                 >
                   {/* Compact Invoice Header */}
@@ -236,26 +236,26 @@ export const BookedTickets = () => {
                     {/* Compact Info Section */}
                     <div className="space-y-2 ">
                       {/* Event Name */}
-                      <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">
+                      <h3 className="font-bold text-base text-gray-900">
                         {event?.eventName || "Event"}
                       </h3>
 
                       {/* Dates */}
-                      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-100">
+                      <div className="flex items-center gap-1 text-xs text-gray-600">
                         <Calendar className="w-3 h-3 text-blue-600" />
                         {new Date(event?.startDate).toLocaleDateString()} - {new Date(event?.endDate).toLocaleDateString()}
                       </div>
 
                       {/* Location */}
                       {location && (
-                        <div className="flex items-start gap-1 text-xs text-gray-600 dark:text-gray-100">
+                        <div className="flex items-start gap-1 text-xs text-gray-600 ">
                           <MapPin className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
                           <span className="line-clamp-2">{location}</span>
                         </div>
                       )}
 
                       {/* User Info */}
-                      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-100">
+                      <div className="flex items-center gap-1 text-xs text-gray-600">
                         <User className="w-3 h-3" />
                         {ticket.userId?.fullName || ticket.userId?.name || 'Guest User'}
                       </div>
@@ -389,7 +389,7 @@ export const BookedTickets = () => {
 
         <div className="text-center mt-8">
           <Button variant="outline" size="lg" asChild>
-            <a href="/user">← Back to Home</a>
+            <a href="/organizer">← Back to Home</a>
           </Button>
         </div>
       </div>
