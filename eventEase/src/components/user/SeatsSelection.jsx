@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +21,10 @@ export const SeatSelectionPage = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const res = await axios.get(`/event/geteventbyid/${id}`);
-        setEvent(res.data.data);
-        setBookedSeatLabels(res.data.data.bookedSeatLabels || []);
+        const res = await api.get(`/event/geteventbyid/${id}`);
+        const ev = res.data?.data ?? res.data;
+        setEvent(ev);
+        setBookedSeatLabels(ev?.bookedSeatLabels || []);
       } catch (err) {
         console.error("Error loading event", err.response?.data || err.message);
       }
@@ -43,21 +44,19 @@ export const SeatSelectionPage = () => {
   const handleFinalBooking = async () => {
     setBooking(true);
     try {
-      const res = await axios.post(
-        `/event/bookseat/${id}`,
-        {
-          quantity: selectedSeats.length,
-          selectedSeats,
-          organizerId: event.organizerId,
-          stateId: event.stateId?._id || event.stateId,
-          cityId: event.cityId?._id || event.cityId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      
-      alert("🎉 Booking success!");
+      const payload = {
+        quantity: selectedSeats.length,
+        selectedSeats,
+        organizerId: event.organizerId,
+        stateId: event.stateId?._id || event.stateId,
+        cityId: event.cityId?._id || event.cityId,
+      };
+
+      const res = await api.post(`/event/bookseat/${id}`, payload);
+
+      // prefer server message
+      const message = res.data?.message || "Booking success! 🎉";
+      alert(message);
       setSelectedSeats([]);
       setBookedSeatLabels((prev) => [...prev, ...selectedSeats]);
       
@@ -76,7 +75,8 @@ export const SeatSelectionPage = () => {
       
     } catch (err) {
       console.error("Booking error", err.response?.data || err.message);
-      alert("❌ Booking failed.");
+      const msg = err.response?.data?.message || err.message || "❌ Booking failed.";
+      alert(msg);
     } finally {
       setBooking(false);
     }
@@ -203,6 +203,8 @@ export const SeatSelectionPage = () => {
                   <RazorpayButton
                     eventId={event._id}
                     amount={totalAmount}
+                    quantity={selectedSeats.length}
+                    selectedSeats={selectedSeats}
                     onPaymentSuccess={handleFinalBooking}
                   />
                 )}

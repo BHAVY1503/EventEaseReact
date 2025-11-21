@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import {
   Card,
   CardContent,
@@ -102,12 +102,10 @@ export const MyTickets = () => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`/tickets/usertickets/self`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTickets(res.data.data);
+        const res = await api.get(`/tickets/usertickets/self`);
+        setTickets(res.data?.data ?? res.data ?? []);
       } catch (error) {
-        console.error("Error fetching tickets:", error);
+        console.error("Error fetching tickets:", error.response?.data || error.message || error);
       }
     };
     if (token) fetchTickets();
@@ -120,37 +118,24 @@ export const MyTickets = () => {
     if (!window.confirm("Are you sure you want to cancel this ticket?")) return;
 
     try {
-      const res = await axios.post(
-        `/tickets/cancel/${ticketId}`,
-        { reason },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post(`/tickets/cancel/${ticketId}`, { reason });
 
       toast({
         title: "Success",
-        description: res.data.message || "Ticket cancelled",
+        description: res.data?.message || "Ticket cancelled",
       });
 
-      // 🔥 Update ticket with full response data
+      // Update ticket using returned ticket object when available
+      const returned = res.data?.data ?? res.data;
       setTickets((prev) =>
-        prev.map((t) =>
-          t._id === ticketId 
-            ? { 
-                ...t, 
-                status: "Cancelled",
-                refundStatus: res.data.refundStatus || "Pending Approval",
-                refundAmount: res.data.refundAmount || 0,
-                cancellationDate: new Date()
-              } 
-            : t
-        )
+        prev.map((t) => (t._id === ticketId ? { ...t, ...(returned || {}), status: returned?.status || "Cancelled" } : t))
       );
     } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.response?.data?.message || "Cancellation failed",
+        description: error.response?.data?.message || error.message || "Cancellation failed",
       });
     }
   };
@@ -205,13 +190,7 @@ export const MyTickets = () => {
   const downloadInvoice = async (ticketId) => {
     setDownloadingTicket(ticketId);
     try {
-      const response = await axios.get(
-        `/tickets/invoice/${ticketId}/download`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          responseType: "blob",
-        }
-      );
+      const response = await api.get(`/tickets/invoice/${ticketId}/download`, { responseType: "blob" });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
@@ -226,11 +205,11 @@ export const MyTickets = () => {
         description: "Invoice downloaded successfully",
       });
     } catch (error) {
-      console.error("Error downloading invoice:", error);
+      console.error("Error downloading invoice:", error.response?.data || error.message || error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to download invoice",
+        description: error.response?.data?.message || "Failed to download invoice",
       });
     } finally {
       setDownloadingTicket(null);
