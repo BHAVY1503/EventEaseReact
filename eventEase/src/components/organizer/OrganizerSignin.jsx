@@ -99,8 +99,10 @@ export const OrganizerSignin = () => {
       const { token, data } = res.data;
 
       localStorage.setItem("organizerId", data._id);
+      localStorage.setItem("userId", data._id);
       localStorage.setItem("role", data.roleId?.name || "Organizer");
       localStorage.setItem("token", token);
+      localStorage.setItem("isVerified", data.isVerified ? "true" : "false");
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       if (data.roleId?.name === "Admin") navigate("/admin");
@@ -121,8 +123,10 @@ export const OrganizerSignin = () => {
 
       if (role === "Organizer") {
         localStorage.setItem("organizerId", res.data.data._id);
+        localStorage.setItem("userId", res.data.data._id);
         localStorage.setItem("role", role);
         localStorage.setItem("token", token);
+        localStorage.setItem("isVerified", res.data.data.isVerified ? "true" : "false");
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         navigate("/organizer");
       } else {

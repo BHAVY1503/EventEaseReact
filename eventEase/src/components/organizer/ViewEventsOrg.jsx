@@ -868,13 +868,74 @@ const ViewEventsOrg = () => {
                       return;
                     }
                     // Optional endpoint to resend verification
-                    await axios.post("/organizer/resend-verification", {}, {
-                      headers: { Authorization: `Bearer ${token}` }
-                    });
+                    await axios.post(
+                      "/organizer/resend-verification",
+                      { organizerId: localStorage.getItem("userId") },
+                      { headers: { Authorization: `Bearer ${token}` } }
+                    );
                     alert("Verification email resent. Check your inbox.");
                   } catch (err) {
-                    console.error("Resend verification failed:", err);
-                    alert(err.response?.data?.message || "Failed to resend verification email.");
+                    console.error("Resend verification failed:", err.response || err);
+                    // If server reports organizer already verified, update local state and continue
+                    const serverMsg = err.response?.data?.message;
+                    if (serverMsg && serverMsg.toLowerCase().includes("already verified")) {
+                      // mark verified locally
+                      localStorage.setItem("isVerified", "true");
+                      setIsVerified(true);
+                      setShowVerifyModal(false);
+                      setShowSignInModal(false);
+                      setPendingPayment(null);
+                      // If there was a pending action, try to continue it (open payment or redirect)
+                      if (pendingPayment) {
+                        // If redirectToSeatSelection requested
+                        if (pendingPayment.redirectToSeatSelection) {
+                          navigate(`/select-seats/${pendingPayment.eventId}`);
+                        } else if (pendingPayment.booking) {
+                          // Open Razorpay flow if available
+                          if (razorpayLoaded && window.Razorpay) {
+                            const options = {
+                              key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                              amount: pendingPayment.amount * 100,
+                              currency: "INR",
+                              name: "EventEase",
+                              description: `Booking for ${selectedEvent?.eventName || ""}`,
+                              handler: async function (response) {
+                                try {
+                                  await bookEventWithoutSeats({
+                                    ...pendingPayment.booking,
+                                    paymentId: response.razorpay_payment_id,
+                                  });
+                                  setPendingPayment(null);
+                                } catch (error) {
+                                  console.error("Booking failed:", error);
+                                  alert("Payment successful but booking failed. Please contact support.");
+                                }
+                              },
+                              prefill: {
+                                name: localStorage.getItem("name") || "Guest User",
+                                email: localStorage.getItem("email") || "",
+                                contact: localStorage.getItem("phone") || "",
+                              },
+                              theme: { color: "#3B82F6" },
+                            };
+
+                            try {
+                              const paymentObject = new window.Razorpay(options);
+                              paymentObject.open();
+                            } catch (err2) {
+                              console.error("Error opening Razorpay after verification:", err2);
+                              alert("Failed to open payment gateway. Please try again.");
+                            }
+                          } else {
+                            // fallback: navigate to booked tickets or refresh
+                            navigate(`/select-seats/${pendingPayment.eventId}`);
+                          }
+                        }
+                      }
+                      return;
+                    }
+
+                    alert(serverMsg || "Failed to resend verification email.");
                   } finally {
                     setShowVerifyModal(false);
                   }
