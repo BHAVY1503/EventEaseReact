@@ -19,28 +19,28 @@ const RefundStatusBadge = ({ ticket }) => {
         return {
           icon: <Clock className="w-4 h-4" />,
           text: 'Awaiting Approval',
-          className: 'bg-yellow-100 text-yellow-800 border-yellow-300 ',
+          className: 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:none',
           description: 'Your refund request is pending admin approval'
         };
       case 'Pending':
         return {
           icon: <AlertCircle className="w-4 h-4" />,
           text: 'Processing',
-          className: 'bg-blue-100 text-blue-800 border-blue-300',
+          className: 'bg-blue-100 text-blue-800 border-blue-300 dark:none ',
           description: 'Refund approved! Processing payment...'
         };
       case 'Completed':
         return {
           icon: <CheckCircle2 className="w-4 h-4" />,
           text: 'Refund Completed',
-          className: 'bg-green-100 text-green-800 border-green-300',
+          className: 'bg-green-100 text-green-800 border-green-300 dark:none ',
           description: `₹${ticket.refundAmount.toLocaleString()} credited on ${new Date(ticket.refundDate).toLocaleDateString()}`
         };
       case 'Rejected':
         return {
           icon: <XCircle className="w-4 h-4" />,
           text: 'Refund Rejected',
-          className: 'bg-red-100 text-red-800 border-red-300',
+          className: 'bg-red-100 text-red-800 border-red-300 dark:none',
           description: ticket.adminRemark || 'Refund request was rejected'
         };
       case 'No Refund':

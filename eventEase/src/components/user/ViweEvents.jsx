@@ -43,9 +43,8 @@ import {
 } from "lucide-react";
 import SignInModal from "@/components/user/SignInModal";
 
-/* -------------------------
-   EventCard - extracted
-   ------------------------- */
+/*
+   EventCard - extracted */
 const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
   const eventStatus = getEventStatus(event);
   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
@@ -54,7 +53,7 @@ const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
   return (
     <Card
       className={
-        "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-black text-gray-900 dark:text-gray-100 dark:border-gray-700 shadow-inner rounded-none h-full flex flex-col hover:-translate-y-2  " +
+        "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm  overflow-hidden dark:boarder-none dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-none h-full flex flex-col hover:-translate-y-2  " +
         (dimmed ? "opacity-60 filter grayscale" : "")
       }
       onClick={() => onCardClick(event)}
@@ -490,9 +489,9 @@ export const ViewEvents = () => {
           </div>
 
           {/* Filters */}
-          <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 p-6 mb-8 dark:bg-gray-800">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-blue-600" />
+          <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg hover  border p-6 mb-8 dark:bg-gray-900 dark:border-none hover:-translate-y-2 transition-all duration-200">
+            <div className="flex items-center gap-2 mb-4 ">
+              <Filter className="w-5 h-5 text-blue-600 " />
               <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -664,30 +663,30 @@ export const ViewEvents = () => {
                   <div className="p-6 space-y-6 dark:bg-black">
                     {/* Quick Info Cards */}
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-blue-50 dark:bg-blue-50 rounded-lg p-4 border border-blue-100 dark:border-blue-100">
-                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1">
+                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-md ">
+                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1 ">
                           <Calendar className="w-4 h-4" />
                           <span className="text-xs font-medium">Date</span>
                         </div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-900">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </p>
                       </div>
 
-                      <div className="bg-purple-50 dark:bg-purple-50 rounded-lg p-4 border border-purple-100 dark:border-purple-100">
-                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-600 mb-1">
+                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-md ">
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-600 mb-1">
                           <Users className="w-4 h-4" />
                           <span className="text-xs font-medium">Available</span>
                         </div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-900">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
                           {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} seats
                         </p>
                       </div>
                     </div>
 
                     {/* Price Section */}
-                    <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:bg-gray-900 rounded-lg p-4 border border-orange-100 dark:border-orange-100">
-                      <div className="flex items-center justify-between">
+                    <div className="bg-gradient-to-r rounded-lg p-4 border border-orange-100 dark:bg-gray-800 shadow-md">
+                      <div className="flex items-center justify-between ">
                         <div className="flex items-center gap-2 text-orange-600 dark:text-orange-600">
                           <Ticket className="w-5 h-5" />
                           <span className="text-sm font-medium">Ticket Price</span>
@@ -699,10 +698,10 @@ export const ViewEvents = () => {
                               if (valid.length === 0) return <span className="text-lg font-bold text-green-600">FREE</span>;
                               const minPrice = Math.min(...valid);
                               const maxPrice = Math.max(...valid);
-                              return <span className="text-lg font-bold text-gray-900 dark:text-gray-900">{minPrice === maxPrice ? `₹${minPrice.toLocaleString()}` : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`}</span>;
+                              return <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{minPrice === maxPrice ? `₹${minPrice.toLocaleString()}` : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`}</span>;
                             }
                             if (selectedEvent.ticketRate) {
-                              return <span className="text-lg font-bold text-gray-900 dark:text-gray-900">₹{selectedEvent.ticketRate.toLocaleString()}</span>;
+                              return <span className="text-lg font-bold text-gray-900 dark:text-gray-100">₹{selectedEvent.ticketRate.toLocaleString()}</span>;
                             }
                             return <span className="text-lg font-bold text-green-600">FREE</span>;
                           })()}
@@ -714,7 +713,7 @@ export const ViewEvents = () => {
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 ">Event Details</h3>
 
-                      <div className="space-y-3">
+                      <div className="space-y-3 shadow-md">
                         <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                           <Calendar className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                           <div>
@@ -773,9 +772,9 @@ export const ViewEvents = () => {
 
                     if (eventStatus.status === "ended") {
                       return (
-                        <div className="text-center py-5">
+                        <div className="text-center py-2">
                           <Badge variant="secondary" className="text-base px-8 py-3">
-                            <CheckCircle className="w-5 h-5 mr-2" />
+                            <CheckCircle className="w-5 h-5 mr-2 text-green-400" />
                             Event Completed
                           </Badge>
                         </div>
@@ -830,11 +829,11 @@ export const ViewEvents = () => {
                               e.stopPropagation();
                               handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1);
                             }}
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white justify-items-center py-6 text-base font-semibold  shadow-lg"
+                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white dark:text-white justify-items-center py-6 text-base font-semibold  shadow-lg"
                           >
                             {!isAuthenticated ? (
                               <>
-                                <LogIn className="w-5 h-5 mr-2" />
+                                <LogIn className="w-5 h-5 mr-2 text-white" />
                                 Sign in to Book Tickets
                               </>
                             ) : processingPayment ? (

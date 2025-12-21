@@ -278,7 +278,7 @@ export const UserDashboard = () => {
       </header>
 
       {/* Modern Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Carousel */}
         <div className="absolute inset-0">
           {images.map((img, index) => (
@@ -368,7 +368,7 @@ export const UserDashboard = () => {
         </div>
       </section>
 
-        <section className="py-24 bg-gray-50 dark:bg-gray-800" >
+        <section id="events" className="py-0 bg-gray-50 dark:bg-gray-800" >
         <ViewEvents/>
         </section>
 
@@ -445,7 +445,7 @@ export const UserDashboard = () => {
 
       {/* How It Works Section */}
       {/* <section className="py-24 bg-white dark:bg-gray-800" id="events"> */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-800" id="events">
+      <section className="py-0 bg-gray-50 dark:bg-gray-800" id="about">
       {/* <section className="py-20 bg-gradient-to-br  via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="events"> */}
 
         <div className="container mx-auto px-6">
@@ -517,7 +517,7 @@ export const UserDashboard = () => {
             ))}
           </div>
         </div>
-        <section id="feedback" className="py-10 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800">
+        <section id="feedback" className="py-0 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800">
          <UserFeedback/>
         </section>
       </section>

@@ -232,12 +232,12 @@ export const LandingPage = () => {
         </div>
       </section>
 
-        <section className="py-24 bg-gray-50 dark:bg-gray-800" >
+        <section className="py-3 bg-gray-50 dark:bg-gray-800" >
         <ViewEvents/>
         </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-800" id="features">
+      <section className="py-24 mb-0 bg-gray-50 dark:bg-gray-800" id="features">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
@@ -354,7 +354,7 @@ export const LandingPage = () => {
 
       {/* How It Works Section */}
       {/* <section className="py-24 bg-white dark:bg-gray-800" id="events"> */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-800" id="events">
+      <section className="py-00 bg-gray-50 dark:bg-gray-800" id="about">
       {/* <section className="py-20 bg-gradient-to-br  via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="events"> */}
 
         <div className="container mx-auto px-6">
@@ -426,12 +426,12 @@ export const LandingPage = () => {
             ))}
           </div>
         </div>
-        <section id="feedback" className="py-0 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800 overflow-hidden">
+        <section id="feedback" className="py-00 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800 overflow-hidden">
                       <UserFeedback/>
                     </section>
       </section>
 
-<footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-16">
+<footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-10">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
             {/* Brand Section */}
@@ -504,7 +504,7 @@ export const LandingPage = () => {
           </div>
             
              {/* Contact Form Section */}
-          <div id="contactus" className="border-t border-white/10 dark:border-gray-700 pt-16 scroll-mt-16">
+          <div id="contactus" className="border-t border-white/10 dark:border-gray-700 pt-0 scroll-mt-16">
             <div className="text-center mb-12">
               <Badge variant="outline" className="mb-4 bg-white/10 text-white border-white/20 dark:bg-transparent dark:border-gray-700">
                 Get In Touch

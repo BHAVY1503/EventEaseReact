@@ -78,7 +78,6 @@ export const OrganizerSignup = () => {
   const submitHandler = async (data) => {
     try {
       setIsLoading(true)
-      data.roleId = "68480b987e2eb1da1f656aef"
       const res = await axios.post("/organizer/signup", data)
       
       if (res.status === 201) {

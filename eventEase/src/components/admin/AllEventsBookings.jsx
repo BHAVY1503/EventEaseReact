@@ -137,7 +137,7 @@ export const AllEventBookings = () => {
 
   if (!tickets.length && !loading) {
     return (
-      <div className="container mx-auto px-4 py-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="mx-auto px-4 py-16 bg-gray-50 dark:bg-gray-800 min-h-screen">
         <div className="text-center py-20">
           <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
           <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -158,7 +158,7 @@ export const AllEventBookings = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-950 min-h-screen">
+    <div className="mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -169,7 +169,7 @@ export const AllEventBookings = () => {
             Manage and monitor all event bookings across the platform
           </p>
         </div>
-        <div className="flex gap-2">
+         <div className="flex gap-2 justify-end">
           <Button
             onClick={exportToCSV}
             className="bg-green-600 hover:bg-green-700 text-white"
@@ -184,6 +184,7 @@ export const AllEventBookings = () => {
             </Button>
           </Link>
         </div>
+      
       </div>
 
       {/* Statistics Cards */}
@@ -436,6 +437,7 @@ export const AllEventBookings = () => {
           })
         )}
       </div>
+       
     </div>
   );
 };
