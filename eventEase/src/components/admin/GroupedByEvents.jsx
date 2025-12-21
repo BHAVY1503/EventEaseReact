@@ -168,7 +168,7 @@ export const GroupedByEvents = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center space-x-2">
           <BarChart3 className="w-8 h-8 text-blue-600" />

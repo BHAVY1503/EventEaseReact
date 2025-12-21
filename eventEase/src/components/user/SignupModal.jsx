@@ -49,7 +49,6 @@ export const SignUpModal = () => {
 
   const onSubmit = async (data) => {
     try {
-      data.roleId = "68480a087e2eb1da1f656aec";
       const res = await axios.post("/user", data);
 
       if (res.status === 201) {

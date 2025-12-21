@@ -62,7 +62,7 @@ export const AdminEvents = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 space-y-8">
+    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
     <div className="flex items-center justify-center space-x-2">
               <BarChart3 className="w-8 h-8 text-blue-600" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -76,7 +76,7 @@ export const AdminEvents = () => {
         const availableSeats = event.numberOfSeats - (event.bookedSeats || 0);
 
         return (
-          <Card key={event._id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <Card key={event._id} className="overflow-hidden hover:shadow-lg transition-shadow hover:-translate-y-4 shadow-lg">
             <div className="relative">
               <img src={event.eventImgUrl} alt={event.eventName} className="w-full h-48 object-cover" />
               {eventEnded && (
@@ -88,13 +88,13 @@ export const AdminEvents = () => {
             </div>
             <CardContent className="p-4 space-y-3">
               <div>
-                <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{event.eventName}</h3>
+                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 line-clamp-2">{event.eventName}</h3>
                 <Badge variant="outline" className="mb-2">
                   {event.eventType}
                 </Badge>
               </div>
 
-              <div className="space-y-1 text-sm text-gray-600">
+              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-4 h-4" />
                   <span>{new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</span>

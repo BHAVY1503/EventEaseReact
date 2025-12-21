@@ -26,7 +26,7 @@ import { AddEvent } from './components/organizer/AddEvent'
 import { ViewMyEvent } from './components/organizer/ViewMyEvent'
 import { UpdateEvent } from './components/organizer/UpdateEvent'
 import { UserHero } from './components/user/UserHero'
-import { ViewEvents } from './components/user/ViweEvents'
+import  ViewEvents  from './components/user/ViweEvents'
 import { BookedTickets } from './components/organizer/BookedTickets'
 import { MyTickets } from './components/organizer/MyTickets'
 import { UserFeedback } from './components/user/UserFeedBack'
@@ -47,6 +47,11 @@ import { AdminLanding } from './AdminLanding'
 import { AdminEvents } from './components/admin/AdminEvents'
 import { AdminInbox } from './components/admin/AdminInbox'
 import { UserDashboard } from './components/user/UserDashboard'
+import { AdminDashboard } from './components/admin/AdminDashboard'
+import { VerifyPage } from './components/common/VerifyPage'
+import { VerifyOrganizer } from './components/common/VerifyOrganizer'
+import { OrganizerDashboard } from './components/organizer/OrganizerDashboard'
+import { AdminRefundRequests } from './components/admin/AdminRefundRequests'
 
 
 
@@ -69,11 +74,14 @@ function App() {
      <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
      <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
       <Route path='/mappicker' element={<MapPicker/>}></Route>
+      <Route path="/verify/:token" element={<VerifyPage />} />
+      <Route path="/organizer/verify/:token" element={<VerifyOrganizer />} />
+
       {/* <Route path='/adminlanding' element={<AdminLanding/>}></Route> */}
 
       {/* Admin  */}
       <Route element={<PrivateRoute/>}>
-      <Route path='/admin' element={<AdminHeroPage/>}>
+      <Route path='/admin' element={<AdminDashboard/>}>
       <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
       <Route path='addstadium' element={<AddStadiumForm/>}></Route>
       <Route path='stadiums' element={<ViewStadiums/>}></Route>
@@ -87,6 +95,7 @@ function App() {
       <Route path='/allusers' element={<AllUsers/>}></Route>
       <Route path='/allorganizer' element={<AllOrganizers/>}></Route>
       <Route path='/admininbox' element={<AdminInbox/>}></Route>
+      <Route path="/refunds" element={<AdminRefundRequests />} />
 
 
       
@@ -95,7 +104,7 @@ function App() {
      {/* organizer  */}
      {/* <Route element={<PrivateRoute/>} */}
       <Route element={<PrivateRoute />}>
-    <Route path="/organizer" element={<OrganizerHeroPage />}>
+    <Route path="/organizer" element={<OrganizerDashboard />}>
       <Route path="addevent" element={<AddEvent />} />
       <Route path="viewevent" element={<ViewMyEvent />} />
     </Route>
@@ -116,7 +125,7 @@ function App() {
       <Route path='viewevents' element={<ViewEvents/>}></Route>
       <Route path='userfeedback' element={<UserFeedback/>}></Route>
       </Route>
-      <Route path='/mytickets' element={<MyTickets/>}></Route>
+      <Route path='/mytickets/:userId' element={<MyTickets/>}></Route>
       <Route path='/select-seats/:id' element={<SeatSelectionPage/>}></Route>
 
 

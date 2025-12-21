@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import axios from "axios";
+import api from "@/lib/api";
 import {
   Menu,
   Calendar,
@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { DarkModeToggle } from "@/contexts/DarkModeContext";
 
 // Custom Components
-import { ViewEvents } from "./ViweEvents";
+import  ViewEvents  from "./ViweEvents";
 import { UserFeedback } from "./UserFeedBack";
 import { ContactUs } from "../common/ContactUs";
 
@@ -67,9 +67,7 @@ export const UserHero = () => {
         return;
       }
       try {
-        const res = await axios.get("/user/getuserbytoken", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/user/getuserbytoken");
         const user = res.data.data;
         const name = user.fullName || user.name || "Guest";
         setUserName(name);
@@ -88,7 +86,7 @@ export const UserHero = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("/event/geteventstats");
+        const res = await api.get("/event/geteventstats");
         setEventStats(res.data);
       } catch (err) {
         console.error("Failed to fetch event stats", err);

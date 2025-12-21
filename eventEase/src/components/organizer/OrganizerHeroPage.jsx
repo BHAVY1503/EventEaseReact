@@ -46,7 +46,7 @@ import { DarkModeToggle } from "@/contexts/DarkModeContext";
 import { AddEvent } from './AddEvent';
 import { ViewMyEvent } from './ViewMyEvent';
 import { UserFeedback } from '../user/UserFeedBack';
-import { ViewEvents } from '../user/ViweEvents';
+import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
 
 // Import your existing images
@@ -55,6 +55,7 @@ import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import defaultprofile from '../../assets/img/testimonials-2.jpg';
+import ViewEventsOrg from './ViewEventsOrg';
 
 export const OrganizerHeroPage = () => {
   const [userName, setUserName] = useState("");
@@ -384,7 +385,8 @@ export const OrganizerHeroPage = () => {
       <div className="relative">
         {/* Events Section */}
         <section id="events" className="py-0 bg-gradient-to-b from-white to-slate-50 dark:from-gray-700 dark:to-black">
-          <ViewEvents />
+          {/* <ViewEvents />*/}
+          <ViewEventsOrg/>
         </section>
 
         {/* My Events Section - FIXED: Added scroll-mt for navbar offset */}
