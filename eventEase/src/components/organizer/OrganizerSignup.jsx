@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+// axios not needed here; thunks handle API calls
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
@@ -12,11 +12,15 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { organizerSignup } from "../../features/auth/authSlice";
+
 export const OrganizerSignup = () => {
   const { register, handleSubmit, formState: { errors } } = useForm()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch();
+  const { isLoading, error } = useAppSelector((s) => s.auth);
   const [isOpen, setIsOpen] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
 
   const validationSchema = {
     nameValidator: {
@@ -77,25 +81,19 @@ export const OrganizerSignup = () => {
 
   const submitHandler = async (data) => {
     try {
-      setIsLoading(true)
-      const res = await axios.post("/organizer/signup", data)
-      
-      if (res.status === 201) {
-        navigate("/organizersignin")
-      }
+      await dispatch(organizerSignup(data)).unwrap();
+      navigate("/organizersignin")
     } catch (err) {
       console.error("Signup error:", err)
-      alert(err.response?.data?.message || "Registration failed. Please try again.")
-    } finally {
-      setIsLoading(false)
+      alert(err || "Registration failed. Please try again.")
     }
   }
 
 
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[500px] bg-gradient-to-b from-gray-900 to-black text-white p-6 rounded-xl shadow-2xl border border-gray-800 max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) navigate('/', { replace: true }); }}>
+      <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[520px] bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white p-6 rounded-2xl shadow-2xl border border-gray-800 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="space-y-3 mb-6">
           <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Become an Organizer
@@ -176,13 +174,13 @@ export const OrganizerSignup = () => {
 
 
           <div className="flex flex-col gap-3 mt-6">
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
             
             <Link to="/" className="w-full">
               <Button 
@@ -196,6 +194,7 @@ export const OrganizerSignup = () => {
             </Link>
 
             <div className="text-center pt-4">
+              {error && <div className="text-red-400 mb-2">{error}</div>}
               <p className="text-sm text-gray-400">
                 Already have an account?{' '}
                 <Link 

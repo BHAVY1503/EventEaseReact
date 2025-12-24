@@ -1,5 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchMyEvents, deleteEvent } from '../../features/events/eventsSlice';
+import { useToast } from '../../hooks/use-toast';
 import { 
   Card, 
   CardContent, 
@@ -48,58 +51,25 @@ import {
 } from 'lucide-react';
 
 export const ViewMyEvent = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { list: events, status, error } = useAppSelector((s) => s.events);
+  const { toast } = useToast();
   const [bookingQuantity, setBookingQuantity] = useState({});
   const [bookedTickets, setBookedTickets] = useState({});
   const [organizerId, setOrganizerId] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-
-  const getOrganizerId = async () => {
-    try {
-      const res = await axios.get("/organizer/organizer/self", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setOrganizerId(res.data.data._id);
-    } catch (err) {
-      console.error("Failed to fetch organizer ID", err);
-      setLoading(false);
-    }
-  };
-
-  const getAllEvents = async () => {
-    try {
-      const res = await axios.get(`/event/geteventbyorganizerid`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setEvents(res.data.data);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (token) getOrganizerId();
-    else setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (organizerId) getAllEvents();
-  }, [organizerId]);
+    dispatch(fetchMyEvents());
+  }, [dispatch]);
 
   const handleDelete = async (eventId) => {
     try {
-      await axios.delete(`/event/deleteevent/${eventId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      getAllEvents();
+      await dispatch(deleteEvent(eventId)).unwrap();
+      toast({ title: 'Event deleted', description: 'Event removed successfully', status: 'success' });
     } catch (err) {
-      console.error("Error deleting event", err);
-      alert("Failed to delete event");
+      console.error('Error deleting event', err);
+      toast({ title: 'Delete failed', description: err || 'Failed to delete event', status: 'error' });
     }
   };
 
@@ -471,7 +441,7 @@ export const ViewMyEvent = () => {
           </Button>
         </div>
 
-        {loading ? (
+        {status === 'loading' ? (
           <LoadingSkeleton />
         ) : displayEvents.length === 0 ? (
           <div className="text-center py-16">

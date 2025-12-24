@@ -10,11 +10,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+//redux
+import { useDispatch, useSelector } from 'react-redux'
+import { signupUser } from '@/features/auth/authSlice'
 
-export const SignUpModal = () => {
+export const SignUpModal = ({ onClose }) => {
   const { register, handleSubmit, formState: { errors } } = useForm()
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(true)
+  const dispatch = useDispatch()
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   const validationSchema = {
     emailValidator: {
@@ -47,22 +52,31 @@ export const SignUpModal = () => {
     }
   }
 
-  const onSubmit = async (data) => {
-    try {
-      const res = await axios.post("/user", data);
+  //redux
+ const onSubmit = async (data) => {
+  const result = await dispatch(signupUser(data));
 
-      if (res.status === 201) {
-        navigate("/signin");
-      }
-    } catch (err) {
-      console.error("Signup error:", err);
-      alert(err.response?.data?.message || "Signup failed. Please try again.");
-    }
-  };
+  if (signupUser.fulfilled.match(result)) {
+    navigate("/signin");
+  }
+};
+
+  // const onSubmit = async (data) => {
+  //   try {
+  //     const res = await axios.post("/user", data);
+
+  //     if (res.status === 201) {
+  //       navigate("/signin");
+  //     }
+  //   } catch (err) {
+  //     console.error("Signup error:", err);
+  //     alert(err.response?.data?.message || "Signup failed. Please try again.");
+  //   }
+  // };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px] bg-black text-white p-6 rounded-lg shadow-lg">
+    <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white p-6 rounded-xl shadow-2xl border border-gray-800">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">Sign Up</DialogTitle>
         </DialogHeader>
@@ -138,6 +152,8 @@ export const SignUpModal = () => {
                 Sign In
               </Link>
             </p>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
           </div>
         </form>
       </DialogContent>

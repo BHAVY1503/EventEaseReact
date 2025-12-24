@@ -11,9 +11,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { organizerLogin, googleLogin } from "../../features/auth/authSlice";
+
 export const OrganizerSignin = () => {
   const { register, handleSubmit, formState: { errors } } = useForm()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch();
+  const { isLoading, error } = useAppSelector((s) => s.auth);
   const [isOpen, setIsOpen] = useState(true)
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
 
@@ -92,55 +97,43 @@ export const OrganizerSignin = () => {
   // ✅ Handle Google Login response
   const handleGoogleResponse = async (response) => {
     try {
-      const res = await axios.post("/organizer/googlelogin", {
-        token: response.credential,
-      });
-
-      const { token, data } = res.data;
-
-      localStorage.setItem("organizerId", data._id);
-      localStorage.setItem("userId", data._id);
-      localStorage.setItem("role", data.roleId?.name || "Organizer");
-      localStorage.setItem("token", token);
-      localStorage.setItem("isVerified", data.isVerified ? "true" : "false");
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
+      const result = await dispatch(googleLogin({ token: response.credential, type: 'organizer' })).unwrap();
+      const { data } = result;
       if (data.roleId?.name === "Admin") navigate("/admin");
       else navigate("/organizer");
-
-    } catch (error) {
-      console.error("Google login failed:", error);
-      alert(error.response?.data?.message || "Google login failed. Please try again.");
+    } catch (err) {
+      console.error("Google login failed:", err);
+      alert(err || "Google login failed. Please try again.");
     }
   };
 
   // ✅ Normal Sign-In (email + password)
   const submitHandler = async (data) => {
     try {
-      const res = await axios.post("/organizer/signin", data);
-      const role = res.data.data.roleId.name;
-      const token = res.data.token;
-
+      const res = await dispatch(organizerLogin(data)).unwrap();
+      const { token, data: userData } = res;
+      const role = userData.roleId.name;
+      
+      // Ensure token is stored
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userData._id);
+      localStorage.setItem("role", role);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      
       if (role === "Organizer") {
-        localStorage.setItem("organizerId", res.data.data._id);
-        localStorage.setItem("userId", res.data.data._id);
-        localStorage.setItem("role", role);
-        localStorage.setItem("token", token);
-        localStorage.setItem("isVerified", res.data.data.isVerified ? "true" : "false");
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         navigate("/organizer");
       } else {
         alert("Access denied, This login is for Organizers only");
       }
     } catch (err) {
       console.error("Signin Error", err);
-      alert(err.response?.data?.message || "Sign in failed. Please try again.");
+      alert(err || "Sign in failed. Please try again.");
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px] bg-black text-white p-6 rounded-lg shadow-lg">
+    <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) navigate('/', { replace: true }); }}>
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-blue-800 via-purple-700 to-black text-white p-6 rounded-xl shadow-2xl border border-gray-800">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
             Organizer Sign In
@@ -176,8 +169,8 @@ export const OrganizerSignin = () => {
 
           {/* Submit */}
           <div className="flex flex-col gap-4">
-            <Button type="submit" className="w-full bg-white text-black hover:bg-gray-900">
-              Sign In
+            <Button type="submit" className="w-full bg-white text-black hover:bg-gray-900" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </div>
 
@@ -199,6 +192,10 @@ export const OrganizerSignin = () => {
               style={{ minHeight: "48px" }}
             />
           </div>
+
+          {error && (
+            <div className="text-center text-red-400 mt-2">{error}</div>
+          )}
 
           {/* Links */}
           <div className="text-center space-y-2">

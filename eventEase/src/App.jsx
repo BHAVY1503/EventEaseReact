@@ -1,32 +1,16 @@
-import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-// import './App.css'
-import { Routes , Route} from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { LandingPage } from './components/common/LandingPage'
-// Removed all CSS imports that might conflict with Tailwind
-// import "./assets/animate.min.css"
-// import 'simplebar/dist/simplebar.min.css';
-// import "./assets/style.css"
-// import './assets/main.css'
-import '../../startbootstrap-landing-page-gh-pages/js/scripts'
-// main.jsx or main.tsx
-import { SignUpModal } from './components/user/SignupModal'
 import { SignUpPageWithLanding } from './SignupPagewithLanding'
-// import { SignInModel } from './components/user/SignInModal'
 import { SigninPageWithLanding } from './SiginPagewithLanding'
 import axios from 'axios'
-// import { AdminLanding } from './AdminLanding'
-import { OrganizerSignup } from './components/organizer/OrganizerSignup'
+import { useAppSelector } from './store/hooks'
 import { OrganizerWithLanding } from './organizerWithlandig'
 import { OrganizerSigninLanding } from './OrganizerSiginLanding'
-import { AdminHeroPage } from './components/admin/AdminHeroPage'
-import { OrganizerHeroPage } from './components/organizer/OrganizerHeroPage'
 import { AddEvent } from './components/organizer/AddEvent'
 import { ViewMyEvent } from './components/organizer/ViewMyEvent'
 import { UpdateEvent } from './components/organizer/UpdateEvent'
-import { UserHero } from './components/user/UserHero'
-import  ViewEvents  from './components/user/ViweEvents'
+import ViewEvents from './components/user/ViweEvents'
 import { BookedTickets } from './components/organizer/BookedTickets'
 import { MyTickets } from './components/organizer/MyTickets'
 import { UserFeedback } from './components/user/UserFeedBack'
@@ -53,91 +37,77 @@ import { VerifyOrganizer } from './components/common/VerifyOrganizer'
 import { OrganizerDashboard } from './components/organizer/OrganizerDashboard'
 import { AdminRefundRequests } from './components/admin/AdminRefundRequests'
 
-
-
 function App() {
+	axios.defaults.baseURL = "http://localhost:3100"
 
-   axios.defaults.baseURL = "http://localhost:3100"
-  
+	const navigate = useNavigate();
+	const authToken = useAppSelector((s) => s.auth.token);
+	const authRole = useAppSelector((s) => s.auth.user?.roleId?.name || null);
 
-  const [count, setCount] = useState(0)
+	useEffect(() => {
+		// keep axios default header in sync
+		if (authToken) {
+			axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
+		} else {
+			delete axios.defaults.headers.common["Authorization"];
+		}
 
-  return (
-    
-    <Routes>
-     <Route path="/" element={<LandingPage/>}></Route>
-     {/* <Route path="/signup" element={<SignUpPageWithLanding/>}></Route> */}
-     {/* <Route path='/signin' element={<SignUpPageWithLanding/>}></Route> */}
-     <Route path="/signup" element={<SignUpPageWithLanding />} />
-     <Route path="/signin" element={<SigninPageWithLanding  />} />
-     <Route path="/adminsignin" element={<AdminLanding/>} />
-     <Route path="/organizersignup" element={<OrganizerWithLanding/>} />
-     <Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
-      <Route path='/mappicker' element={<MapPicker/>}></Route>
-      <Route path="/verify/:token" element={<VerifyPage />} />
-      <Route path="/organizer/verify/:token" element={<VerifyOrganizer />} />
+		// navigate according to role when token changes
+		if (authRole === 'Organizer') navigate('/organizer');
+		else if (authRole === 'User') navigate('/user');
+		else if (authRole === 'Admin') navigate('/admin');
+	}, [authToken, authRole, navigate]);
 
-      {/* <Route path='/adminlanding' element={<AdminLanding/>}></Route> */}
+	return (
+		<Routes>
+			{/* Public Routes */}
+			<Route path="/" element={<LandingPage/>} />
+			<Route path="/signup" element={<SignUpPageWithLanding />} />
+			<Route path="/signin" element={<SigninPageWithLanding />} />
+			<Route path="/adminsignin" element={<AdminLanding/>} />
+			<Route path="/organizersignup" element={<OrganizerWithLanding/>} />
+			<Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
+			<Route path='/mappicker' element={<MapPicker/>} />
+			<Route path="/verify/:token" element={<VerifyPage />} />
+			<Route path="/organizer/verify/:token" element={<VerifyOrganizer />} />
+			<Route path='/contactus' element={<ContactUs/>} />
 
-      {/* Admin  */}
-      <Route element={<PrivateRoute/>}>
-      <Route path='/admin' element={<AdminDashboard/>}>
-      <Route path='groupedbyevent' element={<GroupedByEvents/>}></Route>
-      <Route path='addstadium' element={<AddStadiumForm/>}></Route>
-      <Route path='stadiums' element={<ViewStadiums/>}></Route>
-      {/* <Route path='editstadium/:id' element={<UpdateStadium/>}></Route> */}
-      <Route path='adminevents' element={<AdminEvents/>}></Route>
+			{/* Protected Routes */}
+			<Route element={<PrivateRoute/>}>
+				{/* Admin Routes */}
+				<Route path='/admin' element={<AdminDashboard/>}>
+					<Route path='groupedbyevent' element={<GroupedByEvents/>} />
+					<Route path='addstadium' element={<AddStadiumForm/>} />
+					<Route path='stadiums' element={<ViewStadiums/>} />
+					<Route path='adminevents' element={<AdminEvents/>} />
+				</Route>
+				<Route path='/admin/editstadium/:id' element={<UpdateStadium/>} />
+				<Route path='/alleventsticket' element={<AllEventBookings/>} />
+				<Route path='/allusers' element={<AllUsers/>} />
+				<Route path='/allorganizer' element={<AllOrganizers/>} />
+				<Route path='/admininbox' element={<AdminInbox/>} />
+				<Route path="/admin/refunds" element={<AdminRefundRequests />} />
 
-      </Route>
-      <Route path='/editstadium/:id' element={<UpdateStadium/>}></Route>
-      {/* <Route path='/admin/stadium/edit/:id' element={<UpdateStadium/>}></Route> */}
-      <Route path='/alleventsticket' element={<AllEventBookings/>}></Route>
-      <Route path='/allusers' element={<AllUsers/>}></Route>
-      <Route path='/allorganizer' element={<AllOrganizers/>}></Route>
-      <Route path='/admininbox' element={<AdminInbox/>}></Route>
-      <Route path="/refunds" element={<AdminRefundRequests />} />
+				{/* Organizer Routes */}
+				<Route path="/organizer" element={<OrganizerDashboard />}>
+					<Route path="addevent" element={<AddEvent />} />
+					<Route path="viewevent" element={<ViewMyEvent />} />
+				</Route>
+				<Route path="/stadiumselect" element={<StadiumSelector />} />
+				<Route path="/bookedtickets" element={<BookedTickets />} />
+				<Route path="/bookingofmyevents" element={<BookingsOfMyEvents />} />
+				<Route path="/updateevent/:id" element={<UpdateEvent />} />
+				<Route path="/mytickets" element={<MyTickets />} />
 
-
-      
-      </Route>
-
-     {/* organizer  */}
-     {/* <Route element={<PrivateRoute/>} */}
-      <Route element={<PrivateRoute />}>
-    <Route path="/organizer" element={<OrganizerDashboard />}>
-      <Route path="addevent" element={<AddEvent />} />
-      <Route path="viewevent" element={<ViewMyEvent />} />
-    </Route>
-      <Route path="/stadiumselect" element={<StadiumSelector />} />
-
-    <Route path="/bookedtickets" element={<BookedTickets />} />
-    <Route path="/bookingofmyevents" element={<BookingsOfMyEvents />} />
-    <Route path="/updateevent/:id" element={<UpdateEvent />} />
-    <Route path="/mytickets" element={<MyTickets />} />
-  </Route>
-       
-
-    {/* user  */}
-    <Route element={<PrivateRoute/>}>
-      {/* <Route path='/user' element={<UserHero/>}> */}
-      <Route path='/user' element={<UserDashboard/>}>
-
-      <Route path='viewevents' element={<ViewEvents/>}></Route>
-      <Route path='userfeedback' element={<UserFeedback/>}></Route>
-      </Route>
-      <Route path='/mytickets/:userId' element={<MyTickets/>}></Route>
-      <Route path='/select-seats/:id' element={<SeatSelectionPage/>}></Route>
-
-
-      </Route>
-
-    <Route path='/contactus' element={<ContactUs/>}></Route>
-
-    </Routes>
-
-    
-   
-  )
+				{/* User Routes */}
+				<Route path='/user' element={<UserDashboard/>}>
+					<Route path='viewevents' element={<ViewEvents/>} />
+					<Route path='userfeedback' element={<UserFeedback/>} />
+				</Route>
+				<Route path='/select-seats/:id' element={<SeatSelectionPage/>} />
+			</Route>
+		</Routes>
+	)
 }
 
 export default App

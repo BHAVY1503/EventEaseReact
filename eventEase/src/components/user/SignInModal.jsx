@@ -10,6 +10,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+// redux
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "@/features/auth/authSlice";
+
+
 
 /**
  * SignInModal
@@ -24,6 +29,8 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(open);
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
+  const dispatch = useDispatch();
+  const { isLoading, error, user } = useSelector((state) => state.auth);
 
   const validationSchema = {
     emailValidator: {
@@ -125,33 +132,63 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
     }
   };
 
+// using redux
   const onSubmit = async (formData) => {
-    try {
-      const res = await axios.post("/user/login", formData);
-      const token = res.data.token;
-      const userData = res.data.data;
+  const result = await dispatch(loginUser(formData));
 
-      // Let parent control post-login behavior
-      if (onLoginSuccess) {
-        onLoginSuccess(token, userData);
-      } else {
-        // fallback: local storage + redirect
-        localStorage.setItem("userId", userData._id);
-        localStorage.setItem("role", userData.roleId?.name || "User");
-        localStorage.setItem("token", token);
-        localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        if (userData.roleId?.name === "Admin") navigate("/admin");
-        else navigate("/user");
-      }
-
-      setIsOpen(false);
-      onClose?.();
-    } catch (err) {
-      console.error("Login Error:", err);
-      alert(err.response?.data?.message || "Login failed. Please try again.");
+  if (loginUser.fulfilled.match(result)) {
+    const token = result.payload.token;
+    const userData = result.payload.data;
+    const role = userData.roleId?.name;
+    
+    // Store auth data
+    localStorage.setItem("token", token);
+    localStorage.setItem("userId", userData._id);
+    localStorage.setItem("role", role || "User");
+    localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    
+    // Call parent success callback if provided
+    if (onLoginSuccess) {
+      onLoginSuccess(token, userData);
+    } else {
+      // Default navigation
+      if (role === "Admin") navigate("/admin");
+      else navigate("/user");
     }
-  };
+
+    setIsOpen(false);
+    onClose?.();
+  }
+};
+
+  // const onSubmit = async (formData) => {
+  //   try {
+  //     const res = await axios.post("/user/login", formData);
+  //     const token = res.data.token;
+  //     const userData = res.data.data;
+
+  //     // Let parent control post-login behavior
+  //     if (onLoginSuccess) {
+  //       onLoginSuccess(token, userData);
+  //     } else {
+  //       // fallback: local storage + redirect
+  //       localStorage.setItem("userId", userData._id);
+  //       localStorage.setItem("role", userData.roleId?.name || "User");
+  //       localStorage.setItem("token", token);
+  //       localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
+  //       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  //       if (userData.roleId?.name === "Admin") navigate("/admin");
+  //       else navigate("/user");
+  //     }
+
+  //     setIsOpen(false);
+  //     onClose?.();
+  //   } catch (err) {
+  //     console.error("Login Error:", err);
+  //     alert(err.response?.data?.message || "Login failed. Please try again.");
+  //   }
+  // };
 
   return (
     <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
@@ -218,9 +255,12 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
             <Link to="/adminsignin" className="text-sm text-gray-500 hover:underline">
               For Admin
             </Link>
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
           </div>
         </form>
       </DialogContent>
+
     </Dialog>
   );
 };

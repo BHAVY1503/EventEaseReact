@@ -146,7 +146,7 @@ export const AdminDashboard = () => {
     { to: "/allusers", label: "Users", icon: UserCircle2 },
     { to: "/allorganizer", label: "Organizers", icon: Users },
     { to: "/alleventsticket", label: "Tickets", icon: Ticket  },
-    { to: "/refunds", label: "Refund Requests", icon: Ticket , showRefundBadge: true}, 
+    { to: "/admin/refunds", label: "Refund Requests", icon: Ticket , showRefundBadge: true}, 
     { to: "/admininbox", label: "Inbox", icon: Inbox },
   ];
 

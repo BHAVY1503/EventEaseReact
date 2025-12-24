@@ -26,6 +26,10 @@ export const LandingPage = () => {
     const fetchStats = async () => {
       try {
         const res = await fetch("/event/geteventstats");
+        if (!res.ok) {
+          console.error("Failed to fetch event stats: " + res.statusText);
+          return;
+        }
         const data = await res.json();
         setEventStats(data);
       } catch (err) {

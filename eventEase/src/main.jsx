@@ -5,13 +5,17 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { DarkModeProvider } from './contexts/DarkModeContext'
+import { Provider } from 'react-redux'
+import store from './store/store'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-    <DarkModeProvider>
-    <App />
-    </DarkModeProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <DarkModeProvider>
+          <App />
+        </DarkModeProvider>
+      </BrowserRouter>
+    </Provider>
   </StrictMode>,
 )

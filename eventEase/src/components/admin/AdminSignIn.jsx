@@ -12,9 +12,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { adminLogin, googleLogin } from "../../features/auth/authSlice";
+
 export const AdminSignIn = () => {
   const { register, handleSubmit, formState: { errors } } = useForm()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch();
+  const { isLoading, error } = useAppSelector((s) => s.auth);
   const [isOpen, setIsOpen] = useState(true)
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
 
@@ -85,17 +90,8 @@ export const AdminSignIn = () => {
 
   const handleGoogleResponse = async (response) => {
     try {
-      const res = await axios.post("/user/googlelogin", {
-        token: response.credential,
-      });
-
-      const { token, data } = res.data;
-
-      localStorage.setItem("userId", data._id);
-      localStorage.setItem("role", data.roleId?.name || "User");
-      localStorage.setItem("token", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
+      const res = await dispatch(googleLogin({ token: response.credential, type: 'user' })).unwrap();
+      const { data } = res;
       if (data.roleId?.name === "Admin") {
         navigate("/admin");
       } else {
@@ -103,36 +99,25 @@ export const AdminSignIn = () => {
       }
     } catch (error) {
       console.error("Google login failed:", error);
-      alert(error.response?.data?.message || "Google login failed. Please try again.");
+      alert(error || "Google login failed. Please try again.");
     }
   };
 
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post("/user/login", data);
-      const token = res.data.token;
-  
-      if (res.status === 200) {
-        localStorage.setItem("userId", res.data.data._id);
-        localStorage.setItem("role", res.data.data.roleId.name);
-        localStorage.setItem("token", token)
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-        if (res.data.data.roleId.name === "Admin") {
-          navigate("/admin");
-        } else if (res.data.data.roleId.name === "Admin") {
-          navigate("/admin");
-        }
-      }
+      const res = await dispatch(adminLogin(data)).unwrap();
+      const { data: user } = res;
+      if (user.roleId?.name === "Admin") navigate("/admin");
+      else navigate("/");
     } catch (err) {
       console.error("Login Error:", err);
-      alert(err.response?.data?.message || "Login failed. Please try again.");
+      alert(err || "Login failed. Please try again.");
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px] bg-black text-white p-6 rounded-lg shadow-lg">
+    <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) navigate('/', { replace: true }); }}>
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white p-6 rounded-xl shadow-2xl border border-gray-800">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">Admin Sign In</DialogTitle>
         </DialogHeader>
@@ -163,8 +148,8 @@ export const AdminSignIn = () => {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Button type="submit" className="w-full bg-white text-black hover:bg-gray-900">
-              Sign In
+            <Button type="submit" className="w-full bg-white text-black hover:bg-gray-900" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </div>
 
@@ -186,6 +171,7 @@ export const AdminSignIn = () => {
           </div> */}
 
           <div className="text-center space-y-2">
+            {error && <div className="text-red-400">{error}</div>}
             <p className="text-sm text-gray-500">
               Not registered yet? 
               <Link to="/signup" className="ml-1 text-blue-600 hover:underline">

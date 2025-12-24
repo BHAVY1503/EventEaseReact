@@ -164,6 +164,7 @@ export const ViewEvents = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [prefersDark, setPrefersDark] = useState(false);
 
   const navigate = useNavigate();
 
@@ -182,6 +183,23 @@ export const ViewEvents = () => {
       document.body.appendChild(script);
     };
     loadRazorpay();
+  }, []);
+
+  /* Detect system dark mode (improves drawer contrast regardless of Tailwind 'dark' class) */
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = (e) => setPrefersDark(e.matches);
+      setPrefersDark(mq.matches);
+      if (mq.addEventListener) mq.addEventListener('change', handler);
+      else if (mq.addListener) mq.addListener(handler);
+      return () => {
+        if (mq.removeEventListener) mq.removeEventListener('change', handler);
+        else if (mq.removeListener) mq.removeListener(handler);
+      };
+    } catch (err) {
+      // ignore in non-browser environments
+    }
   }, []);
 
   /* Auth check (listen to storage changes) */
@@ -246,7 +264,7 @@ export const ViewEvents = () => {
         paymentId: booking.paymentId,
       });
       setBookingInfo("Booking successful! 🎉");
-      navigate(`/mytickets/${userId}`);
+      navigate(`/mytickets`);
       getAllEvents();
       setIsDrawerOpen(false);
     } catch (err) {
@@ -606,258 +624,110 @@ export const ViewEvents = () => {
           </div>
         </div>
 
-        {/* Side Drawer */}
+        {/* Side Drawer - simplified design */}
         {selectedEvent && isDrawerOpen && (
           <div className="fixed inset-0 z-50 flex">
-            {/* Backdrop */}
             <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+              className="absolute inset-0 bg-black/40"
               onClick={() => setIsDrawerOpen(false)}
             />
 
-            {/* Drawer Panel */}
-            <div className={`relative ml-auto w-full max-w-lg h-full bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-out ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-              <div className="h-full flex flex-col overflow-hidden">
-                {/* Hero Image Section */}
-                <div className="relative h-64 flex-shrink-0">
-                  <img
-                    src={selectedEvent.eventImgUrl}
-                    alt={selectedEvent.eventName}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-                  {/* Close Button */}
-                  <button
-                    onClick={() => setIsDrawerOpen(false)}
-                    className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-white dark:bg-black dark:hover:bg-gray-500 shadow-lg transition-all"
-                  >
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <aside
+              className={`relative ml-auto w-full max-w-md h-full shadow-lg transform transition duration-200 ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}
+              style={{
+                backgroundColor: prefersDark ? '#071027' : '#ffffff',
+                color: prefersDark ? '#E6EEF8' : undefined,
+              }}
+            >
+              <div className="flex flex-col h-full">
+                {/* Header */}
+                <div className="flex items-start gap-4 p-4 border-b border-gray-200 dark:border-gray-700" style={{ backgroundColor: 'transparent' }}>
+                  <img src={selectedEvent.eventImgUrl} alt={selectedEvent.eventName} className="w-20 h-20 rounded-md object-cover shadow-sm" />
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold line-clamp-2" style={{ color: prefersDark ? '#E6EEF8' : undefined }}>{selectedEvent.eventName}</h3>
+                    {selectedEvent.eventType && <p className="text-sm" style={{ color: prefersDark ? '#AFC3D9' : '#6B7280' }}>{selectedEvent.eventType}</p>}
+                    <div className="mt-2">
+                      <Badge className={`text-xs px-2 py-1 ${prefersDark ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'}`}>{getEventStatus(selectedEvent).label}</Badge>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsDrawerOpen(false)} className={`p-2 rounded ${prefersDark ? 'text-gray-200 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
+                </div>
 
-                  {/* Event Status Badge */}
-                  <div className="absolute top-4 left-4">
-                    <Badge variant={getEventStatus(selectedEvent).variant} className="shadow-lg text-sm px-3 py-1">
-                      {React.createElement(getEventStatus(selectedEvent).icon, { className: "w-4 h-4 mr-1 inline" })}
-                      {getEventStatus(selectedEvent).label}
-                    </Badge>
+                {/* Content */}
+                <div className="p-4 space-y-4 overflow-y-auto flex-1" style={{ backgroundColor: 'transparent' }}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
+                      <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Date</p>
+                      <p className="text-sm font-medium" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>{new Date(selectedEvent.startDate).toLocaleDateString()}</p>
+                    </div>
+                    <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
+                      <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Available</p>
+                      <p className="text-sm font-medium" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>{(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} seats</p>
+                    </div>
                   </div>
 
-                  {/* Title Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-lg">
-                      {selectedEvent.eventName}
-                    </h2>
-                    {selectedEvent.eventType && (
-                      <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30">
-                        {selectedEvent.eventType}
-                      </Badge>
-                    )}
+                  <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
+                    <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Ticket Price</p>
+                    <p className="text-sm font-semibold" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>
+                      {selectedEvent.ticketRate ? `₹${selectedEvent.ticketRate.toLocaleString()}` : 'FREE'}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>Details</h4>
+                    {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
+                      <a href={selectedEvent.zoomUrl} target="_blank" rel="noreferrer" className="text-sm underline" style={{ color: prefersDark ? '#7FB0FF' : '#2563EB' }}>Join Zoom Meeting</a>
+                    ) : selectedEvent.stadiumId?.location?.address ? (
+                      <p className="text-sm" style={{ color: prefersDark ? '#B6C9DB' : '#374151' }}>{selectedEvent.stadiumId.location.address}</p>
+                    ) : selectedEvent.cityId?.name ? (
+                      <p className="text-sm" style={{ color: prefersDark ? '#B6C9DB' : '#374151' }}>{selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ''}</p>
+                    ) : null}
                   </div>
                 </div>
 
-                {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto">
-                  <div className="p-6 space-y-6 dark:bg-black">
-                    {/* Quick Info Cards */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-md ">
-                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1 ">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-xs font-medium">Date</span>
-                        </div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </p>
-                      </div>
-
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-md ">
-                        <div className="flex items-center gap-2 text-green-600 dark:text-green-600 mb-1">
-                          <Users className="w-4 h-4" />
-                          <span className="text-xs font-medium">Available</span>
-                        </div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
-                          {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} seats
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Price Section */}
-                    <div className="bg-gradient-to-r rounded-lg p-4 border border-orange-100 dark:bg-gray-800 shadow-md">
-                      <div className="flex items-center justify-between ">
-                        <div className="flex items-center gap-2 text-orange-600 dark:text-orange-600">
-                          <Ticket className="w-5 h-5" />
-                          <span className="text-sm font-medium">Ticket Price</span>
-                        </div>
-                        <div className="text-right">
-                          {(() => {
-                            if (selectedEvent.eventCategory === "Indoor" && selectedEvent.zonePrices?.length > 0) {
-                              const valid = selectedEvent.zonePrices.filter(p => p > 0);
-                              if (valid.length === 0) return <span className="text-lg font-bold text-green-600">FREE</span>;
-                              const minPrice = Math.min(...valid);
-                              const maxPrice = Math.max(...valid);
-                              return <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{minPrice === maxPrice ? `₹${minPrice.toLocaleString()}` : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`}</span>;
-                            }
-                            if (selectedEvent.ticketRate) {
-                              return <span className="text-lg font-bold text-gray-900 dark:text-gray-100">₹{selectedEvent.ticketRate.toLocaleString()}</span>;
-                            }
-                            return <span className="text-lg font-bold text-green-600">FREE</span>;
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Event Details */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 ">Event Details</h3>
-
-                      <div className="space-y-3 shadow-md">
-                        <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                          <Calendar className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Event Duration</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                              {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                              <br />
-                              <span className="text-gray-500">to</span>
-                              <br />
-                              {new Date(selectedEvent.endDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                            </p>
-                          </div>
-                        </div>
-
-                        {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-                          <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1">
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Online Meeting</p>
-                              <a href={selectedEvent.zoomUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:text-blue-800 underline">
-                                Join Zoom Meeting →
-                              </a>
-                            </div>
-                          </div>
-                        ) : selectedEvent.eventCategory === "Indoor" && selectedEvent.stadiumId?.location?.address ? (
-                          <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <MapPin className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Venue Location</p>
-                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                {selectedEvent.stadiumId.location.address}
-                              </p>
-                            </div>
-                          </div>
-                        ) : selectedEvent.cityId?.name ? (
-                          <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <MapPin className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
-                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                {selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ""}
-                              </p>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Fixed Bottom Action Section */}
-                <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-300 dark:bg-black p-4 space-y-3">
+                {/* Footer Actions */}
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700" style={{ backgroundColor: 'transparent' }}>
                   {(() => {
                     const eventStatus = getEventStatus(selectedEvent);
                     const availableSeats = (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0);
 
-                    if (eventStatus.status === "ended") {
-                      return (
-                        <div className="text-center py-2">
-                          <Badge variant="secondary" className="text-base px-8 py-3">
-                            <CheckCircle className="w-5 h-5 mr-2 text-green-400" />
-                            Event Completed
-                          </Badge>
-                        </div>
-                      );
-                    } else if (eventStatus.status === "soldout") {
-                      return (
-                        <div className="text-center py-4">
-                          <Badge variant="destructive" className="text-base px-8 py-3">
-                            <AlertCircle className="w-5 h-5 mr-2" />
-                            Sold Out
-                          </Badge>
-                        </div>
-                      );
-                    } else if (selectedEvent.eventCategory === "Indoor") {
-                      return (
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSeatSelectionClick(selectedEvent);
-                          }}
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg py-6 text-base font-semibold"
-                        >
-                          {!isAuthenticated && <LogIn className="w-5 h-5 mr-2" />}
-                          <Ticket className="w-5 h-5 mr-2" />
-                          {isAuthenticated ? "Select Your Seats" : "Sign in to Select Seats"}
-                        </Button>
-                      );
-                    } else {
-                      return (
-                        <div className="space-y-2 ">
-                          <Select value={String(ticketQuantities[selectedEvent._id] || 1)} onValueChange={(value) =>
-                            setTicketQuantities({
-                              ...ticketQuantities,
-                              [selectedEvent._id]: parseInt(value),
-                            })
-                          }>
-                            <SelectTrigger className="w-full py-6 text-base bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-700">
-                              <SelectValue placeholder="Select quantity" />
-                            </SelectTrigger>
-                            <SelectContent className="dark:bg-gray-800">
-                              {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
-                                <SelectItem key={i + 1} value={String(i + 1)} className="py-3">
-                                  {i + 1} Ticket{i > 0 ? 's' : ''} - ₹{((i + 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                    if (eventStatus.status === 'ended') return <div className="text-center text-sm text-gray-500">Event Ended</div>;
+                    if (eventStatus.status === 'soldout') return <div className="text-center text-sm text-red-500">Sold Out</div>;
 
-                          <Button
-                            disabled={processingPayment}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1);
-                            }}
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white dark:text-white justify-items-center py-6 text-base font-semibold  shadow-lg"
-                          >
-                            {!isAuthenticated ? (
-                              <>
-                                <LogIn className="w-5 h-5 mr-2 text-white" />
-                                Sign in to Book Tickets
-                              </>
-                            ) : processingPayment ? (
-                              "Processing..."
-                            ) : (
-                              <>
-                                <Ticket className="w-5 h-5 mr-2" />
-                                Pay ₹{((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-                              </>
-                            )}
-                          </Button>
-
-                          {isAuthenticated && !isVerified && (
-                            <p className="text-sm text-red-500 text-center">
-                              ⚠️ Please verify your email to book tickets
-                            </p>
-                          )}
-                        </div>
+                    if (selectedEvent.eventCategory === 'Indoor') {
+                      return (
+                        <Button onClick={(e) => { e.stopPropagation(); handleSeatSelectionClick(selectedEvent); }} className="w-full">{isAuthenticated ? 'Select Seats' : 'Sign in to Select Seats'}</Button>
                       );
                     }
+
+                    return (
+                      <div className="space-y-2">
+                        <Select value={String(ticketQuantities[selectedEvent._id] || 1)} onValueChange={(v) => setTicketQuantities({ ...ticketQuantities, [selectedEvent._id]: parseInt(v) })}>
+                          <SelectTrigger className="w-full" style={{ backgroundColor: prefersDark ? '#071026' : undefined, color: prefersDark ? '#E6EEF8' : undefined }}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
+                              <SelectItem key={i+1} value={String(i+1)}>{i+1} Ticket{i>0?'s':''}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Button disabled={processingPayment} onClick={(e) => { e.stopPropagation(); handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1); }} className="w-full">
+                          { !isAuthenticated ? 'Sign in to Book' : processingPayment ? 'Processing...' : `Pay ₹${((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}` }
+                        </Button>
+
+                        {isAuthenticated && !isVerified && (<p className="text-xs text-red-500 text-center">Please verify your email to book tickets</p>)}
+                      </div>
+                    );
                   })()}
                 </div>
               </div>
-            </div>
+            </aside>
           </div>
         )}
 

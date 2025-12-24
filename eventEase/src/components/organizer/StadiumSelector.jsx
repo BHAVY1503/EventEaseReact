@@ -1,4 +1,5 @@
-import axios from "axios";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchStadiums } from "../../features/stadiums/stadiumsSlice";
 import {
   Card,
   CardContent,
@@ -26,14 +27,14 @@ import {
   Eye,
   Clock,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { selectStadium as selectStadiumAction } from "../../features/stadiums/stadiumsSlice";
 
 export const StadiumSelector = () => {
-  const [stadiums, setStadiums] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedStadium, setSelectedStadium] = useState(null);
+  const dispatch = useAppDispatch();
+  const { list: stadiums, status, error } = useAppSelector((s) => s.stadiums);
+  const selectedStadium = useAppSelector((s) => s.stadiums.selectedStadium);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,52 +46,23 @@ export const StadiumSelector = () => {
   const redirectTo = queryParams.get("redirectTo");
 
   useEffect(() => {
-    const fetchStadiums = async () => {
-      if (!token) {
-        setError("Authentication token not found. Please login again.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get("/admin/stadiums", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (Array.isArray(response.data)) {
-          setStadiums(response.data);
-        } else if (response.data.stadiums && Array.isArray(response.data.stadiums)) {
-          setStadiums(response.data.stadiums);
-        } else {
-          setStadiums([]);
-        }
-      } catch (error) {
-        console.error("Error fetching stadiums:", error);
-        setError("Failed to fetch stadiums. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStadiums();
-  }, [token]);
+    if (!token) return; // auth handled elsewhere
+    dispatch(fetchStadiums());
+  }, [token, dispatch]);
 
   const selectStadium = (stadium) => {
     try {
+      // Persist for legacy code that reads from localStorage
       localStorage.setItem("selectedStadium", JSON.stringify(stadium));
       localStorage.setItem("selectedCategory", "Indoor");
 
-      // Check if we have a specific redirect URL (like /updateevent/:id)
+      // keep in redux for app-wide access
+      dispatch(selectStadiumAction(stadium));
+
+      // Navigate to redirect or default location
       if (redirectTo) {
-        // Navigate to the exact redirect URL provided
         navigate(redirectTo);
       } else {
-        // Default behavior for new events - navigate with hash
         if (role === "Organizer") {
           navigate("/organizer#addevent");
         } else if (role === "Admin") {
@@ -103,13 +75,25 @@ export const StadiumSelector = () => {
     }
   };
 
-  if (loading) {
+  if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin text-purple-600 dark:text-purple-400" />
           <h2 className="text-2xl font-semibold">Loading Stadiums...</h2>
           <p className="text-gray-600 dark:text-gray-400">Please wait while we load stadiums.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h2 className="text-xl font-semibold text-red-600">Failed to load stadiums</h2>
+        <p className="text-gray-600 dark:text-gray-400">{error || 'Please try again later.'}</p>
+        <div className="mt-6">
+          <Button onClick={() => dispatch(fetchStadiums())}>Retry</Button>
         </div>
       </div>
     );

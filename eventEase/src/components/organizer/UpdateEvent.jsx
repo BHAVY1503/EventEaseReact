@@ -5,6 +5,9 @@ import "mapbox-gl/dist/mapbox-gl.css";
 // import "@mapbox-gl/geocoder/dist/mapbox-gl-geocoder.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import axios from "axios";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchEventById, updateEvent } from "../../features/events/eventsSlice";
+import { useToast } from "../../hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -22,6 +25,9 @@ export const UpdateEvent = () => {
   const [cities, setCities] = useState([]);
   const [eventCategory, setEventCategory] = useState("");
   const [selectedStadium, setSelectedStadium] = useState(null);
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+  const { list: eventsList } = useAppSelector((s) => s.events);
 
   const { register, handleSubmit, setValue, reset } = useForm();
   const navigate = useNavigate();
@@ -33,42 +39,42 @@ export const UpdateEvent = () => {
   }, []);
 
   useEffect(() => {
-    const fetchEventData = async () => {
-      try {
-        const res = await axios.get(`/event/geteventbyid/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const event = res.data.data;
-        setEventCategory(event.eventCategory);
+    dispatch(fetchEventById(id));
+  }, [dispatch, id]);
 
-        reset({
-          eventName: event.eventName,
-          eventType: event.eventType,
-          startDate: event.startDate.slice(0, 10),
-          endDate: event.endDate.slice(0, 10),
-          numberOfSeats: event.numberOfSeats,
-          stateId: event.stateId,
-          cityId: event.cityId,
-          zoomUrl: event.zoomUrl,
-          stadiumId: event.stadiumId,
-          latitude: event.latitude,
-          longitude: event.longitude,
-        });
+  useEffect(() => {
+    const event = eventsList.find((e) => e._id === id);
+    if (!event) return;
+    setEventCategory(event.eventCategory);
 
-        setLat(event.latitude);
-        setLng(event.longitude);
+    reset({
+      eventName: event.eventName,
+      eventType: event.eventType,
+      startDate: event.startDate?.slice(0, 10),
+      endDate: event.endDate?.slice(0, 10),
+      numberOfSeats: event.numberOfSeats,
+      stateId: event.stateId,
+      cityId: event.cityId,
+      zoomUrl: event.zoomUrl,
+      stadiumId: event.stadiumId,
+      latitude: event.latitude,
+      longitude: event.longitude,
+    });
 
-        if (event.eventCategory === "Indoor" && event.stadiumId) {
+    setLat(event.latitude);
+    setLng(event.longitude);
+
+    (async () => {
+      if (event.eventCategory === "Indoor" && event.stadiumId) {
+        try {
           const stadiumRes = await axios.get(`/stadium/${event.stadiumId}`);
           setSelectedStadium(stadiumRes.data.data);
+        } catch (err) {
+          console.error('Failed to fetch stadium for event', err);
         }
-      } catch (error) {
-        console.error("Error fetching event data:", error);
       }
-    };
-
-    fetchEventData();
-  }, [id]);
+    })();
+  }, [eventsList, id, reset]);
 
   useEffect(() => {
     const storedCategory = localStorage.getItem("selectedCategory");
@@ -132,27 +138,18 @@ export const UpdateEvent = () => {
     for (const [k, v] of Object.entries(data)) {
       formData.append(k, k === "image" ? v[0] : v);
     }
-
     try {
-      await axios.put(`/event/updateevent/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert("Event updated successfully!");
-      // navigate(`/organizer/viewevent`);
-      // navigate(`/stadiumselect?redirectTo=/updateevent/${id}`);
-      //  navigate("/organizer/viewmyevent")
-       const role = localStorage.getItem("role");
-       if (role === "Admin") {
-      window.location.href = "/admin#groupbyevent";
-        } else {
-       window.location.href = "/organizer#viewevent";
-     }
+      await dispatch(updateEvent({ id, formData })).unwrap();
+      toast({ title: 'Event updated', description: 'Event updated successfully', status: 'success' });
+      const role = localStorage.getItem("role");
+      if (role === "Admin") {
+        window.location.href = "/admin#groupbyevent";
+      } else {
+        window.location.href = "/organizer#viewevent";
+      }
     } catch (err) {
       console.error(err);
-      alert("Failed to update event.");
+      toast({ title: 'Update failed', description: err || 'Failed to update event', status: 'error' });
     }
   };
 
