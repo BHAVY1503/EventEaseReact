@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@mapbox/mapbox-gl-directions": "^4.3.1",
     "@mapbox/mapbox-gl-geocoder": "^5.0.3",
     "@radix-ui/react-accordion": "^1.2.11",
@@ -29,6 +30,7 @@
     "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-google-maps/api": "^2.20.6",
+    "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.9.0",
     "carousel": "^0.0.3",
     "class-variance-authority": "^0.7.1",
@@ -43,6 +45,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.57.0",
     "react-leaflet": "^4.2.1",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.2",
     "shadcn": "^3.5.0",
     "simplebar": "^6.3.1",

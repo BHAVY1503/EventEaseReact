@@ -3,7 +3,9 @@ import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import axios from "axios"; // You'll need to import this in your actual project
+import { useAppDispatch } from "../../store/hooks";
+import { createStadium } from "../../features/stadiums/stadiumsSlice";
+import { useToast } from "../../hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,8 @@ const AddStadiumForm = () => {
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
   const token = localStorage.getItem("token");
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
 
   const totalSeats = watch("totalSeats");
   const seatsPerZone = watch("seatsPerZone");
@@ -114,17 +118,16 @@ const AddStadiumForm = () => {
     formData.append("longitude", data.longitude);
     formData.append("image", image);
 
+    const t = toast({ title: "Adding stadium", description: "Please wait..." });
     try {
-      const res = await axios.post("/admin/stadium", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await dispatch(createStadium(formData)).unwrap();
+      t.update({ title: "Stadium added", description: "Stadium added successfully" });
       setMessage("Stadium added successfully!");
       setMessageType("success");
     } catch (err) {
       console.error(err);
+      const msg = err?.message || err || "Failed to add stadium. Please try again.";
+      t.update({ title: "Add failed", description: String(msg) });
       setMessage("Failed to add stadium. Please try again.");
       setMessageType("error");
     } finally {
@@ -155,7 +158,7 @@ const AddStadiumForm = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -308,7 +311,7 @@ const AddStadiumForm = () => {
                 {isSubmitting ? "Adding Stadium..." : "Add Stadium"}
               </Button>
               </div>
-            </div>
+            </form>
           </CardContent>
         </Card>
 

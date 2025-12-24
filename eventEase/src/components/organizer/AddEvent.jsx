@@ -13,6 +13,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Upload, Video, Building2, DollarSign } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectStadium, clearSelectedStadium } from "../../features/stadiums/stadiumsSlice";
+import { createEvent, fetchMyEvents } from "../../features/events/eventsSlice";
+import { useToast } from "../../hooks/use-toast";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -25,12 +29,21 @@ export const AddEvent = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [eventCategory, setEventCategory] = useState("");
-  const [selectedStadium, setSelectedStadium] = useState(null);
+  const selectedStadium = useAppSelector((s) => s.stadiums.selectedStadium);
+  const dispatch = useAppDispatch();
   const [customZonePrices, setCustomZonePrices] = useState([]);
+  const { toast } = useToast();
 
   const { register, handleSubmit, setValue } = useForm();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  // Ensure axios has token in headers
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  }, [token]);
 
   useEffect(() => {
     axios.get("/state/getallstates").then((r) => setStates(r.data.data));
@@ -49,7 +62,7 @@ export const AddEvent = () => {
     if (storedStadium) {
       const parsed = JSON.parse(storedStadium);
       if (parsed && parsed._id) {
-        setSelectedStadium(parsed);
+        dispatch(selectStadium(parsed));
         setValue("stadiumId", parsed._id);
         setValue("latitude", parsed.location.latitude);
         setValue("longitude", parsed.location.longitude);
@@ -98,6 +111,12 @@ export const AddEvent = () => {
   }, [eventCategory, selectedStadium]);
 
   const submitHandler = async (data) => {
+    if (!token) {
+      alert("Authentication required. Please login first.");
+      navigate("/organizersignin");
+      return;
+    }
+
     const formData = new FormData();
     for (const [k, v] of Object.entries(data)) {
       formData.append(k, k === "image" ? v[0] : v);
@@ -106,28 +125,29 @@ export const AddEvent = () => {
       console.log("customZonePrices being sent:", customZonePrices);
       formData.append("zonePrices", JSON.stringify(customZonePrices));
     }
-
     try {
-      await axios.post("/event/addeventwithfile", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert("Event added successfully!");
-       const role = localStorage.getItem("role");
-       if (role === "Admin") {
-       window.location.reload();
-      window.location.href = "/admin#groupbyevent";
-        } else {
-       window.location.reload();
-       window.location.href = "/organizer#viewevent";
-       alert("Check the 'View My Event' section to see your newly added event")
-     }
-     } catch (err) {
-       console.error(err);
-     alert("Failed to add event.");
-  }
+      // optimistic toast
+      const optimistic = toast({ title: 'Creating event', description: 'Uploading event...' });
+
+      const res = await dispatch(createEvent(formData)).unwrap();
+      // update toast to success
+      optimistic.update({ title: 'Event created', description: 'Event added successfully', status: 'success' });
+
+      const role = localStorage.getItem("role");
+      if (role === "Admin") {
+        // navigate without full page reload
+        navigate('/admin/adminevents');
+      } else {
+        // ensure organiser view updates immediately without reload
+        // the createEvent reducer already prepends the new event to the store,
+        // but fetchMyEvents ensures data consistency with backend
+        dispatch(fetchMyEvents());
+        navigate('/organizer/viewevent');
+      }
+    } catch (err) {
+      console.error(err);
+      toast({ title: 'Create failed', description: err || 'Failed to add event', status: 'error' });
+    }
     //   window.location.href = "/organizer#viewevent";
     // } catch (err) {
     //   console.error(err);
@@ -171,7 +191,7 @@ export const AddEvent = () => {
                       value={eventCategory}
                       onChange={(e) => {
                         setEventCategory(e.target.value);
-                        setSelectedStadium(null);
+                        dispatch(clearSelectedStadium());
                       }}
                     >
                       <option value="">Select Category</option>
