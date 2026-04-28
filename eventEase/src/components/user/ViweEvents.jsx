@@ -45,10 +45,29 @@ import SignInModal from "@/components/user/SignInModal";
 
 /*
    EventCard - extracted */
-const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
+const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSignInClick, onBookClick, dimmed = false }) => {
   const eventStatus = getEventStatus(event);
   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
   const StatusIcon = eventStatus.icon;
+
+  const handleActionClick = (e) => {
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      // User not signed in - show sign in modal
+      onSignInClick(event);
+      return;
+    }
+    
+    // User is signed in
+    if (event.eventCategory === "Indoor") {
+      // For indoor events, redirect to seat selection
+      onBookClick(event, { redirectToSeatSelection: true });
+    } else {
+      // For outdoor events, open the drawer to select quantity and pay
+      onCardClick(event);
+    }
+  };
 
   return (
     <Card
@@ -109,6 +128,38 @@ const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
             <span>{event.cityId.name}{event.stateId ? `, ${event.stateId?.Name || event.stateId?.name}` : ""}</span>
           </div>
         ) : null}
+
+        {/* Price Display */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-gray-800">
+          <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
+            <Users className="w-4 h-4 mr-2 text-purple-500" />
+            <span>{availableSeats} seats</span>
+          </div>
+          <div className="text-sm font-semibold">
+            {(() => {
+              if (event.eventCategory === "Indoor" && event.zonePrices?.length > 0) {
+                const validPrices = event.zonePrices.filter(p => p > 0);
+                if (validPrices.length === 0) {
+                  return <span className="text-green-600 dark:text-green-400">FREE</span>;
+                }
+                const minPrice = Math.min(...validPrices);
+                const maxPrice = Math.max(...validPrices);
+                return (
+                  <span className="text-slate-900 dark:text-gray-100">
+                    {minPrice === maxPrice 
+                      ? `₹${minPrice.toLocaleString()}`
+                      : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`
+                    }
+                  </span>
+                );
+              } else if (event.ticketRate) {
+                return <span className="text-slate-900 dark:text-gray-100">₹{event.ticketRate.toLocaleString()}</span>;
+              } else {
+                return <span className="text-green-600 dark:text-green-400">FREE</span>;
+              }
+            })()}
+          </div>
+        </div>
       </CardContent>
 
       <CardFooter className="pt-4 border-t border-slate-100 dark:border-gray-800">
@@ -126,13 +177,13 @@ const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
           ) : (
             <Button
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-              onClick={(e) => {
-                e.stopPropagation();
-                onCardClick(event);
-              }}
+              onClick={handleActionClick}
             >
               <Ticket className="w-4 h-4 mr-2" />
-              View Details
+              {!isAuthenticated 
+                ? (event.eventCategory === "Indoor" ? "Sign in to Select Seats" : "Sign in to Book")
+                : (event.eventCategory === "Indoor" ? "Select Seats" : "Book Now")
+              }
             </Button>
           )}
         </div>
@@ -424,6 +475,28 @@ export const ViewEvents = () => {
     navigate(`/select-seats/${event._id}`);
   };
 
+  /* Handle card sign-in click (Sign in to Book / Sign in to Select Seats) */
+  const handleCardSignIn = (event) => {
+    if (event.eventCategory === "Indoor") {
+      handleSeatSelectionClick(event);
+    } else {
+      // For outdoor events, show quantity selector in drawer then payment
+      handleBookingClick(event, 1);
+    }
+  };
+
+  /* Handle card book click (Book Now / Select Seats for authenticated users) */
+  const handleCardBook = (event, config) => {
+    if (config?.redirectToSeatSelection) {
+      navigate(`/select-seats/${event._id}`);
+    } else if (event.eventCategory === "Indoor") {
+      navigate(`/select-seats/${event._id}`);
+    } else {
+      // Open drawer for outdoor event to show quantity and payment options
+      handleEventClick(event);
+    }
+  };
+
   const getEventStatus = (event) => {
     const now = new Date();
     const startDate = new Date(event.startDate);
@@ -589,7 +662,7 @@ export const ViewEvents = () => {
                     <CarouselContent className="-ml-4">
                       {activeEvents.map((event) => (
                         <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                          <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} />
+                          <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} isAuthenticated={isAuthenticated} onSignInClick={handleCardSignIn} onBookClick={handleCardBook} />
                         </CarouselItem>
                       ))}
                     </CarouselContent>
@@ -610,7 +683,7 @@ export const ViewEvents = () => {
                       <CarouselContent className="-ml-4">
                         {endedEvents.map((event) => (
                           <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                            <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} dimmed />
+                            <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} isAuthenticated={isAuthenticated} onSignInClick={handleCardSignIn} onBookClick={handleCardBook} dimmed />
                           </CarouselItem>
                         ))}
                       </CarouselContent>
@@ -673,7 +746,23 @@ export const ViewEvents = () => {
                   <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
                     <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Ticket Price</p>
                     <p className="text-sm font-semibold" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>
-                      {selectedEvent.ticketRate ? `₹${selectedEvent.ticketRate.toLocaleString()}` : 'FREE'}
+                      {(() => {
+                        if (selectedEvent.eventCategory === 'Indoor' && selectedEvent.zonePrices?.length > 0) {
+                          const validPrices = selectedEvent.zonePrices.filter(p => p > 0);
+                          if (validPrices.length === 0) {
+                            return 'FREE';
+                          }
+                          const minPrice = Math.min(...validPrices);
+                          const maxPrice = Math.max(...validPrices);
+                          return minPrice === maxPrice 
+                            ? `₹${minPrice.toLocaleString()}`
+                            : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`;
+                        } else if (selectedEvent.ticketRate) {
+                          return `₹${selectedEvent.ticketRate.toLocaleString()}`;
+                        } else {
+                          return 'FREE';
+                        }
+                      })()}
                     </p>
                   </div>
 

@@ -54,6 +54,7 @@ import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import defaultprofile from '../../assets/img/testimonials-2.jpg';
 import ViewEventsOrg from './ViewEventsOrg';
+import ChatBot from '../common/ChatBot';
 
 export const OrganizerDashboard = () => {
   const [userName, setUserName] = useState("");
@@ -545,6 +546,7 @@ export const OrganizerDashboard = () => {
         </footer>
       </div>
 
+      <ChatBot/>
       <Outlet />
     </div>
   );

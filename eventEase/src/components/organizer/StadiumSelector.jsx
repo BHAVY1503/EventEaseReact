@@ -64,9 +64,11 @@ export const StadiumSelector = () => {
         navigate(redirectTo);
       } else {
         if (role === "Organizer") {
-          navigate("/organizer#addevent");
+          navigate("/organizer/addevent");
         } else if (role === "Admin") {
-          navigate("/admin#addevent");
+          navigate("/admin/addevent");
+        } else {
+          navigate("/organizer");
         }
       }
     } catch (error) {

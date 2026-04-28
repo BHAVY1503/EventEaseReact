@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { LandingPage } from './components/common/LandingPage'
 import { SignUpPageWithLanding } from './SignupPagewithLanding'
 import { SigninPageWithLanding } from './SiginPagewithLanding'
@@ -41,6 +41,7 @@ function App() {
 	axios.defaults.baseURL = "http://localhost:3100"
 
 	const navigate = useNavigate();
+	const location = useLocation();
 	const authToken = useAppSelector((s) => s.auth.token);
 	const authRole = useAppSelector((s) => s.auth.user?.roleId?.name || null);
 
@@ -52,11 +53,24 @@ function App() {
 			delete axios.defaults.headers.common["Authorization"];
 		}
 
-		// navigate according to role when token changes
-		if (authRole === 'Organizer') navigate('/organizer');
-		else if (authRole === 'User') navigate('/user');
-		else if (authRole === 'Admin') navigate('/admin');
-	}, [authToken, authRole, navigate]);
+		// navigate according to role ONLY when first logging in (no token before)
+		// Don't redirect if user is already authenticated and navigating within their role
+		if (authRole && authToken) {
+			const currentPath = location.pathname;
+			// Only redirect if they're at a non-protected page and not on a valid organizer/admin/user sub-route
+			const isValidPath = 
+				(authRole === 'Organizer' && (currentPath.startsWith('/organizer') || currentPath.startsWith('/stadiumselect'))) ||
+				(authRole === 'User' && currentPath.startsWith('/user')) ||
+				(authRole === 'Admin' && (currentPath.startsWith('/admin') || currentPath.startsWith('/stadiumselect'))) ||
+				currentPath === '/';
+			
+			if (!isValidPath) {
+				if (authRole === 'Organizer') navigate('/organizer');
+				else if (authRole === 'User') navigate('/user');
+				else if (authRole === 'Admin') navigate('/admin');
+			}
+		}
+	}, [authToken, authRole, navigate, location.pathname]);
 
 	return (
 		<Routes>
