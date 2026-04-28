@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
 
 export const AdminRefundRequests = () => {
   const [tickets, setTickets] = useState([]);
@@ -313,7 +314,8 @@ export const AdminRefundRequests = () => {
                       asChild
                       className="bg-white text-gray-700 border-gray-300 dark: hover:bg-gray-950 "
                     >
-                      <a href="/admin">← Back to Home</a>
+                      {/* <a href="/admin">← Back to Home</a> */}
+                      <Link to="/admin">← Back to Home</Link>
                     </Button>
                   </div>
       </div>

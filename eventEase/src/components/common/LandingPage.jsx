@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import api from '@/lib/api';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -15,6 +16,7 @@ import img4 from '../../assets/img/event.webp';
 import { UserFeedback } from '../user/UserFeedBack';
 import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from './ContactUs';
+import ChatBot from './ChatBot';
 
 export const LandingPage = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
@@ -25,15 +27,10 @@ export const LandingPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch("/event/geteventstats");
-        if (!res.ok) {
-          console.error("Failed to fetch event stats: " + res.statusText);
-          return;
-        }
-        const data = await res.json();
-        setEventStats(data);
+        const res = await api.get('/event/geteventstats');
+        setEventStats(res.data || { totalEvents: 0, activeEvents: 0 });
       } catch (err) {
-        console.error("Failed to fetch event stats", err);
+        console.error('Failed to fetch event stats', err);
       }
     };
     fetchStats();
@@ -549,6 +546,7 @@ export const LandingPage = () => {
         </div>
         
       </footer>
+      <ChatBot/>
 
       <Outlet />
     </div>

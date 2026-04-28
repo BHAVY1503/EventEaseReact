@@ -20,6 +20,7 @@ import {
   Clock,
   AlertCircle
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const AdminInbox = () => {
   const [messages, setMessages] = useState([]);
@@ -298,7 +299,8 @@ export const AdminInbox = () => {
       )}
       <div className="text-center mt-6">
                <Button variant="outline" asChild>
-                <a href="/admin">Back to Dashboard</a>
+                {/* <a href="/admin">Back to Dashboard</a> */}
+                <Link to="/admin">Back to DashBoard</Link>
                 </Button>
              </div>
     </div>
