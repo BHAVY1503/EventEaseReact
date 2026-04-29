@@ -38,7 +38,7 @@ import { OrganizerDashboard } from './components/organizer/OrganizerDashboard'
 import { AdminRefundRequests } from './components/admin/AdminRefundRequests'
 
 function App() {
-	axios.defaults.baseURL = "http://localhost:3100"
+	axios.defaults.baseURL = "https://eventeasenode-js.onrender.com"||"http://localhost:3100"
 
 	const navigate = useNavigate();
 	const location = useLocation();
