@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_BASE || 'http://localhost:3100';
+const baseURL = `https://eventeasenode-js.onrender.com` || 'http://localhost:3100';
 
 const api = axios.create({
   baseURL,

@@ -25,6 +25,7 @@ import defaultprofile from "../../assets/profile.jpg";
 import { UserFeedback } from '../user/UserFeedBack';
 import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
+import ChatBot from '../common/ChatBot';
 
 export const UserDashboard = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
@@ -763,6 +764,9 @@ export const UserDashboard = () => {
         </div>
         
       </footer>
+
+      <ChatBot/>
+
       <Outlet />
     </div>
   );

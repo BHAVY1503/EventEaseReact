@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Users, Upload, Video, Building2, DollarSign } from "lucide-react";
+import { Calendar, MapPin, Users, Upload, Video, Building2, DollarSign, Loader2, CheckCircle } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectStadium, clearSelectedStadium } from "../../features/stadiums/stadiumsSlice";
 import { createEvent, fetchMyEvents } from "../../features/events/eventsSlice";
@@ -29,6 +29,8 @@ export const AddEvent = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [eventCategory, setEventCategory] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const selectedStadium = useAppSelector((s) => s.stadiums.selectedStadium);
   const dispatch = useAppDispatch();
   const [customZonePrices, setCustomZonePrices] = useState([]);
@@ -110,12 +112,21 @@ export const AddEvent = () => {
     });
   }, [eventCategory, selectedStadium]);
 
+  const handleStadiumSelect = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Navigating to stadium selector");
+    navigate("/stadiumselect?redirectTo=/organizer/addevent");
+  };
+
   const submitHandler = async (data) => {
     if (!token) {
-      alert("Authentication required. Please login first.");
+      toast({ title: 'Authentication Required', description: 'Please login first.', status: 'error' });
       navigate("/organizersignin");
       return;
     }
+
+    setIsSubmitting(true);
 
     const formData = new FormData();
     for (const [k, v] of Object.entries(data)) {
@@ -126,27 +137,36 @@ export const AddEvent = () => {
       formData.append("zonePrices", JSON.stringify(customZonePrices));
     }
     try {
-      // optimistic toast
-      const optimistic = toast({ title: 'Creating event', description: 'Uploading event...' });
-
       const res = await dispatch(createEvent(formData)).unwrap();
-      // update toast to success
-      optimistic.update({ title: 'Event created', description: 'Event added successfully', status: 'success' });
+      
+      // Show success state briefly
+      setShowSuccess(true);
+      toast({ 
+        title: '✓ Event Created Successfully!', 
+        description: 'Your event has been added to the platform.', 
+        status: 'success' 
+      });
 
-      const role = localStorage.getItem("role");
-      if (role === "Admin") {
-        // navigate without full page reload
-        navigate('/admin/adminevents');
-      } else {
-        // ensure organiser view updates immediately without reload
-        // the createEvent reducer already prepends the new event to the store,
-        // but fetchMyEvents ensures data consistency with backend
-        dispatch(fetchMyEvents());
-        navigate('/organizer/viewevent');
-      }
+      // Wait 2 seconds then navigate
+      setTimeout(() => {
+        const role = localStorage.getItem("role");
+        if (role === "Admin") {
+          navigate('/admin/adminevents');
+        } else {
+          dispatch(fetchMyEvents());
+          navigate('/organizer/viewevent');
+        }
+      }, 2000);
     } catch (err) {
       console.error(err);
-      toast({ title: 'Create failed', description: err || 'Failed to add event', status: 'error' });
+      toast({ 
+        title: '✗ Failed to Create Event', 
+        description: err?.message || 'Failed to add event. Please try again.', 
+        status: 'error' 
+      });
+      setShowSuccess(false);
+    } finally {
+      setIsSubmitting(false);
     }
     //   window.location.href = "/organizer#viewevent";
     // } catch (err) {
@@ -206,15 +226,16 @@ export const AddEvent = () => {
                     <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <div>
                         <Label className="text-slate-700 mb-2 block  dark:text-gray-800">Stadium Selection</Label>
-                        <Button
+                        <button
                           type="button"
-                          variant="outline"
-                          className="w-full h-12 justify-start text-left font-normal"
-                          onClick={() => navigate("/stadiumselect")}
+                          className="w-full h-12 px-4 border border-slate-300 rounded-lg bg-white hover:bg-slate-50 flex items-center justify-start text-left font-normal cursor-pointer"
+                          onClick={handleStadiumSelect}
                         >
                           <Building2 className="w-4 h-4 mr-2" />
-                          {selectedStadium ? selectedStadium.name : "Select Stadium"}
-                        </Button>
+                          <span className="text-slate-900 dark:text-gray-100">
+                            {selectedStadium ? selectedStadium.name : "Select Stadium"}
+                          </span>
+                        </button>
                       </div>
 
                       {selectedStadium && selectedStadium.zones && (
@@ -426,13 +447,33 @@ export const AddEvent = () => {
               </div>
 
               <div className="flex justify-center pt-6">
-                <Button 
-                  type="submit" 
-                  size="lg"
-                  className="w-full md:w-auto px-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                >
-                  Create Event
-                </Button>
+                {showSuccess ? (
+                  <Button 
+                    type="button" 
+                    size="lg"
+                    disabled
+                    className="w-full md:w-auto px-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white flex items-center gap-2"
+                  >
+                    <CheckCircle size={20} />
+                    Event Added Successfully!
+                  </Button>
+                ) : (
+                  <Button 
+                    type="submit" 
+                    size="lg"
+                    disabled={isSubmitting}
+                    className="w-full md:w-auto px-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        Adding Event...
+                      </>
+                    ) : (
+                      'Create Event'
+                    )}
+                  </Button>
+                )}
               </div>
             </form>
           </CardContent>

@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Link } from 'react-router-dom';
 
 export const AllOrganizers = () => {
   const [organizers, setOrganizers] = useState([]);
@@ -336,7 +337,8 @@ export const AllOrganizers = () => {
 
       <div className="text-center mt-6">
          <Button variant="outline" asChild>
-          <a href="/admin">Back to Dashboard</a>
+          {/* <a href="/admin">Back to Dashboard</a> */}
+          <Link to="/admin">Back to Dashboard</Link>
           </Button>
        </div>
 
