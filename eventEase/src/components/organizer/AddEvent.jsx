@@ -3,7 +3,7 @@ import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-import axios from "axios";
+import api from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,16 +40,16 @@ export const AddEvent = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // Ensure axios has token in headers
+  // Ensure api has token in headers
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
   }, [token]);
 
   useEffect(() => {
-    axios.get("/state/getallstates").then((r) => setStates(r.data.data));
-    axios.get("/city/getallcitys").then((r) => setCities(r.data.data));
+    api.get("/state/getallstates").then((r) => setStates(r.data.data));
+    api.get("/city/getallcitys").then((r) => setCities(r.data.data));
   }, []);
 
   useEffect(() => {

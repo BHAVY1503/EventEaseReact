@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { Link } from "react-router-dom";
 import { MapPin, Users, ExternalLink, Edit, Eye, X, Search, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -25,11 +25,7 @@ const ViewStadiums = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get("/admin/stadiums", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await api.get("/admin/stadiums");
         setStadiums(res.data || []);
       } catch (err) {
         console.error("Error fetching stadiums:", err);

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import axios from 'axios';
-import { 
-  Menu, 
-  User, 
-  Calendar, 
-  Plus, 
-  MessageCircle, 
-  Ticket, 
+import {
+  Menu,
+  User,
+  Calendar,
+  Plus,
+  MessageCircle,
+  Ticket,
   LogOut,
   ChevronDown,
   Facebook,
@@ -25,12 +25,12 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator 
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -150,9 +150,8 @@ export const OrganizerDashboard = () => {
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       {/* FIXED LEFT SIDEBAR */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 overflow-y-auto ${
-          sidebarCollapsed ? "w-20" : "w-72"
-        }`}
+        className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 overflow-y-auto ${sidebarCollapsed ? "w-20" : "w-72"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
@@ -194,9 +193,8 @@ export const OrganizerDashboard = () => {
                   key={item.id}
                   variant="ghost"
                   onClick={() => scrollToSection(item.id)}
-                  className={`w-full ${
-                    sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                  } h-12 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors group`}
+                  className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                    } h-12 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors group`}
                   title={sidebarCollapsed ? item.label : ""}
                 >
                   <item.icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
@@ -217,9 +215,8 @@ export const OrganizerDashboard = () => {
                   <Link key={link.to} to={link.to}>
                     <Button
                       variant="ghost"
-                      className={`w-full ${
-                        sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                      } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
+                      className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                        } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
                       title={sidebarCollapsed ? link.label : ""}
                     >
                       <link.icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
@@ -236,9 +233,8 @@ export const OrganizerDashboard = () => {
             <Button
               variant="ghost"
               onClick={signout}
-              className={`w-full ${
-                sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-              } h-12 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700`}
+              className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                } h-12 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700`}
               title={sidebarCollapsed ? "Sign Out" : ""}
             >
               <LogOut className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"}`} />
@@ -250,18 +246,16 @@ export const OrganizerDashboard = () => {
 
       {/* MAIN CONTENT AREA */}
       <div
-        className={`transition-all duration-300 ${
-          sidebarCollapsed ? "ml-20" : "ml-72"
-        }`}
+        className={`transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-72"
+          }`}
       >
         {/* NAVBAR */}
         <nav
-          className={`fixed top-0 right-0 z-40 transition-all duration-300 ${
-            isScrolled
+          className={`fixed top-0 right-0 z-40 transition-all duration-300 ${isScrolled
               ? "bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-700 shadow-md"
               : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
-          }`}
-          style={{ 
+            }`}
+          style={{
             left: sidebarCollapsed ? "5rem" : "18rem",
             width: sidebarCollapsed ? "calc(100% - 5rem)" : "calc(100% - 18rem)"
           }}
@@ -338,9 +332,8 @@ export const OrganizerDashboard = () => {
           {heroImages.map((img, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
-              }`}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+                }`}
               style={{
                 backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(59,130,246,0.3)), url(${img})`,
                 backgroundSize: 'cover',
@@ -349,7 +342,7 @@ export const OrganizerDashboard = () => {
               }}
             />
           ))}
-          
+
           {/* Hero Content Overlay */}
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <Card className="bg-white/10 dark:bg-gray-900/70 backdrop-blur-md border-white/20 shadow-2xl">
@@ -363,20 +356,20 @@ export const OrganizerDashboard = () => {
                 <p className="text-lg opacity-90 mb-8 max-w-2xl">
                   Manage your events with ease on EventEase - Your complete event management platform
                 </p>
-                
+
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                     onClick={() => scrollToSection('addevent')}
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Create New Event
                   </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="text-black border-white/50 hover:bg-white hover:text-gray-900 shadow-lg backdrop-blur-sm dark:border-gray-600 dark:hover:bg-gray-700 dark:text-white bg-white"
                     onClick={() => scrollToSection('viewevent')}
                   >
@@ -387,7 +380,7 @@ export const OrganizerDashboard = () => {
               </CardContent>
             </Card>
           </div>
-          
+
           {/* Carousel Navigation */}
           <Button
             variant="ghost"
@@ -411,11 +404,10 @@ export const OrganizerDashboard = () => {
             {heroImages.map((_, index) => (
               <button
                 key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide 
-                    ? 'bg-white shadow-lg scale-125' 
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
+                    ? 'bg-white shadow-lg scale-125'
                     : 'bg-white/50 hover:bg-white/75'
-                }`}
+                  }`}
                 onClick={() => setCurrentSlide(index)}
               />
             ))}
@@ -424,7 +416,7 @@ export const OrganizerDashboard = () => {
 
         {/* MAIN SECTIONS */}
         <section id="events" className="py-0 bg-gradient-to-b from-gray-50 to-gray-50 dark:bg-gray-800">
-          <ViewEventsOrg/>
+          <ViewEventsOrg />
         </section>
 
         <section id="addevent" className="py-0 bg-gradient-to-b from-gray-50 to-gray-50 dark:bg-gray-800">
@@ -459,53 +451,53 @@ export const OrganizerDashboard = () => {
                   © 2025 EventEase. All rights reserved.
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <h5 className="text-lg font-semibold mb-6 text-gray-800 dark:text-gray-200">Quick Links</h5>
                 <div className="flex flex-col space-y-3">
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => scrollToSection('events')}
                   >
                     Browse Events
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => scrollToSection('contactus')}
                   >
                     Contact Support
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition-colors"
                   >
                     Privacy Policy
                   </Button>
                 </div>
               </div>
-              
+
               <div className="text-center md:text-right">
                 <h5 className="text-lg font-semibold mb-6 text-gray-800 dark:text-gray-200">Connect With Us</h5>
                 <div className="flex justify-center md:justify-end space-x-4">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-blue-600/20 dark:hover:bg-gray-700 transition-colors rounded-full w-12 h-12"
                   >
                     <Facebook className="w-5 h-5" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-sky-600/20 dark:hover:bg-gray-700 transition-colors rounded-full w-12 h-12"
                   >
                     <Twitter className="w-5 h-5" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-pink-600/20 dark:hover:bg-gray-700 transition-colors rounded-full w-12 h-12"
                   >
                     <Instagram className="w-5 h-5" />
@@ -546,7 +538,7 @@ export const OrganizerDashboard = () => {
         </footer>
       </div>
 
-      <ChatBot/>
+      <ChatBot />
       <Outlet />
     </div>
   );

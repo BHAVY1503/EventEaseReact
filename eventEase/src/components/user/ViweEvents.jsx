@@ -180,9 +180,9 @@ const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSign
               onClick={handleActionClick}
             >
               <Ticket className="w-4 h-4 mr-2" />
-              {!isAuthenticated 
-                ? (event.eventCategory === "Indoor" ? "Sign in to Select Seats" : "Sign in to Book")
-                : (event.eventCategory === "Indoor" ? "Select Seats" : "Book Now")
+              {event.eventCategory === "Indoor" 
+                ? "Select Seats" 
+                : (!isAuthenticated ? "Sign in to Book" : "Book Now")
               }
             </Button>
           )}
@@ -789,7 +789,7 @@ export const ViewEvents = () => {
 
                     if (selectedEvent.eventCategory === 'Indoor') {
                       return (
-                        <Button onClick={(e) => { e.stopPropagation(); handleSeatSelectionClick(selectedEvent); }} className="w-full">{isAuthenticated ? 'Select Seats' : 'Sign in to Select Seats'}</Button>
+                        <Button onClick={(e) => { e.stopPropagation(); handleSeatSelectionClick(selectedEvent); }} className="w-full">Select Seats</Button>
                       );
                     }
 
@@ -836,7 +836,6 @@ export const ViewEvents = () => {
             localStorage.setItem("userId", userData._id);
             localStorage.setItem("role", userData.roleId?.name || "User");
             localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
-            setAuthToken(token);
             setIsAuthenticated(true);
             setIsVerified(userData.isVerified === true);
 

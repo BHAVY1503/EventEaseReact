@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { Bell, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,9 +22,7 @@ export const RefundNotificationBadge = () => {
   const fetchPendingRefunds = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/tickets/alltickets", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/tickets/alltickets");
 
       // Filter pending refund requests
       const pending = res.data.data.filter(

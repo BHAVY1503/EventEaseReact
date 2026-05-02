@@ -4,7 +4,7 @@
 
 
 
-import axios from 'axios';
+import api from '@/lib/api';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -57,9 +57,7 @@ export const GroupedByEvents = () => {
   const fetchGroupedEvents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/event/groupedeventsbyorganizer`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get(`/event/groupedeventsbyorganizer`);
       setGroupedEvents(res.data.data);
     } catch (err) {
       console.error("Error fetching grouped events:", err);
@@ -88,9 +86,7 @@ export const GroupedByEvents = () => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
     setDeleteLoading(prev => ({ ...prev, [eventId]: true }));
     try {
-      await axios.delete(`/event/deleteevent/${eventId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/event/deleteevent/${eventId}`);
       fetchGroupedEvents();
     } catch (err) {
       console.error(err);
@@ -104,10 +100,9 @@ export const GroupedByEvents = () => {
     const quantity = bookingQuantity[eventId] || 1;
     setBookingLoading(prev => ({ ...prev, [eventId]: true }));
     try {
-      const res = await axios.post(
+      const res = await api.post(
         `/event/bookseat/${eventId}`,
-        { stateId, cityId, quantity },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { stateId, cityId, quantity }
       );
       alert("Seat(s) booked successfully!");
       setBookedTickets(prev => ({ ...prev, [eventId]: res.data.data.ticket }));
@@ -123,9 +118,7 @@ export const GroupedByEvents = () => {
   const handleApprove = async (eventId) => {
     setActionLoading(prev => ({ ...prev, [eventId]: true }));
     try {
-      await axios.put(`/event/approveevent/${eventId}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.put(`/event/approveevent/${eventId}`, {});
       fetchGroupedEvents();
     } catch (err) {
       console.error(err);
@@ -145,9 +138,7 @@ export const GroupedByEvents = () => {
     if (!currentRejectEventId) return;
     setActionLoading(prev => ({ ...prev, [currentRejectEventId]: true }));
     try {
-      await axios.put(`/event/rejectevent/${currentRejectEventId}`, { reason: rejectReason }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.put(`/event/rejectevent/${currentRejectEventId}`, { reason: rejectReason });
       setRejectDialogOpen(false);
       fetchGroupedEvents();
     } catch (err) {

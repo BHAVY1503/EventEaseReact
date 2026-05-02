@@ -27,7 +27,7 @@ export const DarkModeProvider = ({ children }) => {
     } else {
       document.documentElement.classList.remove('dark');
     }
-    
+
     // Save preference
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
   }, [isDarkMode]);
@@ -46,7 +46,7 @@ export const DarkModeProvider = ({ children }) => {
 // Dark Mode Toggle Button Component
 export const DarkModeToggle = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  
+
   return (
     <button
       onClick={toggleDarkMode}

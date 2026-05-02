@@ -4,7 +4,7 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 // import "@mapbox-gl/geocoder/dist/mapbox-gl-geocoder.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-import axios from "axios";
+import api from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchEventById, updateEvent } from "../../features/events/eventsSlice";
 import { useToast } from "../../hooks/use-toast";
@@ -34,8 +34,8 @@ export const UpdateEvent = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.get("/state/getallstates").then((r) => setStates(r.data.data));
-    axios.get("/city/getallcitys").then((r) => setCities(r.data.data));
+    api.get("/state/getallstates").then((r) => setStates(r.data.data));
+    api.get("/city/getallcitys").then((r) => setCities(r.data.data));
   }, []);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export const UpdateEvent = () => {
     (async () => {
       if (event.eventCategory === "Indoor" && event.stadiumId) {
         try {
-          const stadiumRes = await axios.get(`/stadium/${event.stadiumId}`);
+          const stadiumRes = await api.get(`/stadium/${event.stadiumId}`);
           setSelectedStadium(stadiumRes.data.data);
         } catch (err) {
           console.error('Failed to fetch stadium for event', err);

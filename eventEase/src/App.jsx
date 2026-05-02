@@ -38,7 +38,9 @@ import { OrganizerDashboard } from './components/organizer/OrganizerDashboard'
 import { AdminRefundRequests } from './components/admin/AdminRefundRequests'
 
 function App() {
-	axios.defaults.baseURL = "https://eventeasenode-js.onrender.com"||"http://localhost:3100"
+	axios.defaults.baseURL = "http://localhost:3100"
+	// axios.defaults.baseURL = "https://eventeasenode-js.onrender.com"||"http://localhost:3100"
+
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -58,12 +60,12 @@ function App() {
 		if (authRole && authToken) {
 			const currentPath = location.pathname;
 			// Only redirect if they're at a non-protected page and not on a valid organizer/admin/user sub-route
-			const isValidPath = 
-				(authRole === 'Organizer' && (currentPath.startsWith('/organizer') || currentPath.startsWith('/stadiumselect'))) ||
-				(authRole === 'User' && currentPath.startsWith('/user')) ||
-				(authRole === 'Admin' && (currentPath.startsWith('/admin') || currentPath.startsWith('/stadiumselect'))) ||
+			const isValidPath =
+				(authRole === 'Organizer' && (currentPath.startsWith('/organizer') || currentPath.startsWith('/stadiumselect') || currentPath.startsWith('/bookedtickets') || currentPath.startsWith('/bookingofmyevents') || currentPath.startsWith('/updateevent') || currentPath.startsWith('/mytickets'))) ||
+				(authRole === 'User' && (currentPath.startsWith('/user') || currentPath.startsWith('/select-seats') || currentPath.startsWith('/mytickets'))) ||
+				(authRole === 'Admin' && (currentPath.startsWith('/admin') || currentPath.startsWith('/stadiumselect') || currentPath.startsWith('/alleventsticket') || currentPath.startsWith('/allusers') || currentPath.startsWith('/allorganizer') || currentPath.startsWith('/admininbox'))) ||
 				currentPath === '/';
-			
+
 			if (!isValidPath) {
 				if (authRole === 'Organizer') navigate('/organizer');
 				else if (authRole === 'User') navigate('/user');
@@ -75,31 +77,31 @@ function App() {
 	return (
 		<Routes>
 			{/* Public Routes */}
-			<Route path="/" element={<LandingPage/>} />
+			<Route path="/" element={<LandingPage />} />
 			<Route path="/signup" element={<SignUpPageWithLanding />} />
 			<Route path="/signin" element={<SigninPageWithLanding />} />
-			<Route path="/adminsignin" element={<AdminLanding/>} />
-			<Route path="/organizersignup" element={<OrganizerWithLanding/>} />
-			<Route path="/organizersignin" element={<OrganizerSigninLanding/>} />
-			<Route path='/mappicker' element={<MapPicker/>} />
+			<Route path="/adminsignin" element={<AdminLanding />} />
+			<Route path="/organizersignup" element={<OrganizerWithLanding />} />
+			<Route path="/organizersignin" element={<OrganizerSigninLanding />} />
+			<Route path='/mappicker' element={<MapPicker />} />
 			<Route path="/verify/:token" element={<VerifyPage />} />
 			<Route path="/organizer/verify/:token" element={<VerifyOrganizer />} />
-			<Route path='/contactus' element={<ContactUs/>} />
+			<Route path='/contactus' element={<ContactUs />} />
 
 			{/* Protected Routes */}
-			<Route element={<PrivateRoute/>}>
+			<Route element={<PrivateRoute />}>
 				{/* Admin Routes */}
-				<Route path='/admin' element={<AdminDashboard/>}>
-					<Route path='groupedbyevent' element={<GroupedByEvents/>} />
-					<Route path='addstadium' element={<AddStadiumForm/>} />
-					<Route path='stadiums' element={<ViewStadiums/>} />
-					<Route path='adminevents' element={<AdminEvents/>} />
+				<Route path='/admin' element={<AdminDashboard />}>
+					<Route path='groupedbyevent' element={<GroupedByEvents />} />
+					<Route path='addstadium' element={<AddStadiumForm />} />
+					<Route path='stadiums' element={<ViewStadiums />} />
+					<Route path='adminevents' element={<AdminEvents />} />
 				</Route>
-				<Route path='/admin/editstadium/:id' element={<UpdateStadium/>} />
-				<Route path='/alleventsticket' element={<AllEventBookings/>} />
-				<Route path='/allusers' element={<AllUsers/>} />
-				<Route path='/allorganizer' element={<AllOrganizers/>} />
-				<Route path='/admininbox' element={<AdminInbox/>} />
+				<Route path='/admin/editstadium/:id' element={<UpdateStadium />} />
+				<Route path='/alleventsticket' element={<AllEventBookings />} />
+				<Route path='/allusers' element={<AllUsers />} />
+				<Route path='/allorganizer' element={<AllOrganizers />} />
+				<Route path='/admininbox' element={<AdminInbox />} />
 				<Route path="/admin/refunds" element={<AdminRefundRequests />} />
 
 				{/* Organizer Routes */}
@@ -114,11 +116,11 @@ function App() {
 				<Route path="/mytickets" element={<MyTickets />} />
 
 				{/* User Routes */}
-				<Route path='/user' element={<UserDashboard/>}>
-					<Route path='viewevents' element={<ViewEvents/>} />
-					<Route path='userfeedback' element={<UserFeedback/>} />
+				<Route path='/user' element={<UserDashboard />}>
+					<Route path='viewevents' element={<ViewEvents />} />
+					<Route path='userfeedback' element={<UserFeedback />} />
 				</Route>
-				<Route path='/select-seats/:id' element={<SeatSelectionPage/>} />
+				<Route path='/select-seats/:id' element={<SeatSelectionPage />} />
 			</Route>
 		</Routes>
 	)

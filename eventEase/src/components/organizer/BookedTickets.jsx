@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { Link } from "react-router-dom";
+import api from "@/lib/api";
 import {
   Card,
   CardContent,
@@ -20,10 +21,11 @@ export const BookedTickets = () => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`/tickets/organizer/self`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTickets(res.data.data || []);
+        const res = await api.get(`/tickets/organizer/self`);
+        const sortedTickets = (res.data.data || []).sort((a, b) => 
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setTickets(sortedTickets);
       } catch (error) {
         console.error("Error fetching tickets:", error);
       }
@@ -81,10 +83,9 @@ export const BookedTickets = () => {
   const downloadInvoice = async (ticketId) => {
     setDownloadingTicket(ticketId);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `/tickets/invoice/${ticketId}/download`,
         {
-          headers: { Authorization: `Bearer ${token}` },
           responseType: 'blob',
         }
       );
@@ -166,9 +167,14 @@ export const BookedTickets = () => {
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            🎟️ My Booked Tickets & Invoices
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              🎟️ My Booked Tickets & Invoices
+            </h2>
+            <Button variant="outline" size="sm" asChild className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
+              <Link to="/organizer">← Back to Home</Link>
+            </Button>
+          </div>
 
           {tickets.length === 0 ? (
             <div className="text-center py-12">
@@ -380,11 +386,6 @@ export const BookedTickets = () => {
             </div>
           )}
 
-          <div className="text-center mt-8">
-            <Button variant="outline" size="lg" asChild className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
-              <a href="/organizer">← Back to Home</a>
-            </Button>
-          </div>
         </div>
       </div>
     </TooltipProvider>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
-import axios from "axios";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import api from "@/lib/api";
 import {
   Menu,
   Calendar,
@@ -66,28 +66,20 @@ export const AdminDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const navigate = useNavigate();
   const heroImages = [img2, img3, img1, img4];
 
   // Fetch admin details
   useEffect(() => {
     const fetchAdmin = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("No authentication token found");
-        setLoading(false);
-        return;
-      }
-
       try {
-        const res = await axios.get("/user/getuserbytoken", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/user/getuserbytoken");
         const user = res.data.data;
         setUserName(user.fullName || user.name || "Admin");
         setError("");
       } catch (err) {
         console.error("Error fetching admin:", err);
-        setError("Failed to load admin data");
+        setError("Nexus authorization failed.");
       } finally {
         setLoading(false);
       }
@@ -115,7 +107,7 @@ export const AdminDashboard = () => {
   const signout = () => {
     if (window.confirm("Are you sure you want to SignOut?")) {
       localStorage.clear();
-      window.location.href = "/adminsignin";
+      navigate("/adminsignin");
     }
   };
 
@@ -145,8 +137,8 @@ export const AdminDashboard = () => {
   const quickLinks = [
     { to: "/allusers", label: "Users", icon: UserCircle2 },
     { to: "/allorganizer", label: "Organizers", icon: Users },
-    { to: "/alleventsticket", label: "Tickets", icon: Ticket  },
-    { to: "/admin/refunds", label: "Refund Requests", icon: Ticket , showRefundBadge: true}, 
+    { to: "/alleventsticket", label: "Tickets", icon: Ticket },
+    { to: "/admin/refunds", label: "Refund Requests", icon: Ticket, showRefundBadge: true },
     { to: "/admininbox", label: "Inbox", icon: Inbox },
   ];
 
@@ -154,9 +146,8 @@ export const AdminDashboard = () => {
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       {/* FIXED LEFT SIDEBAR */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 overflow-y-auto ${
-          sidebarCollapsed ? "w-20" : "w-72"
-        }`}
+        className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 overflow-y-auto ${sidebarCollapsed ? "w-20" : "w-72"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
@@ -193,20 +184,22 @@ export const AdminDashboard = () => {
           {/* Sidebar Navigation */}
           <div className="flex-1 overflow-y-auto py-4 px-2">
             <div className="space-y-1">
-              {sidebarItems.map((item) => (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  onClick={() => scrollToSection(item.id)}
-                  className={`w-full ${
-                    sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                  } h-12 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors group`}
-                  title={sidebarCollapsed ? item.label : ""}
-                >
-                  <item.icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
-                  {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-                </Button>
-              ))}
+              {sidebarItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.id}
+                    variant="ghost"
+                    onClick={() => scrollToSection(item.id)}
+                    className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                      } h-12 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors group`}
+                    title={sidebarCollapsed ? item.label : ""}
+                  >
+                    <Icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
+                    {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
+                  </Button>
+                );
+              })}
             </div>
 
             {/* Quick Links Section */}
@@ -217,27 +210,29 @@ export const AdminDashboard = () => {
                 </p>
               )}
               <div className="space-y-1">
-                {quickLinks.map((link) => (
-                 <Link key={link.to} to={link.to}>
-                 <Button
-                 variant="ghost"
-                 className={`w-full ${
-                 sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                 } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
-                  title={sidebarCollapsed ? link.label : ""}
-                  >
-                 <link.icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
+                {quickLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link key={link.to} to={link.to}>
+                      <Button
+                        variant="ghost"
+                        className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                          } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
+                        title={sidebarCollapsed ? link.label : ""}
+                      >
+                        <Icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
 
-                 {!sidebarCollapsed && (
-                 <span className="text-sm font-medium flex items-center gap-2">
-                  {link.label}
+                        {!sidebarCollapsed && (
+                          <span className="text-sm font-medium flex items-center gap-2">
+                            {link.label}
 
-                 {link.showRefundBadge && <RefundNotificationBadge />}
-                </span>
-                 )}
-               </Button>
-               </Link>
-                ))}
+                            {link.showRefundBadge && <RefundNotificationBadge />}
+                          </span>
+                        )}
+                      </Button>
+                    </Link>
+                  );
+                })}
 
                 {/* {quickLinks.map((link) => (
                   <Link key={link.to} to={link.to}>
@@ -262,9 +257,8 @@ export const AdminDashboard = () => {
             <Button
               variant="ghost"
               onClick={signout}
-              className={`w-full ${
-                sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-              } h-12 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700`}
+              className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
+                } h-12 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700`}
               title={sidebarCollapsed ? "Sign Out" : ""}
             >
               <LogOut className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"}`} />
@@ -276,18 +270,16 @@ export const AdminDashboard = () => {
 
       {/* MAIN CONTENT AREA */}
       <div
-        className={`transition-all duration-300 ${
-          sidebarCollapsed ? "ml-20" : "ml-72"
-        }`}
+        className={`transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-72"
+          }`}
       >
         {/* NAVBAR */}
         <nav
-          className={`fixed top-0 right-0 z-40 transition-all duration-300 ${
-            isScrolled
+          className={`fixed top-0 right-0 z-40 transition-all duration-300 ${isScrolled
               ? "bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-700 shadow-md"
               : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
-          }`}
-          style={{ 
+            }`}
+          style={{
             left: sidebarCollapsed ? "5rem" : "18rem",
             width: sidebarCollapsed ? "calc(100% - 5rem)" : "calc(100% - 18rem)"
           }}
@@ -306,7 +298,7 @@ export const AdminDashboard = () => {
 
               {/* Right Side Actions */}
               <div className="flex items-center space-x-4">
-                 <PendingEventsBadge onNavigate={scrollToSection} />
+                <PendingEventsBadge onNavigate={scrollToSection} />
                 <DarkModeToggle />
 
                 {/* Error Alert */}
@@ -323,7 +315,7 @@ export const AdminDashboard = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10 ring-2 ring-red-100 dark:ring-red-900">
-                        <AvatarImage  />
+                        <AvatarImage />
                         <AvatarFallback className="bg-gradient-to-r from-red-500 to-purple-500 text-white font-semibold">
                           {userName ? userName.charAt(0).toUpperCase() : "A"}
                         </AvatarFallback>
@@ -363,9 +355,8 @@ export const AdminDashboard = () => {
           {heroImages.map((img, i) => (
             <div
               key={i}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                i === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
-              }`}
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${i === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
+                }`}
               style={{
                 backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(220,38,127,0.3)), url(${img})`,
                 backgroundSize: "cover",
@@ -428,11 +419,10 @@ export const AdminDashboard = () => {
             {heroImages.map((_, index) => (
               <button
                 key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
                     ? "bg-white shadow-lg scale-125"
                     : "bg-white/50 hover:bg-white/75"
-                }`}
+                  }`}
                 onClick={() => setCurrentSlide(index)}
               />
             ))}
@@ -442,51 +432,51 @@ export const AdminDashboard = () => {
         {/* MAIN SECTIONS */}
         <section
           id="events"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gary-50 dark:bg-gray-800"
+          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50 dark:bg-gray-800"
         >
-            <ViewEvents/>
+          <ViewEvents />
         </section>
 
         <section
           id="groupbyevent"
           className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
         >
-          <GroupedByEvents/>
+          <GroupedByEvents />
         </section>
 
         <section
           id="adminevents"
           className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
         >
-          <AdminEvents/>
+          <AdminEvents />
         </section>
 
         <section
           id="addevent"
           className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
         >
-         <AddEvent/>
+          <AddEvent />
         </section>
 
         <section
           id="addstadium"
           className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
         >
-         <AddStadiumForm/>
+          <AddStadiumForm />
         </section>
 
         <section
           id="viewstadiums"
           className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
         >
-          <ViewStadiums/>
+          <ViewStadiums />
         </section>
 
         <section
           id="feedback"
           className="py-0 bg-gradient-to-b from-gray-50 to-gray-50 dark:bg-gray-800"
         >
-          <UserFeedback/>
+          <UserFeedback />
         </section>
 
         {/* FOOTER */}

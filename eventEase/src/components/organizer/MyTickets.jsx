@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import {
   Card,
@@ -98,12 +99,20 @@ export const MyTickets = () => {
   const [downloadingTicket, setDownloadingTicket] = useState(null);
   const token = localStorage.getItem("token");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
         const res = await api.get(`/tickets/usertickets/self`);
-        setTickets(res.data?.data ?? res.data ?? []);
+        const raw = res.data?.data ?? res.data ?? [];
+        // Sort newest first by createdAt or booking date
+        const sorted = [...raw].sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.bookingDate || 0);
+          const dateB = new Date(b.createdAt || b.bookingDate || 0);
+          return dateB - dateA;
+        });
+        setTickets(sorted);
       } catch (error) {
         console.error("Error fetching tickets:", error.response?.data || error.message || error);
       }
@@ -263,10 +272,26 @@ export const MyTickets = () => {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Top header bar with back button */}
+        <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Link to="/user"
+              // onClick={() => navigate(-1)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-150"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              Back
+            </Link>
+            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              🎟️ My Tickets
+            </h2>
+            <div className="w-16" />{/* spacer to center title */}
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            🎟️ My Tickets & Invoices
-          </h2>
 
           {tickets.length === 0 ? (
             <div className="text-center py-12">
@@ -522,15 +547,8 @@ export const MyTickets = () => {
             </div>
           )}
 
-          <div className="text-center mt-8">
-            <Button
-              variant="outline"
-              size="lg"
-              asChild
-              className="bg-white text-gray-700 border-gray-300 dark: hover:bg-gray-950 "
-            >
-              <a href="/user">← Back to Home</a>
-            </Button>
+          <div className="text-center mt-8 text-sm text-gray-400 dark:text-gray-500">
+            Showing {tickets.length} ticket{tickets.length !== 1 ? 's' : ''} · Most recent first
           </div>
         </div>
       </div>
@@ -1398,6 +1416,18 @@ export const MyTickets = () => {
 //     </TooltipProvider>
 //   );
 // };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

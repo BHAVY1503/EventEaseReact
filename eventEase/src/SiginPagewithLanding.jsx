@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LandingPage } from '../src/components/common/LandingPage'; 
-import SignInModal from './components/user/SignInModal'; 
+import { LandingPage } from '../src/components/common/LandingPage';
+import SignInModal from './components/user/SignInModal';
 
 export const SigninPageWithLanding = () => {
   const [showModal, setShowModal] = useState(true);

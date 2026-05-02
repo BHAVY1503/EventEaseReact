@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '@/lib/api';
 
 const initialState = {
   list: [],
@@ -10,7 +10,7 @@ const initialState = {
 
 export const fetchStadiums = createAsyncThunk('stadiums/fetchAll', async (_, thunkAPI) => {
   try {
-    const res = await axios.get('/admin/stadiums');
+    const res = await api.get('/admin/stadiums');
     // API may return array or {stadiums: []}
     if (Array.isArray(res.data)) return res.data;
     if (res.data.stadiums) return res.data.stadiums;
@@ -22,7 +22,7 @@ export const fetchStadiums = createAsyncThunk('stadiums/fetchAll', async (_, thu
 
 export const createStadium = createAsyncThunk('stadiums/create', async (payload, thunkAPI) => {
   try {
-    const res = await axios.post('/admin/stadiums', payload);
+    const res = await api.post('/admin/stadiums', payload);
     return res.data;
   } catch (err) {
     return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to create stadium');

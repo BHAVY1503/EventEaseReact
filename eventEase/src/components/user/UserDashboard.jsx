@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket, ChevronDown, LogOut, Badge } from "lucide-react";
@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DarkModeToggle } from '@/contexts/DarkModeContext';
 import axios from 'axios';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useDispatch } from 'react-redux';
+import { logout } from '@/features/auth/authSlice';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +25,7 @@ import img4 from '../../assets/img/event.webp';
 import defaultprofile from "../../assets/profile.jpg";
 
 import { UserFeedback } from '../user/UserFeedBack';
-import  ViewEvents  from '../user/ViweEvents';
+import ViewEvents from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
 import ChatBot from '../common/ChatBot';
 
@@ -35,6 +37,8 @@ export const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const images = [img4, img2, img3, img1];
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -89,40 +93,38 @@ export const UserDashboard = () => {
 
   const signout = () => {
     if (window.confirm("Are you sure you want to sign out?")) {
+      dispatch(logout());
       localStorage.clear();
-      window.location.href = "/signin";
+      navigate('/signin');
     }
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       {/* Enhanced Navigation */}
-      <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-lg' 
-          : 'bg-transparent'
-      }`}>
+      <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${isScrolled
+        ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-lg'
+        : 'bg-transparent'
+        }`}>
         <div className="container mx-auto flex h-20 items-center justify-between px-6">
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
               <Ticket className="h-6 w-6 text-white" />
             </div>
-            <span className={`font-bold text-2xl transition-colors ${
-              isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
-            }`}>EventEase</span>
+            <span className={`font-bold text-2xl transition-colors ${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
+              }`}>EventEase</span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {['Home', 'Features', 'Events', 'About'].map((item) => (
-              <a 
+              <a
                 key={item}
-                href={`#${item.toLowerCase()}`} 
-                className={`text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                  isScrolled 
-                    ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400' 
-                    : 'text-white/90 hover:text-white'
-                }`}
+                href={`#${item.toLowerCase()}`}
+                className={`text-sm font-medium transition-all duration-200 hover:scale-105 ${isScrolled
+                  ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                  : 'text-white/90 hover:text-white'
+                  }`}
               >
                 {item}
               </a>
@@ -140,9 +142,9 @@ export const UserDashboard = () => {
               <SheetContent className="w-80 bg-white dark:bg-gray-900">
                 <nav className="flex flex-col space-y-6 mt-8">
                   {['Home', 'Features', 'Events', 'About'].map((item) => (
-                    <a 
+                    <a
                       key={item}
-                      href={`#${item.toLowerCase()}`} 
+                      href={`#${item.toLowerCase()}`}
                       className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       {item}
@@ -156,69 +158,69 @@ export const UserDashboard = () => {
                       <Link to="/signup">Get Started</Link>
                     </Button>
                   </div> */}
-                   {/* Profile */}
-            <div className="flex items-center space-x-3">
-              {error && (
-                <Alert className="w-64 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
-                  <AlertDescription className="text-red-800 dark:text-red-300">
-                    {error}
-                  </AlertDescription>
-                </Alert>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Card className="p-2 border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-md transition-shadow cursor-pointer">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="w-9 h-9">
-                        <AvatarImage src={defaultprofile} />
-                        <AvatarFallback 
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold flex items-center justify-center"
+                  {/* Profile */}
+                  <div className="flex items-center space-x-3">
+                    {error && (
+                      <Alert className="w-64 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+                        <AlertDescription className="text-red-800 dark:text-red-300">
+                          {error}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Card className="p-2 border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:shadow-md transition-shadow cursor-pointer">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="w-9 h-9">
+                              <AvatarImage src={defaultprofile} />
+                              <AvatarFallback
+                                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base font-semibold flex items-center justify-center"
+                              >
+                                {userName ? userName.charAt(0).toUpperCase() : "G"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="hidden sm:block text-left">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {loading ? "Loading..." : userName || "Guest"}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Event Explorer
+                              </p>
+                            </div>
+                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                          </div>
+                        </Card>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-56 bg-white/95 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700"
+                      >
+                        <div className="px-3 py-2 border-b dark:border-gray-700">
+                          <p className="text-sm font-medium dark:text-white">
+                            {userName}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Event Explorer
+                          </p>
+                        </div>
+                        <DropdownMenuItem asChild>
+                          <Link
+                            to="/mytickets"
+                            className="flex items-center hover:bg-red-50 dark:hover:bg-gray-800"
+                          >
+                            <Ticket className="w-4 h-4 mr-3 text-red-600" />
+                            My Tickets
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={signout}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-gray-800"
                         >
-                          {userName ? userName.charAt(0).toUpperCase() : "G"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="hidden sm:block text-left">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {loading ? "Loading..." : userName || "Guest"}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Event Explorer
-                        </p>
-                      </div>
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    </div>
-                  </Card>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 bg-white/95 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700"
-                >
-                  <div className="px-3 py-2 border-b dark:border-gray-700">
-                    <p className="text-sm font-medium dark:text-white">
-                      {userName}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Event Explorer
-                    </p>
+                          <LogOut className="w-4 h-4 mr-3 text-red-600" /> Sign Out
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/mytickets"
-                      className="flex items-center hover:bg-red-50 dark:hover:bg-gray-800"
-                    >
-                      <Ticket className="w-4 h-4 mr-3 text-red-600" />
-                      My Tickets
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={signout}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-gray-800"
-                  >
-                    <LogOut className="w-4 h-4 mr-3 text-red-600" /> Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -227,7 +229,7 @@ export const UserDashboard = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <DarkModeToggle />
-            
+
             {loading ? (
               <div className="animate-pulse">
                 <div className="h-10 w-32 bg-gray-200 rounded-md"></div>
@@ -243,7 +245,7 @@ export const UserDashboard = () => {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                         <Avatar className="h-10 w-10">
-                          <AvatarFallback 
+                          <AvatarFallback
                             className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold flex items-center justify-center"
                           >
                             {userName ? userName.charAt(0).toUpperCase() : "G"}
@@ -262,7 +264,7 @@ export const UserDashboard = () => {
                           My Tickets
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={signout}
                         className="text-red-600 cursor-pointer"
                       >
@@ -285,9 +287,8 @@ export const UserDashboard = () => {
           {images.map((img, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-all duration-1000 ${
-                index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-              }`}
+              className={`absolute inset-0 transition-all duration-1000 ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                }`}
               style={{
                 backgroundImage: `url(${img})`,
                 backgroundSize: 'cover',
@@ -298,26 +299,26 @@ export const UserDashboard = () => {
             </div>
           ))}
         </div>
-        
+
         {/* Hero Content */}
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
           <div className="inline-flex items-center px-4 py-2 bg-white/10 dark:bg-white/20 backdrop-blur-md rounded-full border border-white/20 mb-8">
             <Star className="h-4 w-4 text-yellow-400 mr-2" />
             <span className="text-white/90 text-sm font-medium">Trusted by 10,000+ event organizers</span>
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
             Your Events,
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> Simplified</span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
             From intimate gatherings to massive concerts - create, manage, and sell tickets for any event with our all-in-one platform.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-full shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 text-lg"
               asChild
             >
@@ -326,8 +327,8 @@ export const UserDashboard = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               className="border-white/30 text-gray-700 hover:bg-white/10 backdrop-blur-md font-semibold px-8 py-4 rounded-full text-lg dark:text-gray-100 "
               asChild
@@ -335,7 +336,7 @@ export const UserDashboard = () => {
               <Link to="/events">Browse Events</Link>
             </Button>
           </div>
-          
+
           {/* Trust indicators */}
           <div className="flex flex-wrap justify-center items-center gap-8 text-white/70">
             <div className="flex items-center">
@@ -353,25 +354,24 @@ export const UserDashboard = () => {
           </div>
         </div>
 
-        
-        
+
+
         {/* Carousel Navigation */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
           {images.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/75'
-              }`}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/75'
+                }`}
             />
           ))}
         </div>
       </section>
 
-        <section id="events" className="py-0 bg-gray-50 dark:bg-gray-800" >
-        <ViewEvents/>
-        </section>
+      <section id="events" className="py-0 bg-gray-50 dark:bg-gray-800" >
+        <ViewEvents />
+      </section>
 
       {/* Features Section */}
       <section className="py-24 bg-gray-50 dark:bg-gray-800" id="features">
@@ -384,7 +384,7 @@ export const UserDashboard = () => {
               Powerful tools and features designed to make event management effortless and ticket sales seamless.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
@@ -447,7 +447,7 @@ export const UserDashboard = () => {
       {/* How It Works Section */}
       {/* <section className="py-24 bg-white dark:bg-gray-800" id="events"> */}
       <section className="py-0 bg-gray-50 dark:bg-gray-800" id="about">
-      {/* <section className="py-20 bg-gradient-to-br  via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="events"> */}
+        {/* <section className="py-20 bg-gradient-to-br  via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="events"> */}
 
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -458,7 +458,7 @@ export const UserDashboard = () => {
               From concept to sold-out event, our platform guides you through every step of the journey.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {[
               {
@@ -469,7 +469,7 @@ export const UserDashboard = () => {
                 features: ["Event customization", "Ticket configuration", "Venue selection"]
               },
               {
-                step: "02", 
+                step: "02",
                 title: "Promote & Sell",
                 description: "Share your event across social media, embed tickets on your website, and track sales with real-time analytics.",
                 image: img3,
@@ -486,8 +486,8 @@ export const UserDashboard = () => {
               <div key={index} className="relative group">
                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border border-gray-100 dark:border-gray-700">
                   <div className="relative h-48 rounded-2xl overflow-hidden mb-6">
-                    <img 
-                      src={step.image} 
+                    <img
+                      src={step.image}
                       alt={step.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
@@ -496,10 +496,10 @@ export const UserDashboard = () => {
                       {step.step}
                     </div>
                   </div>
-                  
+
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{step.description}</p>
-                  
+
                   <ul className="space-y-2">
                     {step.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
@@ -509,7 +509,7 @@ export const UserDashboard = () => {
                     ))}
                   </ul>
                 </div>
-                
+
                 {/* Connecting line */}
                 {index < 2 && (
                   <div className="hidden lg:block absolute top-24 -right-6 w-12 h-px bg-gradient-to-r from-blue-300 to-purple-300 dark:from-blue-600 dark:to-purple-600 z-10" />
@@ -519,7 +519,7 @@ export const UserDashboard = () => {
           </div>
         </div>
         <section id="feedback" className="py-0 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800">
-         <UserFeedback/>
+          <UserFeedback />
         </section>
       </section>
 
@@ -666,9 +666,9 @@ export const UserDashboard = () => {
               </p>
               <div className="flex space-x-4">
                 {['facebook', 'twitter', 'instagram', 'linkedin'].map((social) => (
-                  <a 
+                  <a
                     key={social}
-                    href="#" 
+                    href="#"
                     className="w-10 h-10 bg-gray-800 dark:bg-gray-900 hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
                   >
                     <span className="sr-only">{social}</span>
@@ -676,7 +676,7 @@ export const UserDashboard = () => {
                 ))}
               </div>
             </div>
-            
+
             {/* Quick Links */}
             <div>
               <h4 className="text-lg font-semibold mb-6">Platform</h4>
@@ -690,7 +690,7 @@ export const UserDashboard = () => {
                 ))}
               </ul>
             </div>
-            
+
             {/* Support */}
             <div>
               <h4 className="text-lg font-semibold mb-6">Support</h4>
@@ -704,14 +704,14 @@ export const UserDashboard = () => {
                 ))}
               </ul>
             </div>
-            
+
             {/* Newsletter */}
             <div>
               <h4 className="text-lg font-semibold mb-6">Stay Updated</h4>
               <p className="text-gray-400 dark:text-gray-500 mb-4">Get the latest updates and event tips.</p>
               <div className="flex">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   placeholder="Enter your email"
                   className="flex-1 px-4 py-3 bg-gray-800 dark:bg-gray-950 border border-gray-700 dark:border-gray-800 rounded-l-lg focus:outline-none focus:border-blue-500 text-white"
                 />
@@ -721,8 +721,8 @@ export const UserDashboard = () => {
               </div>
             </div>
           </div>
-            
-             {/* Contact Form Section */}
+
+          {/* Contact Form Section */}
           <div id="contactus" className="border-t border-white/10 dark:border-gray-700 pt-16 scroll-mt-16">
             <div className="text-center mb-12">
               <Badge variant="outline" className="mb-4 bg-white/10 text-white border-white/20 dark:bg-transparent dark:border-gray-700">
@@ -742,7 +742,7 @@ export const UserDashboard = () => {
             </Card>
           </div>
 
-          
+
           <div className="border-t border-gray-800 dark:border-gray-900 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p className="text-gray-400 dark:text-gray-500 text-sm mb-4 md:mb-0">
@@ -758,14 +758,14 @@ export const UserDashboard = () => {
                   99.9% Uptime
                 </span>
               </div>
-               
+
             </div>
           </div>
         </div>
-        
+
       </footer>
 
-      <ChatBot/>
+      <ChatBot />
 
       <Outlet />
     </div>

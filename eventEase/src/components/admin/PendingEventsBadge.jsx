@@ -2,7 +2,7 @@
 // Save this file and import it in AdminDashboard.jsx
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Bell, AlertCircle, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,7 @@ export const PendingEventsBadge = ({ onNavigate }) => {
   const fetchPendingEvents = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("/event/groupedeventsbyorganizer", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/event/groupedeventsbyorganizer");
 
       let pending = [];
       res.data.data.forEach((group) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, MapPin, Calendar, Users, Ticket, Edit, Trash2, CheckCircle2, ExternalLink, BarChart3 } from "lucide-react";
@@ -17,9 +17,7 @@ export const AdminEvents = () => {
   const fetchAdminEvents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/event/adminevents", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/event/adminevents");
       setEvents(res.data.data);
     } catch (err) {
       console.error("Error fetching admin events:", err);
@@ -37,9 +35,7 @@ export const AdminEvents = () => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
     setDeleteLoading(prev => ({ ...prev, [eventId]: true }));
     try {
-      await axios.delete(`/event/deleteevent/${eventId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/event/deleteevent/${eventId}`);
       fetchAdminEvents();
     } catch (err) {
       alert("Failed to delete event");

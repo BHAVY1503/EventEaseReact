@@ -66,13 +66,13 @@ export const UserFeedback = () => {
               Testimonials
             </span>
           </div>
-          
+
           <h2 className="text-5xl md:text-6xl font-bold">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
               What People Are Saying
             </span>
           </h2>
-          
+
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
             Join thousands of satisfied users who love what we do. Hear their stories and experiences.
           </p>
@@ -112,7 +112,7 @@ export const UserFeedback = () => {
         {/* Feedback Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {feedbacks.map((fb, i) => (
-            <Card 
+            <Card
               key={i}
               onMouseEnter={() => setHoveredCard(i)}
               onMouseLeave={() => setHoveredCard(null)}
@@ -120,7 +120,7 @@ export const UserFeedback = () => {
             >
               {/* Gradient Border Effect on Hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl -z-10" />
-              
+
               {/* Quote Icon */}
               <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
                 <Quote className="h-16 w-16 text-blue-600 dark:text-blue-400" />
@@ -130,13 +130,12 @@ export const UserFeedback = () => {
                 {/* Star Rating */}
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, idx) => (
-                    <Star 
-                      key={idx} 
-                      className={`h-4 w-4 ${
-                        hoveredCard === i 
-                          ? 'fill-yellow-400 text-yellow-400' 
+                    <Star
+                      key={idx}
+                      className={`h-4 w-4 ${hoveredCard === i
+                          ? 'fill-yellow-400 text-yellow-400'
                           : 'fill-yellow-300 text-yellow-300'
-                      } transition-all duration-300`}
+                        } transition-all duration-300`}
                     />
                   ))}
                 </div>
@@ -149,8 +148,8 @@ export const UserFeedback = () => {
                 {/* User Info */}
                 <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <Avatar className="h-12 w-12 ring-2 ring-blue-500/20 group-hover:ring-blue-500/50 transition-all duration-300">
-                    <AvatarImage 
-                      src={fb.profileImage || defaultProfile} 
+                    <AvatarImage
+                      src={fb.profileImage || defaultProfile}
                       alt={fb.userName}
                       onError={(e) => { e.target.src = defaultProfile; }}
                     />
@@ -236,8 +235,8 @@ export const UserFeedback = () => {
                 </div>
 
                 <div className="flex justify-end pt-4">
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={loading}
                     size="lg"
                     className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
@@ -265,8 +264,8 @@ export const UserFeedback = () => {
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             Want to see more? Check out all our reviews
           </p>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-semibold px-6 py-2 rounded-full transition-all duration-300 hover:scale-105"
           >
             View All Reviews
