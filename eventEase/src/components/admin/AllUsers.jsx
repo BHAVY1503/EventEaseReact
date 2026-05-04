@@ -11,10 +11,16 @@ import {
   UserCircle,
   Shield,
   AlertCircle,
-  Loader2
+  Loader2,
+  Activity,
+  Globe,
+  Sparkles,
+  ArrowRight,
+  Zap,
+  CheckCircle2,
+  ShieldAlert
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -35,9 +41,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -55,8 +62,8 @@ export const AllUsers = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setUsers(res.data.data);
-      setFilteredUsers(res.data.data);
+      setUsers(res.data.data || []);
+      setFilteredUsers(res.data.data || []);
     } catch (err) {
       console.error("Error fetching users:", err);
     } finally {
@@ -96,336 +103,226 @@ export const AllUsers = () => {
       setUserToDelete(null);
     } catch (err) {
       console.error("Error deleting user", err);
-      alert("Failed to delete user");
+      alert("FAILED TO PURGE ENTITY.");
     }
   };
 
-  const getRoleBadgeColor = (role) => {
-    const roleColors = {
-      'Admin': 'bg-red-100 text-red-800 border-red-200',
-      'User': 'bg-blue-100 text-blue-800 border-blue-200',
-      'Organizer': 'bg-purple-100 text-purple-800 border-purple-200',
+  const getRoleBadgeStyle = (role) => {
+    const styles = {
+      'Admin': 'bg-[#E11D48]/20 text-[#E11D48] border-[#E11D48]/30',
+      'User': 'bg-emerald-500/20 text-emerald-500 border-emerald-500/30',
+      'Organizer': 'bg-blue-500/20 text-blue-500 border-blue-500/30',
     };
-    return roleColors[role] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return styles[role] || 'bg-gray-500/20 text-gray-500 border-gray-500/30';
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto" />
-          <p className="text-gray-600 font-medium">Loading users...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+        <div className="relative">
+          <div className="w-20 h-20 border-2 border-[#E11D48]/20 rounded-full animate-ping" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#E11D48] absolute inset-0 m-auto" />
         </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#E11D48] animate-pulse">Syncing User Registry Nodes</p>
       </div>
     );
   }
 
   return (
-    // <div className="w-full space-y-6">
-      <div className="w-full space-y-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors">
-
-      {/* Header Section */}
-      <div className="space-y-2">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-            <Users className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              User Management
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Manage and monitor all registered users
+    <div className="space-y-12 pb-20">
+      {/* HEADER SECTION */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
+        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+          <Users className="h-3 w-3 text-[#E11D48] animate-pulse" />
+          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Global User Directory Active</span>
+        </div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
+              USER<br />
+              <span className="text-[#E11D48]">COMMAND</span>
+            </h1>
+            <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
+              Surveillance and regulation of all platform entities.
             </p>
           </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white "> */}
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
-
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600">Total Users</p>
-                <p className="text-3xl font-bold text-blue-600">{users.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white */}
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
-
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600">Active Users</p>
-                <p className="text-3xl font-bold text-green-600">{users.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <UserCircle className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white"> */}
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
-
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-purple-600">Filtered</p>
-                <p className="text-3xl font-bold text-purple-600">{filteredUsers.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Filter className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Card */}
-      {/* <Card className="border-gray-200 shadow-lg"> */}
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 dark:border-gray-700 ">
-
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-8 border-l border-white/10 pl-8 h-fit">
             <div>
-              <CardTitle className="text-2xl">All Users</CardTitle>
-              <CardDescription>Complete list of registered users with management options</CardDescription>
+              <p className="text-[8px] font-black uppercase tracking-[0.3em] text-gray-600 mb-1">Total Entities</p>
+              <p className="text-3xl font-black text-white">{users.length}</p>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className="border-gray-300">
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
+            <div>
+              <p className="text-[8px] font-black uppercase tracking-[0.3em] text-gray-600 mb-1">Grid Match</p>
+              <p className="text-3xl font-black text-[#E11D48]">{filteredUsers.length}</p>
             </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* STATS SECTION */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { label: "Active Nodes", value: users.length, icon: Activity, color: "text-[#E11D48]" },
+          { label: "Privileged Access", value: users.filter(u => u.role === 'Admin').length, icon: Shield, color: "text-blue-500" },
+          { label: "Service Providers", value: users.filter(u => u.role === 'Organizer').length, icon: Globe, color: "text-emerald-500" },
+        ].map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="p-8 bg-[#0A0A0A] border border-white/5 rounded-[2.5rem] space-y-4 shadow-2xl relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
+               <stat.icon className="w-20 h-20 text-white" />
+            </div>
+            <div className="flex items-center justify-between relative z-10">
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-500">{stat.label}</p>
+              <div className={cn("w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10", stat.color)}>
+                <stat.icon className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-4xl font-black text-white relative z-10">{stat.value}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* MAIN REGISTRY */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="border border-white/5 bg-[#0A0A0A] rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-3xl"
+      >
+        <div className="p-10 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gradient-to-r from-transparent to-white/[0.02]">
+          <div className="space-y-1">
+             <h3 className="text-2xl font-black uppercase tracking-tight text-white">Central Registry</h3>
+             <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Validated Platform Entities</p>
           </div>
           
-          {/* Search Bar */}
-          <div className="mt-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-6 flex-1 max-w-2xl">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
               <Input
-                type="text"
-                placeholder="Search by name, email, or phone..."
+                placeholder="IDENTIFY BY NAME, EMAIL, OR PHONE..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-gray-300"
+                className="h-14 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-800 transition-all"
               />
             </div>
+            <Button variant="outline" className="h-14 px-8 border-white/10 bg-transparent text-gray-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-2xl hover:bg-white hover:text-black transition-all">
+              <Download className="w-4 h-4 mr-3" /> EXPORT GRID
+            </Button>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="p-0">
-          {filteredUsers.length === 0 ? (
-            <div className="p-12 text-center">
-              <Alert className="max-w-md mx-auto border-blue-200 bg-blue-50">
-                <AlertCircle className="w-4 h-4 text-blue-600" />
-                <AlertDescription className="text-blue-800">
-                  {searchTerm ? 'No users found matching your search.' : 'No users registered yet.'}
-                </AlertDescription>
-              </Alert>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  {/* <TableRow className="bg-gray-50"> */}
-                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors border-gray-100">
-                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">#</TableHead>
-                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">User</TableHead>
-                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">Contact</TableHead>
-                    <TableHead className="font-semibold text-gray-800 dark:text-gray-200">Role</TableHead>
-                    <TableHead className="font-semibold text-right text-gray-800 dark:text-gray-200">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user, index) => (
-                    <TableRow key={user._id} className="hover:bg-gray-200 transition-colors dark:text-gray-100 dark:hover:bg-gray-900 border-gray-100">
-                      <TableCell className="font-medium text-gray-600 dark:text-gray-100 border-gray-100">
-                        {index + 1}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="w-10 h-10 ring-2 ring-blue-100">
-                            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold">
-                              {user.fullName?.charAt(0).toUpperCase() || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold text-gray-900 dark:text-gray-100">{user.fullName}</p>
-                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-100">
-                              <Mail className="w-3 h-3 mr-1" />
-                              {user.email}
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-100">
-                          <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                          {user.phoneNumber || 'N/A'}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={getRoleBadgeColor(user.roleId?.name || user.role)}>
-                          <Shield className="w-3 h-3 mr-1" />
-                          {user.roleId?.name || user.role || 'User'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => handleDeleteClick(user)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        <div className="p-0 overflow-x-auto custom-scrollbar">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-white/5 hover:bg-transparent">
+                <TableHead className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 py-6 pl-10">Sequence</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 py-6">Entity Profile</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 py-6">Communications</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 py-6">Access Tier</TableHead>
+                <TableHead className="text-right text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 py-6 pr-10">Protocols</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user, index) => (
+                <TableRow key={user._id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+                  <TableCell className="text-[11px] font-black text-gray-600 py-6 pl-10">
+                    {String(index + 1).padStart(2, '0')}
+                  </TableCell>
+                  <TableCell className="py-6">
+                    <div className="flex items-center gap-6">
+                      <Avatar className="w-12 h-12 rounded-2xl ring-2 ring-white/5">
+                        <AvatarFallback className="bg-gradient-to-br from-[#E11D48] to-[#991B1B] text-white font-black uppercase text-lg">
+                          {user.fullName?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <p className="text-[13px] font-black text-white uppercase tracking-tight group-hover:text-[#E11D48] transition-colors">{user.fullName}</p>
+                        <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">{user._id.substring(0, 12)}...</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-6">
+                    <div className="space-y-2">
+                      <div className="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <Mail className="w-3 h-3 mr-3 text-gray-600" />
+                        {user.email}
+                      </div>
+                      <div className="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <Phone className="w-3 h-3 mr-3 text-gray-600" />
+                        {user.phoneNumber || 'NULL'}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-6">
+                    <Badge variant="outline" className={cn("px-4 py-1.5 rounded-lg font-black text-[9px] uppercase tracking-widest border", getRoleBadgeStyle(user.roleId?.name || user.role))}>
+                      <Shield className="w-3 h-3 mr-2" />
+                      {user.roleId?.name || user.role || 'User'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right py-6 pr-10">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-red-500 hover:text-white hover:bg-red-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-xl h-10 px-6 transition-all"
+                      onClick={() => handleDeleteClick(user)}
+                    >
+                      <Trash2 className="w-3 h-3 mr-3" />
+                      PURGE
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </motion.div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* FOOTER ACTION */}
+      <div className="text-center pt-8">
+        <Link to="/admin">
+          <Button variant="outline" className="h-16 px-10 border-white/10 bg-[#0A0A0A] text-gray-500 font-black uppercase tracking-[0.4em] text-[10px] rounded-2xl hover:bg-white hover:text-black transition-all group">
+            RETURN TO COMMAND CENTER <ArrowRight className="w-4 h-4 ml-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </Link>
+      </div>
+
+      {/* PURGE DIALOG */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-red-600" />
-              </div>
-              <span>Delete User</span>
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete <strong>{userToDelete?.fullName}</strong>? 
-              This action cannot be undone and will permanently remove the user from the system.
-            </AlertDialogDescription>
+        <AlertDialogContent className="bg-[#050505] border border-white/10 rounded-[2.5rem] p-10 max-w-md">
+          <AlertDialogHeader className="space-y-6">
+            <div className="w-16 h-16 bg-[#E11D48]/10 rounded-[1.5rem] flex items-center justify-center border border-[#E11D48]/20 mx-auto">
+              <ShieldAlert className="w-8 h-8 text-[#E11D48]" />
+            </div>
+            <div className="text-center space-y-2">
+              <AlertDialogTitle className="text-2xl font-black uppercase tracking-tight text-white leading-tight">
+                ENTITY TERMINATION<br />
+                <span className="text-[#E11D48]">CONFIRMATION</span>
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-[11px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
+                YOU ARE ABOUT TO PERMANENTLY PURGE <span className="text-white">"{userToDelete?.fullName}"</span> FROM THE CENTRAL CORE. THIS ACTION IS IRREVERSIBLE.
+              </AlertDialogDescription>
+            </div>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="mt-10 gap-4">
+            <AlertDialogCancel className="h-14 flex-1 bg-white/5 border-white/10 text-gray-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-2xl hover:bg-white/10">CANCEL PROTOCOL</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
+              className="h-14 flex-1 bg-[#E11D48] text-white font-black uppercase tracking-[0.2em] text-[9px] rounded-2xl hover:bg-red-700 shadow-[0_0_20px_rgba(225,29,72,0.4)]"
             >
-              Delete User
+              EXECUTE PURGE
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      <div className="text-center mt-6">
-        <Button variant="outline" asChild>
-          {/* <a href="/admin">Back to Dashboard</a> */}
-          <Link to="/admin">Back to Dashboard</Link>
-           </Button>
-       </div>
-
     </div>
   );
 };
-
-
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-
-// export const AllUsers = () => {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const token = localStorage.getItem("token");
-
-  
-//     const fetchUsers = async () => {
-//       try {
-//         const res = await axios.get("/user", {
-//           headers: {
-//             Authorization: `Bearer ${token}`
-//           }
-//         });
-//         setUsers(res.data.data);
-//       } catch (err) {
-//         console.error("Error fetching users:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//  useEffect(() => {
-//     if (token) fetchUsers();
-//   }, [token]);
-
- 
-
-//     const handleDelete = async (userId) => {
-//     if (!window.confirm("Are you sure you want to delete this User?")) return;
-//     try {
-//       await axios.delete(`/deleteuser/${userId}`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       fetchUsers();
-//     } catch (err) {
-//       console.error("Error deleting event", err);
-//       alert("Failed to delete event");
-//     }
-//   };
-
-//    if (loading) {
-//     return <h4 className='text-center mt-4'>Loading users...</h4>;
-//   }
-
-//   if (!users.length) {
-//     return <h5 className='text-center mt-4'>No users found.</h5>;
-//   }
-
-//   return (
-//     <div className="container mt-5">
-//       <h2 className="text-center mb-4">All Users (Admin Only)</h2>
-//       <table className="table table-bordered table-striped">
-//         <thead className="thead-dark">
-//           <tr>
-//             <th>#</th>
-//             <th>Full Name</th>
-//             <th>Email</th>
-//             <th>Role</th>
-//             <th>PhoneNo</th>
-//             <th>Action</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {users.map((user, index) => (
-//             <tr key={user._id}>
-//               <td>{index + 1}</td>
-//               <td>{user.fullName}</td>
-//               <td>{user.email}</td>
-//               <td>{user.roleId?.name || user.role}</td>
-//               <td>{user.phoneNumber}</td>
-//               <td> <button className='btn btn-danger btn-sm' onClick={() => handleDelete(user._id)}>
-//                             Delete
-//                           </button></td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-
-//       <div className="text-center mt-3">
-//         <a href="/admin" className="btn btn-outline-dark">Back to Admin Home</a>
-//       </div>
-//     </div>
-//   );
-// };

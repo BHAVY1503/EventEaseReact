@@ -7,10 +7,8 @@ import { Input } from "@/components/ui/input"
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog"
+import { Ticket, ShieldCheck, X, ArrowRight } from "lucide-react"
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { organizerSignup } from "../../features/auth/authSlice";
@@ -93,120 +91,130 @@ export const OrganizerSignup = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (!open) navigate('/', { replace: true }); }}>
-      <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[520px] bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white p-6 rounded-2xl shadow-2xl border border-gray-800 max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="space-y-3 mb-6">
-          <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Become an Organizer
-          </DialogTitle>
-          <DialogDescription className="text-center text-gray-400 text-base">
-            Start creating and managing amazing events
-          </DialogDescription>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit(submitHandler)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Full Name</label>
-              <Input
-                type="text"
-                className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white placeholder:text-gray-500"
-                placeholder="John Doe"
-                {...register("name", validationSchema.nameValidator)}
-              />
-              {errors.name && (
-                <span className="text-sm text-red-400">{errors.name.message}</span>
-              )}
-            </div>
+      <DialogContent className="max-w-4xl bg-black border border-white/5 p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] z-[1000] rounded-[2rem] max-h-[85vh]">
+        <div className="grid grid-cols-1 md:grid-cols-12 h-full max-h-[85vh]">
+           {/* Visual Side (40%) */}
+           <div className="hidden md:flex md:col-span-5 relative bg-[#050505] p-10 lg:p-12 flex-col justify-between border-r border-white/5 overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] -mr-32 -mt-32" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[100px] -ml-32 -mb-32" />
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Organization Name</label>
-              <Input
-                type="text"
-                className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white placeholder:text-gray-500"
-                placeholder="Your Organization"
-                {...register("organizationName", validationSchema.OnameValidator)}
-              />
-              {errors.organizationName && (
-                <span className="text-sm text-red-400">{errors.organizationName.message}</span>
-              )}
-            </div>
-          </div>
+              <div className="relative z-10">
+                 <div className="flex items-center gap-4 mb-12">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+                       <Ticket className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-[0.5em] text-white">EventEase <span className="text-blue-500">Pro</span></span>
+                 </div>
+                 
+                 <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-[0.85] mb-8">
+                    EMPOWER<br />YOUR VISION
+                 </h2>
+                 <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] leading-relaxed max-w-[240px]">
+                    Join the global network of elite event organizers. Scale your impact and reach millions.
+                 </p>
+              </div>
 
-          <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">Email</label>
-          <Input
-            type="email"
-            className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white placeholder:text-gray-500"
-            placeholder="your@email.com"
-            {...register("email", validationSchema.emailValidator)}
-          />
-          {errors.email && (
-            <span className="text-sm text-red-400">{errors.email.message}</span>
-          )}
+              <div className="relative z-10 flex items-center gap-6">
+                 <div className="flex items-center gap-2 text-[10px] font-black text-gray-700 uppercase tracking-widest">
+                    <ShieldCheck className="h-4 w-4 text-blue-500" /> Professional Protocol
+                 </div>
+              </div>
+           </div>
+
+           {/* Form Side (60%) */}
+           <div className="md:col-span-7 p-10 md:p-12 bg-black flex flex-col overflow-y-auto no-scrollbar">
+              <div className="flex justify-between items-center mb-16">
+                 <div>
+                    <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-2 text-glow">Organizer Registration</h3>
+                    <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-purple-500" />
+                 </div>
+                 <button onClick={() => { setIsOpen(false); navigate('/'); }} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-blue-600 transition-all">
+                    <X className="w-5 h-5" />
+                 </button>
+              </div>
+
+              <form onSubmit={handleSubmit(submitHandler)} className="space-y-10">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="relative group">
+                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Subject Name</p>
+                       <input
+                          {...register("name", validationSchema.nameValidator)}
+                          type="text"
+                          placeholder="FULL NAME"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                       />
+                       {errors.name && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.name.message}</p>}
+                    </div>
+
+                    <div className="relative group">
+                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Organization</p>
+                       <input
+                          {...register("organizationName", validationSchema.OnameValidator)}
+                          type="text"
+                          placeholder="ENTITY NAME"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                       />
+                       {errors.organizationName && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.organizationName.message}</p>}
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="relative group">
+                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Transmission ID</p>
+                       <input
+                          {...register("email", validationSchema.emailValidator)}
+                          type="email"
+                          placeholder="EMAIL@DOMAIN.COM"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                       />
+                       {errors.email && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.email.message}</p>}
+                    </div>
+
+                    <div className="relative group">
+                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Phone Link</p>
+                       <input
+                          {...register("PhoneNo", validationSchema.phoneValidator)}
+                          type="tel"
+                          placeholder="+91 00000 00000"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                       />
+                       {errors.PhoneNo && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.PhoneNo.message}</p>}
+                    </div>
+                 </div>
+
+                 <div className="relative group">
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Access Key</p>
+                    <input
+                       {...register("password", validationSchema.passwordValidator)}
+                       type="password"
+                       placeholder="••••••••"
+                       className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                    />
+                    {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.password.message}</p>}
+                 </div>
+
+                 {error && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black uppercase tracking-widest text-center">
+                       {typeof error === 'string' ? error : "REGISTRATION FAILED"}
+                    </div>
+                 )}
+
+                 <div className="space-y-8 pt-8">
+                    <Button
+                       type="submit"
+                       disabled={isLoading}
+                       className="w-full h-16 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full text-xs font-black tracking-[0.4em] uppercase transition-all duration-300 shadow-[0_0_30px_rgba(37,99,235,0.2)] hover:shadow-[0_0_40px_rgba(37,99,235,0.4)] transform hover:scale-[1.01]"
+                    >
+                       {isLoading ? "TRANSMITTING..." : "INITIATE ACCOUNT CREATION"}
+                    </Button>
+
+                    <p className="text-center text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                       Already Registered? <Link to="/organizersignin" className="text-blue-500 hover:underline ml-2">Access Pro Portal</Link>
+                    </p>
+                 </div>
+              </form>
+           </div>
         </div>
-         
-          <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">Password</label>
-          <Input
-            type="password"
-            className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white placeholder:text-gray-500"
-            placeholder="••••••••"
-            {...register("password", validationSchema.passwordValidator)}
-          />
-          {errors.password && (
-            <span className="text-sm text-red-400">{errors.password.message}</span>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">Phone Number</label>
-          <Input
-            type="tel"
-            className="bg-gray-800/50 border-gray-700 focus:border-blue-500 text-white placeholder:text-gray-500"
-            placeholder="1234567890"
-            {...register("PhoneNo", validationSchema.phoneValidator)}
-          />
-          {errors.PhoneNo && (
-            <span className="text-sm text-red-400">{errors.PhoneNo.message}</span>
-          )}
-        </div>
-
-
-
-          <div className="flex flex-col gap-3 mt-6">
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating Account..." : "Create Account"}
-                  </Button>
-            
-            <Link to="/" className="w-full">
-              <Button 
-                type="button"
-                variant="outline" 
-                className="w-full border-gray-700 text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors"
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-            </Link>
-
-            <div className="text-center pt-4">
-              {error && <div className="text-red-400 mb-2">{error}</div>}
-              <p className="text-sm text-gray-400">
-                Already have an account?{' '}
-                <Link 
-                  to="/organizersignin" 
-                  className="text-blue-400 hover:text-blue-300 hover:underline transition-colors font-medium"
-                >
-                  Sign In
-                </Link>
-              </p>
-            </div>
-          </div>
-        </form>
       </DialogContent>
     </Dialog>
   );

@@ -1,11 +1,12 @@
 import axios from 'axios';
+import api from '@/lib/api';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -19,33 +20,36 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { 
   CalendarDays, 
   Mail, 
   MapPin, 
   Users, 
-  IndianRupee, 
-  ArrowLeft, 
-  Ticket,
   Search,
   Filter,
-  Download,
   TrendingUp,
   Calendar,
   User,
   DollarSign,
   CheckCircle2,
   XCircle,
-  Clock
+  Clock,
+  ArrowLeft,
+  Sparkles,
+  Activity,
+  Zap,
+  LayoutGrid,
+  History,
+  ShieldCheck,
+  Globe,
+  IndianRupee,
+  Ticket,
+  ChevronRight,
+  Download,
+  BarChart3
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export const BookingsOfMyEvents = () => {
   const [tickets, setTickets] = useState([]);
@@ -54,27 +58,17 @@ export const BookingsOfMyEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterEvent, setFilterEvent] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
-  const [dataView, setDataView] = useState('combined'); // 'combined', 'tickets', 'payments'
+  const [dataView, setDataView] = useState('combined');
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch both tickets and payment history
         const [ticketsRes, paymentsRes] = await Promise.all([
-          axios.get("/tickets/organizer/self", {
-            headers: { Authorization: `Bearer ${token}` }
-          }).catch(err => {
-            console.error("Error fetching tickets:", err);
-            return { data: { data: [] } };
-          }),
-          axios.get("/payments/payment_history", {
-            headers: { Authorization: `Bearer ${token}` }
-          }).catch(err => {
-            console.error("Error fetching payment history:", err);
-            return { data: { data: [] } };
-          })
+          api.get("/tickets/organizer/self").catch(err => ({ data: { data: [] } })),
+          api.get("/payment/payment_history").catch(err => ({ data: { data: [] } }))
         ]);
 
         setTickets(ticketsRes.data.data || []);
@@ -86,51 +80,31 @@ export const BookingsOfMyEvents = () => {
       }
     };
 
-    if (token) {
-      fetchData();
-    }
+    if (token) fetchData();
   }, [token]);
 
-  // Combine tickets and payments data
   const getCombinedData = () => {
     const eventMap = new Map();
-
-    // Add ticket data
     tickets.forEach(ticket => {
       const eventId = ticket.eventId?._id;
       if (!eventId) return;
-
       if (!eventMap.has(eventId)) {
-        eventMap.set(eventId, {
-          event: ticket.eventId,
-          tickets: [],
-          payments: []
-        });
+        eventMap.set(eventId, { event: ticket.eventId, tickets: [], payments: [] });
       }
       eventMap.get(eventId).tickets.push(ticket);
     });
-
-    // Add payment data
     paymentHistory.forEach(payment => {
       const eventId = payment.eventId?._id;
       if (!eventId) return;
-
       if (!eventMap.has(eventId)) {
-        eventMap.set(eventId, {
-          event: payment.eventId,
-          tickets: [],
-          payments: []
-        });
+        eventMap.set(eventId, { event: payment.eventId, tickets: [], payments: [] });
       }
       eventMap.get(eventId).payments.push(payment);
     });
-
     return Array.from(eventMap.values());
   };
 
   const combinedData = getCombinedData();
-
-  // Calculate statistics
   const stats = {
     totalBookings: tickets.length + paymentHistory.filter(p => p.status === 'captured').length,
     totalRevenue: [
@@ -142,1255 +116,272 @@ export const BookingsOfMyEvents = () => {
                     paymentHistory.filter(p => p.status === 'captured').reduce((sum, p) => sum + (p.quantity || 1), 0),
   };
 
-  // Filter events
   const filteredData = combinedData.filter(({ event }) => {
     if (!event) return false;
-    
     const matchesSearch = event.eventName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesEvent = filterEvent === 'all' || event._id === filterEvent;
-    
-    if (activeTab === 'upcoming') {
-      return new Date(event.endDate) >= new Date() && matchesSearch && matchesEvent;
-    } else if (activeTab === 'past') {
-      return new Date(event.endDate) < new Date() && matchesSearch && matchesEvent;
-    }
+    if (activeTab === 'upcoming') return new Date(event.endDate) >= new Date() && matchesSearch && matchesEvent;
+    if (activeTab === 'past') return new Date(event.endDate) < new Date() && matchesSearch && matchesEvent;
     return matchesSearch && matchesEvent;
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:bg-gray-900">
-        <div className="container mx-auto px-4 py-16">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-lg text-gray-600 dark:text-gray-300">Loading bookings...</p>
-            </div>
-          </div>
-        </div>
+  const LoadingSkeleton = () => (
+    <div className="space-y-12 animate-pulse">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white/5 rounded-3xl" />)}
       </div>
-    );
-  }
-
-  if (combinedData.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:bg-gray-900">
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center max-w-2xl mx-auto">
-            <div className="mb-8">
-              <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Ticket className="w-12 h-12 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-                No Bookings Yet
-              </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                Once people start booking your events, you'll see all the details here.
-              </p>
-            </div>
-            
-            <Link to="/organizer">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      <div className="h-64 bg-white/5 rounded-[3rem]" />
+    </div>
+  );
 
   const getPaymentStatusBadge = (status) => {
-    const statusConfig = {
-      captured: { color: 'bg-green-500', icon: CheckCircle2, text: 'Success' },
-      failed: { color: 'bg-red-500', icon: XCircle, text: 'Failed' },
-      pending: { color: 'bg-yellow-500', icon: Clock, text: 'Pending' },
-      refunded: { color: 'bg-gray-500', icon: XCircle, text: 'Refunded' }
-    };
-    
-    const config = statusConfig[status] || statusConfig.pending;
-    const Icon = config.icon;
-    
+    const config = {
+      captured: { color: 'bg-green-500/20 text-green-500', text: 'SUCCESS' },
+      failed: { color: 'bg-red-500/20 text-red-500', text: 'FAILED' },
+      pending: { color: 'bg-yellow-500/20 text-yellow-500', text: 'PENDING' },
+      refunded: { color: 'bg-gray-500/20 text-gray-500', text: 'REFUNDED' }
+    }[status] || { color: 'bg-blue-500/20 text-blue-500', text: 'PROCESSING' };
+
     return (
-      <Badge className={`${config.color} text-white`}>
-        <Icon className="w-3 h-3 mr-1" />
+      <Badge className={cn("px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border-none", config.color)}>
         {config.text}
       </Badge>
     );
   };
 
   const EventBookingCard = ({ event, tickets, payments }) => {
-    const ticketRevenue = tickets.reduce((sum, t) => sum + (t.ticketRate * t.quantity), 0);
-    const paymentRevenue = payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (p.amount / 100), 0);
-    const totalRevenue = ticketRevenue + paymentRevenue;
-    
-    const ticketAttendees = tickets.reduce((sum, t) => sum + t.quantity, 0);
-    const paymentAttendees = payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (p.quantity || 1), 0);
-    const totalAttendees = ticketAttendees + paymentAttendees;
-    
-    const totalBookings = tickets.length + payments.length;
+    const totalRevenue = tickets.reduce((sum, t) => sum + (t.ticketRate * t.quantity), 0) + 
+                         payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (p.amount / 100), 0);
+    const totalAttendees = tickets.reduce((sum, t) => sum + t.quantity, 0) + 
+                           payments.filter(p => p.status === 'captured').reduce((sum, p) => sum + (p.quantity || 1), 0);
     const isPastEvent = new Date(event.endDate) < new Date();
 
     return (
-      <Card className={`shadow-xl border-0 overflow-hidden transition-all hover:shadow-2xl ${
-        isPastEvent ? 'opacity-75' : ''
-      }`}>
-        {/* Event Header */}
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex-1">
-              <CardTitle className="text-2xl font-bold mb-2">{event.eventName}</CardTitle>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {event.eventType}
-                </Badge>
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {event.eventCategory}
-                </Badge>
-                {isPastEvent && (
-                  <Badge className="bg-green-500/20 text-white border-green-300/30">
-                    Completed
+      <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group">
+        <Card className="bg-white/10 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-3xl transition-all duration-700 hover:border-[#E11D48]/40 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col xl:flex-row">
+            {/* Event Info Sidebar */}
+            <div className="xl:w-80 p-10 bg-black/40 border-b xl:border-b-0 xl:border-r border-white/5 space-y-8">
+               <div className="space-y-4">
+                  <Badge className="bg-[#E11D48]/10 text-[#E11D48] text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full">
+                     {isPastEvent ? "COMPLETED NODE" : "ACTIVE NODE"}
                   </Badge>
-                )}
-              </div>
+                  <h3 className="text-2xl font-black uppercase tracking-tighter text-white leading-none group-hover:text-[#E11D48] transition-colors">
+                     {event.eventName}
+                  </h3>
+                  <div className="flex items-center gap-3 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
+                     <Calendar className="w-3.5 h-3.5 text-[#E11D48]" />
+                     {new Date(event.startDate).toLocaleDateString()}
+                  </div>
+               </div>
+
+               <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                     <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Revenue</p>
+                     <p className="text-lg font-black text-white">₹{totalRevenue.toLocaleString()}</p>
+                  </div>
+                  <div className="space-y-1">
+                     <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Attendees</p>
+                     <p className="text-lg font-black text-white">{totalAttendees}</p>
+                  </div>
+               </div>
             </div>
-            
-            <div className="text-right">
-              <div className="flex items-center text-white/90 mb-1 justify-end">
-                <CalendarDays className="w-4 h-4 mr-2" />
-                <span className="text-sm">{new Date(event.startDate).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center text-white/90 justify-end">
-                <CalendarDays className="w-4 h-4 mr-2" />
-                <span className="text-sm">{new Date(event.endDate).toLocaleDateString()}</span>
-              </div>
+
+            {/* Transactions Area */}
+            <div className="flex-1 p-10 space-y-10">
+               {tickets.length > 0 && (
+                 <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                       <Ticket className="w-4 h-4 text-[#E11D48]" />
+                       <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Confirmed Manifest</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       {tickets.map(t => (
+                         <div key={t._id} className="p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4 hover:bg-white/10 transition-all">
+                            <div className="flex justify-between items-start">
+                               <div className="space-y-1">
+                                  <p className="text-[9px] font-black text-white uppercase tracking-tight">{t.userId?.fullName || t.organizerId?.name || "ANONYMOUS"}</p>
+                                  <p className="text-[7px] font-bold text-gray-500 uppercase">{t.userId?.email || t.organizerId?.email}</p>
+                               </div>
+                               <Badge className="bg-green-500/10 text-green-500 text-[7px] font-black rounded-full border-none px-2 py-0.5">PAID</Badge>
+                            </div>
+                            <div className="flex justify-between items-end pt-2 border-t border-white/5">
+                               <div className="flex items-center gap-2 text-[8px] font-bold text-gray-400">
+                                  <Users className="w-3 h-3" /> {t.quantity} SEATS
+                               </div>
+                               <p className="text-sm font-black text-[#E11D48]">₹{(t.ticketRate * t.quantity).toLocaleString()}</p>
+                            </div>
+                         </div>
+                       ))}
+                    </div>
+                 </div>
+               )}
+
+               {payments.length > 0 && (
+                 <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                       <IndianRupee className="w-4 h-4 text-emerald-500" />
+                       <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Transaction Logs</h4>
+                    </div>
+                    <div className="overflow-x-auto no-scrollbar">
+                       <table className="w-full text-left border-collapse">
+                          <thead>
+                             <tr className="border-b border-white/5">
+                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest">ID</th>
+                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest">Subject</th>
+                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest text-right">Amount</th>
+                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest text-right">Status</th>
+                             </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                             {payments.map(p => (
+                               <tr key={p._id} className="group/row">
+                                  <td className="py-4 text-[8px] font-mono text-gray-600 uppercase">{p.orderId?.slice(-8)}</td>
+                                  <td className="py-4">
+                                     <div className="flex flex-col">
+                                        <span className="text-[9px] font-black text-white uppercase">{p.userId?.fullName || "ANONYMOUS"}</span>
+                                        <span className="text-[7px] text-gray-600">{new Date(p.createdAt).toLocaleDateString()}</span>
+                                     </div>
+                                  </td>
+                                  <td className="py-4 text-right text-[10px] font-black text-white">₹{(p.amount / 100).toLocaleString()}</td>
+                                  <td className="py-4 text-right">{getPaymentStatusBadge(p.status)}</td>
+                               </tr>
+                             ))}
+                          </tbody>
+                       </table>
+                    </div>
+                 </div>
+               )}
             </div>
           </div>
-        </CardHeader>
-
-        {/* Statistics Bar */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 px-6 py-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <Ticket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Total Bookings</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">{totalBookings}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Attendees</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">{totalAttendees}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 col-span-2 md:col-span-1">
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <IndianRupee className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Revenue</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">₹{totalRevenue.toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bookings List */}
-        <CardContent className="p-6">
-          {/* Tickets Section */}
-          {tickets.length > 0 && (
-            <div className="mb-6">
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                <Ticket className="w-5 h-5 mr-2 text-blue-600" />
-                Confirmed Tickets ({tickets.length})
-              </h4>
-              
-              <div className="space-y-4">
-                {tickets.map((ticket, index) => (
-                  <div key={ticket._id}>
-                    <Card className="border-2 border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all">
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* Customer Info */}
-                          <div className="space-y-3">
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <User className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                                <span className="text-sm font-medium">Customer</span>
-                              </div>
-                              <p className="text-gray-900 dark:text-white font-semibold ml-6">
-                                {ticket.userId?.fullName || ticket.organizerId?.name || "N/A"}
-                              </p>
-                            </div>
-                            
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <Mail className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                                <span className="text-sm font-medium">Email</span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm ml-6 break-words">
-                                {ticket.userId?.email || ticket.organizerId?.email || "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Booking Details */}
-                          <div className="space-y-3">
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <Ticket className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                                <span className="text-sm font-medium">Quantity</span>
-                              </div>
-                              <div className="ml-6">
-                                <Badge variant="outline" className="text-base px-3 py-1">
-                                  {ticket.quantity} Ticket{ticket.quantity > 1 ? "s" : ""}
-                                </Badge>
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <MapPin className="w-4 h-4 mr-2 text-red-600 dark:text-red-400" />
-                                <span className="text-sm font-medium">Location</span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm ml-6">
-                                {ticket.cityId?.name || "N/A"}, {ticket.stateId?.Name || "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Payment Info */}
-                          <div className="space-y-3">
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <DollarSign className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                                <span className="text-sm font-medium">Total Amount</span>
-                              </div>
-                              <div className="ml-6">
-                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                  ₹{(ticket.ticketRate * ticket.quantity).toLocaleString()}
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  ₹{ticket.ticketRate} × {ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Selected Seats for Indoor Events */}
-                        {event.eventCategory === "Indoor" && ticket.selectedSeats?.length > 0 && (
-                          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                            <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
-                              <Ticket className="w-4 h-4 mr-2" />
-                              Selected Seats:
-                            </h5>
-                            <div className="flex flex-wrap gap-2">
-                              {ticket.selectedSeats.map((seat, seatIndex) => (
-                                <Badge key={seatIndex} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1">
-                                  {seat}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                    
-                    {index < tickets.length - 1 && <Separator className="my-4" />}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Payment History Section */}
-          {payments.length > 0 && (
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-green-600" />
-                Payment Transactions ({payments.length})
-              </h4>
-              
-              <div className="space-y-4">
-                {payments.map((payment, index) => (
-                  <div key={payment._id}>
-                    <Card className="border-2 border-gray-100 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600 transition-all">
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {/* Payment Info */}
-                          <div className="space-y-3">
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <User className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                                <span className="text-sm font-medium">Customer</span>
-                              </div>
-                              <p className="text-gray-900 dark:text-white font-semibold ml-6">
-                                {payment.userId?.fullName || payment.organizerId?.name || "N/A"}
-                              </p>
-                            </div>
-                            
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <Mail className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-                                <span className="text-sm font-medium">Email</span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm ml-6 break-words">
-                                {payment.userId?.email || payment.organizerId?.email || "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Transaction Details */}
-                          <div className="space-y-3">
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <Ticket className="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400" />
-                                <span className="text-sm font-medium">Order ID</span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-xs ml-6 font-mono">
-                                {payment.orderId || "N/A"}
-                              </p>
-                            </div>
-                            
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <Calendar className="w-4 h-4 mr-2 text-orange-600 dark:text-orange-400" />
-                                <span className="text-sm font-medium">Date</span>
-                              </div>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm ml-6">
-                                {payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Amount & Status */}
-                          <div className="space-y-3">
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <DollarSign className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                                <span className="text-sm font-medium">Amount</span>
-                              </div>
-                              <div className="ml-6">
-                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                  ₹{((payment.amount || 0) / 100).toLocaleString()}
-                                </p>
-                                {payment.quantity && (
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {payment.quantity} ticket{payment.quantity > 1 ? "s" : ""}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-                                <span className="text-sm font-medium">Status</span>
-                              </div>
-                              <div className="ml-0">
-                                {getPaymentStatusBadge(payment.status)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    {index < payments.length - 1 && <Separator className="my-4" />}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </Card>
+      </motion.div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:bg-black">
-      
-      <div className="container mx-auto px-4 py-16 max-w-7xl dark:bg-slate-900">
-        <div className="flex gap-2 justify-end mb-6">
-          <Link to="/organizer">
-            <Button variant="outline" className="border-gray-300 dark:border-gray-700">
-             <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-             </Button>
-          </Link>
-        </div>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            Event Bookings & Payments
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            Manage and track all bookings and payment transactions for your events
-          </p>
-        </div>
-        
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm mb-1">Total Bookings</p>
-                  <p className="text-3xl font-bold">{stats.totalBookings}</p>
-                </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Ticket className="w-6 h-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm mb-1">Total Revenue</p>
-                  <p className="text-3xl font-bold">₹{stats.totalRevenue.toLocaleString()}</p>
-                </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm mb-1">Total Events</p>
-                  <p className="text-3xl font-bold">{stats.totalEvents}</p>
-                </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-6 h-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm mb-1">Total Attendees</p>
-                  <p className="text-3xl font-bold">{stats.totalAttendees}</p>
-                </div>
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card className="mb-8 border-0 shadow-lg bg-white/70 backdrop-blur-sm dark:bg-gray-800/70">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filter Bookings</h3>
+    <div className="w-full space-y-12 pb-20">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16">
+         <div>
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-8">
+               <Activity className="h-4 w-4 text-[#E11D48]" />
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Operational Intelligence v4.0</span>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search by event name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white dark:bg-gray-700"
-                />
-              </div>
-              
-              <Select value={filterEvent} onValueChange={setFilterEvent}>
-                <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-400">
-                  <SelectValue placeholder="Filter by event" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800">
-                  <SelectItem value="all">All Events</SelectItem>
-                  {combinedData.map(({ event }) => (
-                    <SelectItem key={event._id} value={event._id}>
-                      {event.eventName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tabs for All / Upcoming / Past */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-              <TabsList className="grid grid-cols-3 w-full dark:bg-gray-700">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                <TabsTrigger value="past">Past</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            {/* Data View Switch */}
-            <div className="flex items-center gap-4 mt-6">
-              <Button
-                variant={dataView === "combined" ? "default" : "outline"}
-                onClick={() => setDataView("combined")}
-              >
-                Combined View
-              </Button>
-              <Button
-                variant={dataView === "tickets" ? "default" : "outline"}
-                onClick={() => setDataView("tickets")}
-              >
-                Tickets Only
-              </Button>
-              {/* <Button
-                variant={dataView === "payments" ? "default" : "outline"}
-                onClick={() => setDataView("payments")}
-              >
-                Payments Only
-              </Button> */}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Render Events */}
-        <div className="grid grid-cols-1 gap-8">
-          {filteredData.map(({ event, tickets, payments }) => {
-            // Apply current view mode
-            const filteredTickets =
-              dataView === "tickets" ? tickets : dataView === "combined" ? tickets : [];
-            const filteredPayments =
-              dataView === "payments" ? payments : dataView === "combined" ? payments : [];
-
-            return (
-              <EventBookingCard
-                key={event._id}
-                event={event}
-                tickets={filteredTickets}
-                payments={filteredPayments}
-              />
-            );
-          })}
-        </div>
+            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
+               SALES <span className="text-[#E11D48]">REPORT</span>
+            </h1>
+         </div>
+         <div className="flex gap-4">
+            <Button variant="outline" className="h-12 px-6 bg-white/5 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl hover:bg-white/10">
+               <Download className="w-3.5 h-3.5 mr-2" /> EXPORT DATA
+            </Button>
+         </div>
       </div>
-    // </div>
+
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <div className="space-y-16">
+          {/* Intelligence Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { label: 'GROSS REVENUE', val: `₹${stats.totalRevenue.toLocaleString()}`, icon: IndianRupee, color: 'text-[#E11D48]' },
+              { label: 'TOTAL BOOKINGS', val: stats.totalBookings, icon: Ticket, color: 'text-blue-500' },
+              { label: 'ATTENDEE COUNT', val: stats.totalAttendees, icon: Users, color: 'text-emerald-500' },
+              { label: 'ACTIVE NODES', val: stats.totalEvents, icon: Globe, color: 'text-purple-500' },
+            ].map((s, i) => (
+              <Card key={i} className="bg-white/10 border border-white/10 rounded-3xl p-8 backdrop-blur-3xl space-y-4 hover:border-white/20 transition-all shadow-xl">
+                <div className="flex justify-between items-start">
+                   <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
+                      <s.icon className={cn("w-5 h-5", s.color)} />
+                   </div>
+                   <div className="h-1.5 w-1.5 bg-[#E11D48] rounded-full animate-pulse" />
+                </div>
+                <div>
+                   <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{s.label}</p>
+                   <p className="text-3xl font-black text-white tracking-tighter mt-1">{s.val}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Filtering Node */}
+          <Card className="bg-white/10 border border-white/10 rounded-[3rem] p-10 backdrop-blur-3xl shadow-xl">
+             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+                <div className="lg:col-span-5 space-y-4">
+                   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">Search Manifest</p>
+                   <div className="relative group">
+                      <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-[#E11D48] transition-colors" />
+                      <Input 
+                        placeholder="ENTER EVENT IDENTITY..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="h-16 pl-14 bg-white/5 border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-[#E11D48]/50"
+                      />
+                   </div>
+                </div>
+                <div className="lg:col-span-4 space-y-4">
+                   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">Timeline Filter</p>
+                   <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/5">
+                      {[
+                        { id: 'all', label: 'ALL', icon: LayoutGrid },
+                        { id: 'upcoming', label: 'UPCOMING', icon: Zap },
+                        { id: 'past', label: 'HISTORICAL', icon: History },
+                      ].map(tab => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id)}
+                          className={cn(
+                            "flex-1 h-12 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2",
+                            activeTab === tab.id ? "bg-[#E11D48] text-white shadow-xl" : "text-gray-500 hover:text-white"
+                          )}
+                        >
+                           <tab.icon className="w-3 h-3" /> {tab.label}
+                        </button>
+                      ))}
+                   </div>
+                </div>
+                <div className="lg:col-span-3 space-y-4">
+                   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">Node Selection</p>
+                   <Select value={filterEvent} onValueChange={setFilterEvent}>
+                      <SelectTrigger className="h-16 bg-white/5 border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-[#E11D48]/50">
+                         <SelectValue placeholder="FILTER BY NODE" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-black border-white/5 text-white">
+                         <SelectItem value="all">ALL NODES</SelectItem>
+                         {combinedData.map(({ event }) => (
+                           <SelectItem key={event._id} value={event._id}>{event.eventName}</SelectItem>
+                         ))}
+                      </SelectContent>
+                   </Select>
+                </div>
+             </div>
+          </Card>
+
+          {/* Records Manifest */}
+          <div className="space-y-8">
+             <AnimatePresence>
+                {filteredData.length === 0 ? (
+                  <div className="py-40 text-center bg-white/5 border border-white/5 rounded-[3rem] backdrop-blur-3xl">
+                     <BarChart3 className="w-16 h-16 text-gray-800 mx-auto mb-8" />
+                     <h3 className="text-2xl font-black uppercase tracking-tighter text-white">No Intelligence Detected</h3>
+                     <p className="text-gray-600 font-bold uppercase tracking-widest text-[9px] mt-2">Adjust your filters to scan different operational nodes.</p>
+                  </div>
+                ) : (
+                  filteredData.map(({ event, tickets, payments }) => (
+                    <EventBookingCard 
+                      key={event._id} 
+                      event={event} 
+                      tickets={dataView === "payments" ? [] : tickets} 
+                      payments={dataView === "tickets" ? [] : payments} 
+                    />
+                  ))
+                )}
+             </AnimatePresence>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
-
-
-
-
-
-// import axios from 'axios';
-// import React, { useEffect, useState } from 'react';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Badge } from '@/components/ui/badge';
-// import { Button } from '@/components/ui/button';
-// import { Alert, AlertDescription } from '@/components/ui/alert';
-// import { Separator } from '@/components/ui/separator';
-// import { Input } from '@/components/ui/input';
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select';
-// import {
-//   Tabs,
-//   TabsContent,
-//   TabsList,
-//   TabsTrigger,
-// } from '@/components/ui/tabs';
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel";
-// import { 
-//   CalendarDays, 
-//   Mail, 
-//   MapPin, 
-//   Users, 
-//   IndianRupee, 
-//   ArrowLeft, 
-//   Ticket,
-//   Search,
-//   Filter,
-//   Download,
-//   TrendingUp,
-//   Calendar,
-//   User,
-//   DollarSign
-// } from 'lucide-react';
-// import { Link } from 'react-router-dom';
-
-// export const BookingsOfMyEvents = () => {
-//   const [tickets, setTickets] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [filterEvent, setFilterEvent] = useState('all');
-//   const [activeTab, setActiveTab] = useState('all');
-
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     const fetchTickets = async () => {
-//       try {
-//         const res = await axios.get("/tickets/organizer/self", {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-//         setTickets(res.data.data);
-//       } catch (err) {
-//         console.error("Error fetching tickets:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     if (token) {
-//       fetchTickets();
-//     }
-//   }, [token]);
-
-//   // Group tickets by event
-//   const groupedByEvent = tickets.reduce((acc, ticket) => {
-//     const eventId = ticket.eventId?._id;
-//     if (!acc[eventId]) acc[eventId] = { event: ticket.eventId, tickets: [] };
-//     acc[eventId].tickets.push(ticket);
-//     return acc;
-//   }, {});
-
-//   // Calculate statistics
-//   const stats = {
-//     totalBookings: tickets.length,
-//     totalRevenue: tickets.reduce((sum, t) => sum + (t.ticketRate * t.quantity), 0),
-//     totalEvents: Object.keys(groupedByEvent).length,
-//     totalAttendees: tickets.reduce((sum, t) => sum + t.quantity, 0),
-//   };
-
-//   // Filter tickets
-//   const filteredGroups = Object.values(groupedByEvent).filter(({ event, tickets }) => {
-//     const matchesSearch = event.eventName.toLowerCase().includes(searchTerm.toLowerCase());
-//     const matchesEvent = filterEvent === 'all' || event._id === filterEvent;
-    
-//     if (activeTab === 'upcoming') {
-//       return new Date(event.endDate) >= new Date() && matchesSearch && matchesEvent;
-//     } else if (activeTab === 'past') {
-//       return new Date(event.endDate) < new Date() && matchesSearch && matchesEvent;
-//     }
-//     return matchesSearch && matchesEvent;
-//   });
-
-//   if (loading) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:bg-gray-900">
-//         <div className="container mx-auto px-4 py-16">
-//           <div className="flex items-center justify-center min-h-[400px]">
-//             <div className="text-center">
-//               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-//               <p className="text-lg text-gray-600 dark:text-gray-300">Loading bookings...</p>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (!tickets.length) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:bg-gray-900">
-//         <div className="container mx-auto px-4 py-16">
-//           <div className="text-center max-w-2xl mx-auto">
-//             <div className="mb-8">
-//               <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-//                 <Ticket className="w-12 h-12 text-blue-600 dark:text-blue-400" />
-//               </div>
-//               <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-//                 No Bookings Yet
-//               </h1>
-//               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-//                 Once people start booking your events, you'll see all the details here.
-//               </p>
-//             </div>
-            
-//             <Link to="/organizer">
-//               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-//                 <ArrowLeft className="w-4 h-4 mr-2" />
-//                 Back to Dashboard
-//               </Button>
-//             </Link>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   const EventBookingCard = ({ event, tickets }) => {
-//     const eventRevenue = tickets.reduce((sum, t) => sum + (t.ticketRate * t.quantity), 0);
-//     const totalAttendees = tickets.reduce((sum, t) => sum + t.quantity, 0);
-//     const isPastEvent = new Date(event.endDate) < new Date();
-
-//     return (
-//       <Card className={`shadow-xl border-0 overflow-hidden transition-all hover:shadow-2xl ${
-//         isPastEvent ? 'opacity-75' : ''
-//       }`}>
-//         {/* Event Header */}
-//         <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-//           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-//             <div className="flex-1">
-//               <CardTitle className="text-2xl font-bold mb-2">{event.eventName}</CardTitle>
-//               <div className="flex flex-wrap gap-2">
-//                 <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-//                   {event.eventType}
-//                 </Badge>
-//                 <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-//                   {event.eventCategory}
-//                 </Badge>
-//                 {isPastEvent && (
-//                   <Badge className="bg-green-500/20 text-white border-green-300/30">
-//                     Completed
-//                   </Badge>
-//                 )}
-//               </div>
-//             </div>
-            
-//             <div className="text-right">
-//               <div className="flex items-center text-white/90 mb-1 justify-end">
-//                 <CalendarDays className="w-4 h-4 mr-2" />
-//                 <span className="text-sm">{new Date(event.startDate).toLocaleDateString()}</span>
-//               </div>
-//               <div className="flex items-center text-white/90 justify-end">
-//                 <CalendarDays className="w-4 h-4 mr-2" />
-//                 <span className="text-sm">{new Date(event.endDate).toLocaleDateString()}</span>
-//               </div>
-//             </div>
-//           </div>
-//         </CardHeader>
-
-//         {/* Statistics Bar */}
-//         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 px-6 py-4">
-//           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-//             <div className="flex items-center gap-3">
-//               <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-//                 <Ticket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-//               </div>
-//               <div>
-//                 <p className="text-xs text-gray-600 dark:text-gray-400">Total Bookings</p>
-//                 <p className="text-lg font-bold text-gray-900 dark:text-white">{tickets.length}</p>
-//               </div>
-//             </div>
-            
-//             <div className="flex items-center gap-3">
-//               <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-//                 <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
-//               </div>
-//               <div>
-//                 <p className="text-xs text-gray-600 dark:text-gray-400">Attendees</p>
-//                 <p className="text-lg font-bold text-gray-900 dark:text-white">{totalAttendees}</p>
-//               </div>
-//             </div>
-            
-//             <div className="flex items-center gap-3 col-span-2 md:col-span-1">
-//               <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-//                 <IndianRupee className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-//               </div>
-//               <div>
-//                 <p className="text-xs text-gray-600 dark:text-gray-400">Revenue</p>
-//                 <p className="text-lg font-bold text-gray-900 dark:text-white">₹{eventRevenue.toLocaleString()}</p>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Bookings List */}
-//         <CardContent className="p-6">
-//           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-//             Booking Details ({tickets.length})
-//           </h4>
-          
-//           <div className="space-y-4">
-//             {tickets.map((ticket, index) => (
-//               <div key={ticket._id}>
-//                 <Card className="border-2 border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all">
-//                   <CardContent className="p-4">
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       {/* Customer Info */}
-//                       <div className="space-y-3">
-//                         <div>
-//                           <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-//                             <User className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-//                             <span className="text-sm font-medium">Customer</span>
-//                           </div>
-//                           <p className="text-gray-900 dark:text-white font-semibold ml-6">
-//                             {ticket.userId?.fullName || ticket.organizerId?.name || "N/A"}
-//                           </p>
-//                         </div>
-                        
-//                         <div>
-//                           <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-//                             <Mail className="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" />
-//                             <span className="text-sm font-medium">Email</span>
-//                           </div>
-//                           <p className="text-gray-600 dark:text-gray-400 text-sm ml-6 break-words">
-//                             {ticket.userId?.email || ticket.organizerId?.email || "N/A"}
-//                           </p>
-//                         </div>
-//                       </div>
-                      
-//                       {/* Booking Details */}
-//                       <div className="space-y-3">
-//                         <div>
-//                           <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-//                             <Ticket className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-//                             <span className="text-sm font-medium">Quantity</span>
-//                           </div>
-//                           <div className="ml-6">
-//                             <Badge variant="outline" className="text-base px-3 py-1">
-//                               {ticket.quantity} Ticket{ticket.quantity > 1 ? "s" : ""}
-//                             </Badge>
-//                           </div>
-//                         </div>
-                        
-//                         <div>
-//                           <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-//                             <MapPin className="w-4 h-4 mr-2 text-red-600 dark:text-red-400" />
-//                             <span className="text-sm font-medium">Location</span>
-//                           </div>
-//                           <p className="text-gray-600 dark:text-gray-400 text-sm ml-6">
-//                             {ticket.cityId?.name || "N/A"}, {ticket.stateId?.Name || "N/A"}
-//                           </p>
-//                         </div>
-//                       </div>
-                      
-//                       {/* Payment Info */}
-//                       <div className="space-y-3">
-//                         <div>
-//                           <div className="flex items-center text-gray-700 dark:text-gray-300 mb-1">
-//                             <DollarSign className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-//                             <span className="text-sm font-medium">Total Amount</span>
-//                           </div>
-//                           <div className="ml-6">
-//                             <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-//                               ₹{(ticket.ticketRate * ticket.quantity).toLocaleString()}
-//                             </p>
-//                             <p className="text-xs text-gray-500 dark:text-gray-400">
-//                               ₹{ticket.ticketRate} × {ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""}
-//                             </p>
-//                           </div>
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     {/* Selected Seats for Indoor Events */}
-//                     {event.eventCategory === "Indoor" && ticket.selectedSeats?.length > 0 && (
-//                       <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-//                         <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
-//                           <Ticket className="w-4 h-4 mr-2" />
-//                           Selected Seats:
-//                         </h5>
-//                         <div className="flex flex-wrap gap-2">
-//                           {ticket.selectedSeats.map((seat, seatIndex) => (
-//                             <Badge key={seatIndex} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1">
-//                               {seat}
-//                             </Badge>
-//                           ))}
-//                         </div>
-//                       </div>
-//                     )}
-//                   </CardContent>
-//                 </Card>
-                
-//                 {index < tickets.length - 1 && <Separator className="my-4" />}
-//               </div>
-//             ))}
-//           </div>
-//         </CardContent>
-//       </Card>
-//     );
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:bg-black">
-//       <div className="container mx-auto px-4 py-16 max-w-7xl dark:bg-slate-900">
-//         {/* Header */}
-//         <div className="text-center mb-12 ">
-//           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-//             Event Bookings
-//           </h1>
-//           <p className="text-lg text-gray-600 dark:text-gray-400">
-//             Manage and track all bookings for your events
-//           </p>
-//         </div>
-
-//         {/* Statistics Cards */}
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-//           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-lg">
-//             <CardContent className="p-6">
-//               <div className="flex items-center justify-between">
-//                 <div>
-//                   <p className="text-blue-100 text-sm mb-1">Total Bookings</p>
-//                   <p className="text-3xl font-bold">{stats.totalBookings}</p>
-//                 </div>
-//                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-//                   <Ticket className="w-6 h-6" />
-//                 </div>
-//               </div>
-//             </CardContent>
-//           </Card>
-
-//           <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-lg">
-//             <CardContent className="p-6">
-//               <div className="flex items-center justify-between">
-//                 <div>
-//                   <p className="text-green-100 text-sm mb-1">Total Revenue</p>
-//                   <p className="text-3xl font-bold">₹{stats.totalRevenue.toLocaleString()}</p>
-//                 </div>
-//                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-//                   <TrendingUp className="w-6 h-6" />
-//                 </div>
-//               </div>
-//             </CardContent>
-//           </Card>
-
-//           <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-lg">
-//             <CardContent className="p-6">
-//               <div className="flex items-center justify-between">
-//                 <div>
-//                   <p className="text-purple-100 text-sm mb-1">Total Events</p>
-//                   <p className="text-3xl font-bold">{stats.totalEvents}</p>
-//                 </div>
-//                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-//                   <Calendar className="w-6 h-6" />
-//                 </div>
-//               </div>
-//             </CardContent>
-//           </Card>
-
-//           <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-lg">
-//             <CardContent className="p-6">
-//               <div className="flex items-center justify-between">
-//                 <div>
-//                   <p className="text-orange-100 text-sm mb-1">Total Attendees</p>
-//                   <p className="text-3xl font-bold">{stats.totalAttendees}</p>
-//                 </div>
-//                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-//                   <Users className="w-6 h-6" />
-//                 </div>
-//               </div>
-//             </CardContent>
-//           </Card>
-//         </div>
-
-//         {/* Filters */}
-//         <Card className="mb-8 border-0 shadow-lg bg-white/70 backdrop-blur-sm dark:bg-gray-800/70">
-//           <CardContent className="p-6">
-//             <div className="flex items-center gap-2 mb-4">
-//               <Filter className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-//               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filter Bookings</h3>
-//             </div>
-            
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//               <div className="relative">
-//                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by event name..."
-//                   value={searchTerm}
-//                   onChange={(e) => setSearchTerm(e.target.value)}
-//                   className="pl-10 bg-white dark:bg-gray-700"
-//                 />
-//               </div>
-              
-//               <Select value={filterEvent} onValueChange={setFilterEvent}>
-//                 <SelectTrigger className="bg-white dark:bg-gray-700">
-//                   <SelectValue placeholder="Filter by event" />
-//                 </SelectTrigger>
-//                 <SelectContent className="dark:bg-gray-800">
-//                   <SelectItem value="all">All Events</SelectItem>
-//                   {Object.values(groupedByEvent).map(({ event }) => (
-//                     <SelectItem key={event._id} value={event._id}>
-//                       {event.eventName}
-//                     </SelectItem>
-//                   ))}
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </CardContent>
-//         </Card>
-
-//         {/* Tabs */}
-//         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-//           <TabsList className="grid w-full md:w-auto grid-cols-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
-//             <TabsTrigger value="all">All Events ({Object.keys(groupedByEvent).length})</TabsTrigger>
-//             <TabsTrigger value="upcoming">
-//               Upcoming ({Object.values(groupedByEvent).filter(({event}) => new Date(event.endDate) >= new Date()).length})
-//             </TabsTrigger>
-//             <TabsTrigger value="past">
-//               Past ({Object.values(groupedByEvent).filter(({event}) => new Date(event.endDate) < new Date()).length})
-//             </TabsTrigger>
-//           </TabsList>
-//         </Tabs>
-
-//         {/* Event Bookings Carousel */}
-//         {filteredGroups.length > 0 ? (
-//           <Carousel opts={{ align: "start", loop: false }} className="w-full">
-//             <CarouselContent className="-ml-4">
-//               {filteredGroups.map(({ event, tickets }) => (
-//                 <CarouselItem key={event._id} className="pl-4 basis-full">
-//                   <EventBookingCard event={event} tickets={tickets} />
-//                 </CarouselItem>
-//               ))}
-//             </CarouselContent>
-//             {filteredGroups.length > 1 && (
-//               <>
-//                 <CarouselPrevious className="hidden md:flex" />
-//                 <CarouselNext className="hidden md:flex" />
-//               </>
-//             )}
-//           </Carousel>
-//         ) : (
-//           <Card className="bg-white/70 backdrop-blur-sm dark:bg-gray-800/70 border-0 shadow-lg">
-//             <CardContent className="p-12 text-center">
-//               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-//                 <Search className="w-8 h-8 text-gray-400" />
-//               </div>
-//               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No bookings found</h3>
-//               <p className="text-gray-600 dark:text-gray-400">Try adjusting your filters</p>
-//             </CardContent>
-//           </Card>
-//         )}
-
-//         {/* Back Button */}
-//         <div className="text-center mt-12">
-//           <Link to="/organizer">
-//             <Button size="lg" variant="outline" className="px-8 shadow-lg">
-//               <ArrowLeft className="w-4 h-4 mr-2" />
-//               Back to Dashboard
-//             </Button>
-//           </Link>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-
-// import axios from 'axios';
-// import React, { useEffect, useState } from 'react';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Badge } from '@/components/ui/badge';
-// import { Button } from '@/components/ui/button';
-// import { Alert, AlertDescription } from '@/components/ui/alert';
-// import { Separator } from '@/components/ui/separator';
-// import { CalendarDays, Mail, MapPin, Users, IndianRupee, ArrowLeft, Ticket } from 'lucide-react';
-// import { Link } from 'react-router-dom';
-
-// export const BookingsOfMyEvents = () => {
-//   const [tickets, setTickets] = useState([]);
-//   const [loading, setLoading] = useState(true);
-
-//   // Note: In production, use React state instead of localStorage
-//   const token = localStorage.getItem("token"); // Replace with actual token from state
-
-//   useEffect(() => {
-//     const fetchTickets = async () => {
-//       try {
-//         const res = await axios.get("/tickets/organizer/self", {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-
-//         setTickets(res.data.data);
-//       } catch (err) {
-//         console.error("Error fetching tickets:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     if (token) {
-//       fetchTickets();
-//     }
-//   }, [token]);
-
-//   if (loading) {
-//     return (
-//       <div className="container mx-auto px-4 py-8">
-//         <div className="flex items-center justify-center min-h-[400px]">
-//           <div className="text-center">
-//             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-//             <p className="text-lg text-gray-600">Loading bookings...</p>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (!tickets.length) {
-//     return (
-//       <div className="container mx-auto px-4 py-8">
-//         <div className="text-center">
-//           <h1 className="text-3xl font-bold text-gray-900 mb-8 ">Bookings of My Events</h1>
-//           <Alert className="max-w-md mx-auto">
-//             <Ticket className="h-4 w-4" />
-//             <AlertDescription className="text-lg ">
-//               No bookings yet for your events.
-//             </AlertDescription>
-//           </Alert>
-//           <Button href="" variant="outline" className="mt-6">
-//             <ArrowLeft className="w-4 h-4 mr-2" />
-//             Back to Home
-//           </Button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // Group tickets by event
-//   const groupedByEvent = tickets.reduce((acc, ticket) => {
-//     const eventId = ticket.eventId?._id;
-//     if (!acc[eventId]) acc[eventId] = { event: ticket.eventId, tickets: [] };
-//     acc[eventId].tickets.push(ticket);
-//     return acc;
-//   }, {});
-
-//   return (
-//     <div className="container mx-auto px-4 py-8 max-w-6xl">
-//       <div className="text-center mb-8">
-//         <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-gray-50">Bookings of My Events</h1>
-//         <p className="text-gray-600 dark:text-gray-400">Manage and view all bookings for your events</p>
-//       </div>
-      
-//       <div className="space-y-6">
-//         {Object.values(groupedByEvent).map(({ event, tickets }) => (
-//           <Card key={event._id} className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark-to-gray-900 border-gray-300">
-//             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-//               <CardTitle className="flex items-center justify-between">
-//                 <div>
-//                   <h3 className="text-xl font-semibold">{event.eventName}</h3>
-//                   <Badge variant="secondary" className="mt-2 bg-white/20 text-white border-white/30">
-//                     {event.eventType}
-//                   </Badge>
-//                 </div>
-//                 <div className="text-right text-sm">
-//                   <div className="flex items-center text-white/90 mb-1">
-//                     <CalendarDays className="w-4 h-4 mr-1" />
-//                     Start: {new Date(event.startDate).toLocaleDateString()}
-//                   </div>
-//                   <div className="flex items-center text-white/90">
-//                     <CalendarDays className="w-4 h-4 mr-1" />
-//                     End: {new Date(event.endDate).toLocaleDateString()}
-//                   </div>
-//                 </div>
-//               </CardTitle>
-//             </CardHeader>
-            
-//             <CardContent className="p-6">
-//               <div className="space-y-4">
-//                 {tickets.map((ticket, index) => (
-//                   <div key={ticket._id}>
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 rounded-lg bg-white shadow-sm border">
-//                       <div className="space-y-2">
-//                         <div className="flex items-center text-gray-700">
-//                           <Users className="w-4 h-4 mr-2 text-blue-600" />
-//                           <span className="font-medium">Booked By:</span>
-//                         </div>
-//                         <p className="text-gray-900 font-semibold ml-6">
-//                           {ticket.userId?.fullName || ticket.organizerId?.name || "N/A"}
-//                         </p>
-                        
-//                         <div className="flex items-center text-gray-700 mt-2">
-//                           <Mail className="w-4 h-4 mr-2 text-blue-600" />
-//                           <span className="font-medium">Email:</span>
-//                         </div>
-//                         <p className="text-gray-600 ml-6 break-words">
-//                           {ticket.userId?.email || ticket.organizerId?.email || "N/A"}
-//                         </p>
-//                       </div>
-                      
-//                       <div className="space-y-2">
-//                         <div className="flex items-center text-gray-700 ">
-//                           <Ticket className="w-4 h-4 mr-2 text-green-600" />
-//                           <span className="font-medium">Quantity:</span>
-//                           <Badge variant="outline" className="ml-2 text-gray-700">{ticket.quantity}</Badge>
-//                         </div>
-                        
-//                         <div className="flex items-center text-gray-700 mt-2">
-//                           <MapPin className="w-4 h-4 mr-2 text-red-600" />
-//                           <span className="font-medium">Location:</span>
-//                         </div>
-//                         <p className="text-gray-600 ml-6">
-//                           {ticket.cityId?.name || "N/A"}, {ticket.stateId?.Name || "N/A"}
-//                         </p>
-//                       </div>
-                      
-//                       <div className="space-y-2">
-//                         <div className="flex items-center text-gray-700">
-//                           <IndianRupee className="w-4 h-4 mr-2 text-green-600" />
-//                           <span className="font-medium">Booked at:</span>
-//                         </div>
-//                         <div className="ml-6">
-//                           <p className="text-lg font-bold text-green-700">
-//                             ₹{ticket.ticketRate}
-//                           </p>
-//                           <p className="text-sm text-gray-500">
-//                             ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})
-//                           </p>
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     {event.eventCategory === "Indoor" && ticket.selectedSeats?.length > 0 && (
-//                       <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-//                         <h4 className="font-semibold text-gray-800 mb-2">Selected Seats:</h4>
-//                         <div className="flex flex-wrap gap-2">
-//                           {ticket.selectedSeats.map((seat, seatIndex) => (
-//                             <Badge key={seatIndex} variant="default" className="bg-blue-600 hover:bg-blue-700">
-//                               {seat}
-//                             </Badge>
-//                           ))}
-//                         </div>
-//                       </div>
-//                     )}
-                    
-//                     {index < tickets.length - 1 && <Separator className="my-4" />}
-//                   </div>
-//                 ))}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         ))}
-//       </div>
-
-//       <div className="text-center mt-8">
-//         <Link to="/organizer">
-//         <Button href="/" variant="outline" size="lg" className="px-8">
-//           <ArrowLeft className="w-4 h-4 mr-2" />
-//           Back to Home
-//         </Button>
-//         </Link>
-//       </div>
-//     </div>
-//   );
-// };
-
-
-
-

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../store/hooks";
+import { logout } from "../../features/auth/authSlice";
 import api from "@/lib/api";
 import {
   Menu,
@@ -41,6 +43,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { DarkModeToggle } from "@/contexts/DarkModeContext";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Images
 import img1 from "../../assets/img/hero-bg.jpg";
@@ -66,6 +70,7 @@ export const AdminDashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const heroImages = [img2, img3, img1, img4];
 
@@ -106,7 +111,7 @@ export const AdminDashboard = () => {
   // Signout
   const signout = () => {
     if (window.confirm("Are you sure you want to SignOut?")) {
-      localStorage.clear();
+      dispatch(logout());
       navigate("/adminsignin");
     }
   };
@@ -143,433 +148,344 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-black text-white selection:bg-[#E11D48]/30">
       {/* FIXED LEFT SIDEBAR */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transition-all duration-300 overflow-y-auto ${sidebarCollapsed ? "w-20" : "w-72"
-          }`}
+        className={cn(
+          "fixed left-0 top-0 h-screen bg-[#050505] border-r border-white/20 z-50 transition-all duration-500 flex flex-col shadow-[10px_0_40px_rgba(0,0,0,0.5)]",
+          sidebarCollapsed ? "w-20" : "w-72"
+        )}
       >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              {!sidebarCollapsed && (
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-red-600 to-purple-600 rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-bold bg-gradient-to-r from-red-600 to-purple-600 bg-clip-text text-transparent">
-                      EventEase
-                    </h1>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Admin Panel</p>
-                  </div>
-                </div>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                {sidebarCollapsed ? (
-                  <ChevronRight className="w-5 h-5" />
-                ) : (
-                  <ChevronLeft className="w-5 h-5" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Sidebar Navigation */}
-          <div className="flex-1 overflow-y-auto py-4 px-2">
-            <div className="space-y-1">
-              {sidebarItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Button
-                    key={item.id}
-                    variant="ghost"
-                    onClick={() => scrollToSection(item.id)}
-                    className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                      } h-12 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-400 transition-colors group`}
-                    title={sidebarCollapsed ? item.label : ""}
-                  >
-                    <Icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
-                    {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-                  </Button>
-                );
-              })}
-            </div>
-
-            {/* Quick Links Section */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              {!sidebarCollapsed && (
-                <p className="px-4 mb-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Quick Links
-                </p>
-              )}
-              <div className="space-y-1">
-                {quickLinks.map((link) => {
-                  const Icon = link.icon;
-                  return (
-                    <Link key={link.to} to={link.to}>
-                      <Button
-                        variant="ghost"
-                        className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                          } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
-                        title={sidebarCollapsed ? link.label : ""}
-                      >
-                        <Icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
-
-                        {!sidebarCollapsed && (
-                          <span className="text-sm font-medium flex items-center gap-2">
-                            {link.label}
-
-                            {link.showRefundBadge && <RefundNotificationBadge />}
-                          </span>
-                        )}
-                      </Button>
-                    </Link>
-                  );
-                })}
-
-                {/* {quickLinks.map((link) => (
-                  <Link key={link.to} to={link.to}>
-                    <Button
-                      variant="ghost"
-                      className={`w-full ${
-                        sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                      } h-12 hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-700 dark:hover:text-purple-400 transition-colors`}
-                      title={sidebarCollapsed ? link.label : ""}
-                    >
-                      <link.icon className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"} flex-shrink-0`} />
-                      {!sidebarCollapsed && <span className="text-sm font-medium">{link.label}</span>}
-                    </Button>
-                  </Link>
-                ))} */}
+        {/* Sidebar Header */}
+        <div className="h-24 flex items-center justify-between px-6 border-b border-white/10">
+          {!sidebarCollapsed && (
+            <div className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-[#E11D48] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.4)]">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-black tracking-tighter uppercase text-white">EventEase</span>
+                <span className="text-[7px] font-black tracking-[0.4em] text-[#E11D48]">COMMAND NEXUS</span>
               </div>
             </div>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="hover:bg-white/5 text-gray-400"
+          >
+            {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </Button>
+        </div>
+
+        {/* Sidebar Navigation */}
+        <div className="flex-1 overflow-y-auto py-8 px-3 space-y-8 no-scrollbar">
+          {/* Main Nodes */}
+          <div className="space-y-2">
+            {!sidebarCollapsed && (
+              <p className="px-4 mb-4 text-[9px] font-black text-gray-600 uppercase tracking-[0.4em]">Operational Nodes</p>
+            )}
+            {sidebarItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  onClick={() => scrollToSection(item.id)}
+                  className={cn(
+                    "w-full h-12 transition-all duration-300 rounded-xl group",
+                    sidebarCollapsed ? "justify-center px-0" : "justify-start px-4",
+                    "hover:bg-[#E11D48]/10"
+                  )}
+                >
+                  <Icon className={cn("h-5 w-5", sidebarCollapsed ? "" : "mr-3", "text-gray-400 group-hover:text-[#E11D48] transition-colors")} />
+                  {!sidebarCollapsed && (
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 group-hover:text-white transition-colors">
+                      {item.label}
+                    </span>
+                  )}
+                </Button>
+              );
+            })}
           </div>
 
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <Button
-              variant="ghost"
-              onClick={signout}
-              className={`w-full ${sidebarCollapsed ? "justify-center px-2" : "justify-start px-4"
-                } h-12 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700`}
-              title={sidebarCollapsed ? "Sign Out" : ""}
-            >
-              <LogOut className={`w-5 h-5 ${sidebarCollapsed ? "" : "mr-3"}`} />
-              {!sidebarCollapsed && <span className="font-medium">Sign Out</span>}
-            </Button>
+          {/* Core Intelligence */}
+          <div className="space-y-2">
+            {!sidebarCollapsed && (
+              <p className="px-4 mb-4 text-[9px] font-black text-gray-600 uppercase tracking-[0.4em]">Core Intelligence</p>
+            )}
+            {quickLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.to} to={link.to}>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full h-12 transition-all duration-300 rounded-xl group",
+                      sidebarCollapsed ? "justify-center px-0" : "justify-start px-4",
+                      "hover:bg-white/5"
+                    )}
+                  >
+                    <Icon className={cn("h-5 w-5", sidebarCollapsed ? "" : "mr-3", "text-gray-400 group-hover:text-white transition-colors")} />
+                    {!sidebarCollapsed && (
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 group-hover:text-white transition-colors flex items-center gap-2">
+                        {link.label}
+                        {link.showRefundBadge && <RefundNotificationBadge />}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              );
+            })}
           </div>
+        </div>
+
+        {/* Sidebar Footer */}
+        <div className="p-6 border-t border-white/10">
+          <Button
+            variant="ghost"
+            onClick={signout}
+            className={cn(
+              "w-full h-12 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl",
+              sidebarCollapsed ? "justify-center px-0" : "justify-start px-4"
+            )}
+          >
+            <LogOut className={cn("h-5 w-5", sidebarCollapsed ? "" : "mr-3", "text-[#E11D48]")} />
+            {!sidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-[0.2em]">Terminate Session</span>}
+          </Button>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <div
-        className={`transition-all duration-300 ${sidebarCollapsed ? "ml-20" : "ml-72"
-          }`}
+      <main
+        className={cn(
+          "transition-all duration-500 min-h-screen relative",
+          sidebarCollapsed ? "ml-20" : "ml-72"
+        )}
       >
-        {/* NAVBAR */}
+        {/* TOP COMMAND BAR */}
         <nav
-          className={`fixed top-0 right-0 z-40 transition-all duration-300 ${isScrolled
-              ? "bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-700 shadow-md"
-              : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
-            }`}
+          className={cn(
+            "fixed top-0 right-0 z-40 transition-all duration-500 px-10 h-24 flex items-center",
+            isScrolled ? "bg-black/80 backdrop-blur-3xl border-b border-white/10" : "bg-transparent"
+          )}
           style={{
             left: sidebarCollapsed ? "5rem" : "18rem",
             width: sidebarCollapsed ? "calc(100% - 5rem)" : "calc(100% - 18rem)"
           }}
         >
-          <div className="px-6">
-            <div className="flex justify-between items-center h-16">
-              {/* Page Title */}
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Welcome Back, {userName}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Manage your platform with ease
-                </p>
-              </div>
+          <div className="w-full flex justify-between items-center">
+            <div>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-1">Central Nexus Active</h2>
+              <p className="text-2xl font-black uppercase tracking-tighter text-white">Command Authority: {userName}</p>
+            </div>
 
-              {/* Right Side Actions */}
-              <div className="flex items-center space-x-4">
-                <PendingEventsBadge onNavigate={scrollToSection} />
-                <DarkModeToggle />
-
-                {/* Error Alert */}
-                {error && (
-                  <Alert className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
-                    <AlertDescription className="text-red-800 dark:text-red-300 text-sm">
-                      {error}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {/* User Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar className="h-10 w-10 ring-2 ring-red-100 dark:ring-red-900">
-                        <AvatarImage />
-                        <AvatarFallback className="bg-gradient-to-r from-red-500 to-purple-500 text-white font-semibold">
-                          {userName ? userName.charAt(0).toUpperCase() : "A"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-56 bg-white/95 dark:bg-gray-800/95 border-gray-200 dark:border-gray-700"
-                  >
-                    <div className="px-3 py-2 border-b dark:border-gray-700">
-                      <p className="text-sm font-medium dark:text-white">{userName}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">System Administrator</p>
-                    </div>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admininbox" className="flex items-center cursor-pointer">
-                        <Inbox className="w-4 h-4 mr-3 text-blue-600" />
-                        Inbox
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={signout}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-gray-800 cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4 mr-3 text-red-600" /> Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+            <div className="flex items-center gap-6">
+              <PendingEventsBadge onNavigate={scrollToSection} />
+              <div className="h-8 w-px bg-white/10" />
+              <DarkModeToggle />
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-12 w-12 rounded-xl p-0 overflow-hidden border border-white/10 hover:border-[#E11D48]/50 transition-all">
+                    <Avatar className="h-full w-full rounded-none">
+                      <AvatarImage src={defaultprofile} className="grayscale hover:grayscale-0 transition-all" />
+                      <AvatarFallback className="bg-[#050505] text-white text-[10px] font-black">
+                        {userName ? userName.charAt(0).toUpperCase() : "A"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 bg-[#050505] border-white/10 p-2 rounded-2xl shadow-2xl">
+                  <div className="px-4 py-4 border-b border-white/5">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white">{userName}</p>
+                    <p className="text-[8px] text-gray-500 uppercase mt-1 tracking-widest">Master System Administrator</p>
+                  </div>
+                  <DropdownMenuItem className="flex items-center px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-colors cursor-pointer group" onClick={() => navigate('/admininbox')}>
+                    <Inbox className="w-4 h-4 mr-3 text-blue-500 group-hover:scale-110 transition-transform" />
+                    Nexus Inbox
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuItem onClick={signout} className="flex items-center px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#E11D48] hover:bg-[#E11D48]/10 transition-colors cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-3" />
+                    Terminate Access
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </nav>
 
-        {/* HERO SECTION */}
-        <div id="home" className="relative h-screen mt-16 overflow-hidden">
+        {/* HERO NEXUS */}
+        <div id="home" className="relative h-[90vh] overflow-hidden">
           {heroImages.map((img, i) => (
             <div
               key={i}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${i === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
-                }`}
+              className={cn(
+                "absolute inset-0 transition-all duration-[2s] ease-out",
+                i === currentSlide ? "opacity-40 scale-100 rotate-0" : "opacity-0 scale-110 rotate-1"
+              )}
               style={{
-                backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(220,38,127,0.3)), url(${img})`,
+                backgroundImage: `url(${img})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                backgroundAttachment: "fixed",
               }}
             />
           ))}
-
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <Card className="bg-white/10 dark:bg-gray-900/70 backdrop-blur-md border-white/20 shadow-2xl">
-              <CardContent className="p-12 text-center text-white">
-                <h1 className="text-5xl font-bold mb-4">
-                  Welcome Back, {userName || "Admin"}
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+          
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="max-w-4xl px-10 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1 }}
+              >
+                <Badge className="bg-[#E11D48] text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] mb-10 shadow-[0_0_40px_rgba(225,29,72,0.4)] border-0">
+                  Nexus Authorization Verified
+                </Badge>
+                <h1 className="text-7xl md:text-8xl font-black text-white leading-[0.85] uppercase tracking-tighter mb-10">
+                  Operational <br /> <span className="text-[#E11D48]">Command</span> Center
                 </h1>
-                <p className="text-lg opacity-90 mb-8">
-                  Manage your platform with full control – EventEase Admin Portal
+                <p className="text-lg text-gray-400 font-bold uppercase tracking-[0.3em] mb-12 max-w-2xl mx-auto leading-relaxed">
+                  Total system oversight across the EventEase decentralized architecture
                 </p>
-                <div className="flex gap-4 justify-center">
+                <div className="flex flex-wrap gap-6 justify-center">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
                     onClick={() => scrollToSection("addevent")}
+                    className="h-20 px-10 bg-white text-black font-black uppercase tracking-[0.4em] text-[11px] rounded-full hover:bg-[#E11D48] hover:text-white transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)] group"
                   >
-                    <Plus className="w-5 h-5 mr-2" /> Create Event
+                    <Plus className="w-5 h-5 mr-4 group-hover:rotate-90 transition-transform" /> Initialize Event
                   </Button>
                   <Button
                     size="lg"
                     variant="outline"
-                    className="text-black border-white/50 hover:bg-gray-800 hover:text-gray-900 dark:text-white bg-white "
                     onClick={() => scrollToSection("events")}
+                    className="h-20 px-10 bg-transparent border-white/20 text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-full hover:bg-white hover:text-black transition-all"
                   >
-                    <Calendar className="w-5 h-5 mr-2" /> View Events
+                    <Calendar className="w-5 h-5 mr-4" /> Global Catalog
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </motion.div>
+            </div>
           </div>
 
-          {/* HERO NAVIGATION */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute left-6 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-            onClick={prevSlide}
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-            onClick={nextSlide}
-          >
-            <ArrowRight className="w-6 h-6" />
-          </Button>
-
-          {/* Slide Indicators */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
-            {heroImages.map((_, index) => (
-              <button
-                key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide
-                    ? "bg-white shadow-lg scale-125"
-                    : "bg-white/50 hover:bg-white/75"
-                  }`}
-                onClick={() => setCurrentSlide(index)}
-              />
-            ))}
+          {/* Slide Controls */}
+          <div className="absolute bottom-20 left-10 flex gap-4">
+             <button onClick={prevSlide} className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><ArrowLeft className="w-5 h-5" /></button>
+             <button onClick={nextSlide} className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><ArrowRight className="w-5 h-5" /></button>
           </div>
         </div>
 
-        {/* MAIN SECTIONS */}
-        <section
-          id="events"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50 dark:bg-gray-800"
-        >
-          <ViewEvents />
-        </section>
+        {/* CORE OPERATIONAL MODULES */}
+        <div className="relative z-10 space-y-32 pb-40 px-10">
+          <section id="events" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Global Catalog</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Master Manifest</span>
+             </div>
+             <ViewEvents />
+          </section>
 
-        <section
-          id="groupbyevent"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
-        >
-          <GroupedByEvents />
-        </section>
+          <section id="groupbyevent" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Intelligence Grids</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Data Clusters</span>
+             </div>
+             <GroupedByEvents />
+          </section>
 
-        <section
-          id="adminevents"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
-        >
-          <AdminEvents />
-        </section>
+          <section id="adminevents" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Nexus Operations</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Authorized Transmissions</span>
+             </div>
+             <AdminEvents />
+          </section>
 
-        <section
-          id="addevent"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
-        >
-          <AddEvent />
-        </section>
+          <section id="addevent" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Production Forge</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Manifest Initialization</span>
+             </div>
+             <AddEvent />
+          </section>
 
-        <section
-          id="addstadium"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
-        >
-          <AddStadiumForm />
-        </section>
+          <section id="addstadium" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Sector Expansion</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Physical Node Config</span>
+             </div>
+             <AddStadiumForm />
+          </section>
 
-        <section
-          id="viewstadiums"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50  dark:bg-gray-800"
-        >
-          <ViewStadiums />
-        </section>
+          <section id="viewstadiums" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Arena Assets</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Node Monitoring</span>
+             </div>
+             <ViewStadiums />
+          </section>
 
-        <section
-          id="feedback"
-          className="py-0 bg-gradient-to-b from-gray-50 to-gray-50 dark:bg-gray-800"
-        >
-          <UserFeedback />
-        </section>
+          <section id="feedback" className="scroll-mt-32">
+             <div className="flex items-center gap-10 mb-16">
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Neural Feedback</h2>
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">User Sentiment</span>
+             </div>
+             <UserFeedback />
+          </section>
+        </div>
 
-        {/* FOOTER */}
-        <footer className="relative bg-gradient-to-br from-slate-100 via-red-100 to-purple-100 dark:from-slate-900 dark:via-red-900 dark:to-purple-900 text-gray-900 dark:text-white overflow-hidden">
-          <div className="relative max-w-7xl mx-auto px-4 py-20">
-            <div className="grid md:grid-cols-3 gap-12 items-center mb-16">
-              <div className="text-center md:text-left">
-                <div className="flex justify-center md:justify-start items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-purple-500 rounded-xl flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <h4 className="text-3xl font-bold bg-gradient-to-r from-red-400 to-purple-400 bg-clip-text text-transparent">
-                    EventEase Admin
-                  </h4>
+        {/* NEXUS FOOTER */}
+        <footer className="relative bg-[#050505] border-t border-white/10 text-white overflow-hidden py-32 px-10">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-24">
+            <div className="col-span-1 md:col-span-2 space-y-10">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-[#E11D48] rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.4)]">
+                   <Shield className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                  Manage events, users, and organizers effortlessly.
-                </p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs">
-                  © 2025 EventEase. All rights reserved.
-                </p>
-              </div>
-
-              <div className="text-center">
-                <h5 className="text-lg font-semibold mb-6 text-gray-800 dark:text-gray-200">
-                  Admin Links
-                </h5>
-                <div className="flex flex-col space-y-3">
-                  <Link to="/allusers">
-                    <Button
-                      variant="ghost"
-                      className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
-                    >
-                      User Management
-                    </Button>
-                  </Link>
-                  <Link to="/allorganizer">
-                    <Button
-                      variant="ghost"
-                      className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
-                    >
-                      Organizer Management
-                    </Button>
-                  </Link>
-                  <Link to="/admininbox">
-                    <Button
-                      variant="ghost"
-                      className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
-                    >
-                      Support Center
-                    </Button>
-                  </Link>
+                <div>
+                   <h3 className="text-4xl font-black uppercase tracking-tighter italic">EventEase <span className="text-gray-600">NEXUS</span></h3>
+                   <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Command Authority Established</p>
                 </div>
               </div>
-
-              <div className="text-center md:text-right">
-                <h5 className="text-lg font-semibold mb-6 text-gray-800 dark:text-gray-200">
-                  Connect With Us
-                </h5>
-                <div className="flex justify-center md:justify-end space-x-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="rounded-full text-gray-700 dark:text-gray-300 hover:bg-blue-600/20 dark:hover:bg-gray-700"
-                  >
-                    <Facebook className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="rounded-full text-gray-700 dark:text-gray-300 hover:bg-sky-600/20 dark:hover:bg-gray-700"
-                  >
-                    <Twitter className="w-5 h-5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="rounded-full text-gray-700 dark:text-gray-300 hover:bg-pink-600/20 dark:hover:bg-gray-700"
-                  >
-                    <Instagram className="w-5 h-5" />
-                  </Button>
-                </div>
-              </div>
+              <p className="text-gray-500 font-bold uppercase tracking-widest text-[11px] max-w-md leading-relaxed">
+                Centralized intelligence and operational control for the EventEase decentralized event ecosystem. 
+                All transmissions monitored under protocol X-88.
+              </p>
             </div>
 
-            <div className="border-t border-gray-300 dark:border-white/10 mt-16 pt-8 text-center">
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Built with ❤️ for seamless event management | EventEase Admin Portal
-              </p>
+            <div className="space-y-8">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Quick Access</h4>
+               <div className="flex flex-col gap-4">
+                  {quickLinks.map(link => (
+                    <Link key={link.to} to={link.to} className="text-sm font-black uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
+                      {link.label}
+                    </Link>
+                  ))}
+               </div>
+            </div>
+
+            <div className="space-y-8">
+               <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Nexus Support</h4>
+               <div className="flex flex-col gap-4 text-sm font-black uppercase tracking-widest text-gray-400">
+                  <span>Authorized Personnel Only</span>
+                  <span>System Diagnostics Active</span>
+                  <span>© 2026 NEXUS CORE</span>
+               </div>
             </div>
           </div>
         </footer>
-      </div>
+      </main>
 
       <Outlet />
     </div>

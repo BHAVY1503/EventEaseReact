@@ -11,9 +11,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Upload, MapPin, Calculator } from "lucide-react";
+import { 
+  Upload, 
+  MapPin, 
+  Calculator, 
+  Activity, 
+  Sparkles, 
+  Building2, 
+  Globe, 
+  ArrowRight, 
+  ShieldAlert, 
+  CheckCircle2 
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -37,13 +49,12 @@ const AddStadiumForm = () => {
   const totalSeats = watch("totalSeats");
   const seatsPerZone = watch("seatsPerZone");
 
-  // Calculate zones on totalSeats/seatsPerZone change
   useEffect(() => {
     const total = parseInt(totalSeats || 0);
     const perZone = parseInt(seatsPerZone || 20);
     const count = Math.ceil(total / perZone);
     setZoneCount(count);
-    setZonePrices(Array(count).fill(100)); // Default ₹100
+    setZonePrices(Array(count).fill(100));
   }, [totalSeats, seatsPerZone]);
 
   useEffect(() => {
@@ -51,12 +62,12 @@ const AddStadiumForm = () => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/dark-v11", // Elite Dark Style
       center: [lng, lat],
       zoom: 10,
     });
 
-    const marker = new mapboxgl.Marker({ draggable: true })
+    const marker = new mapboxgl.Marker({ draggable: true, color: "#E11D48" })
       .setLngLat([lng, lat])
       .addTo(map.current);
 
@@ -118,17 +129,14 @@ const AddStadiumForm = () => {
     formData.append("longitude", data.longitude);
     formData.append("image", image);
 
-    const t = toast({ title: "Adding stadium", description: "Please wait..." });
     try {
       await dispatch(createStadium(formData)).unwrap();
-      t.update({ title: "Stadium added", description: "Stadium added successfully" });
-      setMessage("Stadium added successfully!");
+      setMessage("Stadium deployment successful.");
       setMessageType("success");
+      toast({ title: "Infrastructure Deployed", description: "Stadium has been integrated into the central core." });
     } catch (err) {
       console.error(err);
-      const msg = err?.message || err || "Failed to add stadium. Please try again.";
-      t.update({ title: "Add failed", description: String(msg) });
-      setMessage("Failed to add stadium. Please try again.");
+      setMessage("Deployment failed. Verify network protocols.");
       setMessageType("error");
     } finally {
       setIsSubmitting(false);
@@ -136,382 +144,230 @@ const AddStadiumForm = () => {
   };
 
   return (
-    // <div className=" bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 ">
-      // <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-700 dark:via-black dark:to-black ">
-    <div className="container mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-800 min-h-screen text-gray-900 dark:text-gray-100">
-       
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-8">
-        {/* <div className="text-center space-y-2"> */}
-          <h1 className="text-4xl font-bold text-slate-900 mb-2 dark:text-gray-100">Add Indoor Stadium</h1>
-          <p className="text-slate-600 dark:text-gray-100">Create a new stadium with seating zones and location details</p>
+    <div className="space-y-12 pb-20">
+      {/* HEADER SECTION */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
+        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+          <Activity className="h-3 w-3 text-[#E11D48] animate-pulse" />
+          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Infrastructure Acquisition Protocol</span>
         </div>
+        <div className="space-y-2">
+          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
+            DEPLOY<br />
+            <span className="text-[#E11D48]">STADIUM</span>
+          </h1>
+          <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
+            Integrate new indoor arena modules into the global event network.
+          </p>
+        </div>
+      </motion.div>
 
-        <Card className="shadow-xl border-0">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Stadium Information
-            </CardTitle>
-            <CardDescription>
-              Enter the basic details of your stadium
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Basic Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Stadium Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Enter stadium name"
-                    {...register("name", { required: "Stadium name is required" })}
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name.message}</p>
-                  )}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+        {/* FORM SIDE (3/5) */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-3 space-y-8"
+        >
+          <div className="border border-white/5 bg-[#0A0A0A] rounded-[2.5rem] p-10 space-y-10 shadow-2xl backdrop-blur-3xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
+              <Building2 className="w-64 h-64 text-white" />
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 relative z-10">
+              {/* BASIC INTEL */}
+              <div className="space-y-8">
+                <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#E11D48]/10 flex items-center justify-center border border-[#E11D48]/20">
+                    <Sparkles className="w-4 h-4 text-[#E11D48]" />
+                  </div>
+                  <h3 className="text-xl font-black uppercase tracking-tight text-white">Core Specification</h3>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    id="address"
-                    placeholder="Enter stadium address"
-                    {...register("address", { required: "Address is required" })}
-                  />
-                  {errors.address && (
-                    <p className="text-sm text-red-500">{errors.address.message}</p>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3 group">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Designation Name</p>
+                    <Input
+                      placeholder="ENTER STADIUM NAME"
+                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      {...register("name", { required: "Name is mandatory" })}
+                    />
+                    {errors.name && <p className="text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.name.message}</p>}
+                  </div>
+
+                  <div className="space-y-3 group">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Electronic Address</p>
+                    <Input
+                      placeholder="ENTER PHYSICAL LOCATION"
+                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      {...register("address", { required: "Address is mandatory" })}
+                    />
+                    {errors.address && <p className="text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.address.message}</p>}
+                  </div>
                 </div>
               </div>
 
-              {/* Seating Configuration */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Calculator className="h-4 w-4" />
-                    Seating Configuration
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="totalSeats">Total Seats</Label>
-                      <Input
-                        id="totalSeats"
-                        type="number"
-                        min="1"
-                        placeholder="e.g. 1000"
-                        {...register("totalSeats", { 
-                          required: "Total seats is required",
-                          min: { value: 1, message: "Must be at least 1 seat" }
-                        })}
-                      />
-                      {errors.totalSeats && (
-                        <p className="text-sm text-red-500">{errors.totalSeats.message}</p>
-                      )}
-                    </div>
+              {/* SEATING ARCHITECTURE */}
+              <div className="space-y-8 pt-6">
+                <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                    <Calculator className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-black uppercase tracking-tight text-white">Seating Architecture</h3>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="seatsPerZone">Seats per Zone</Label>
-                      <Input
-                        id="seatsPerZone"
-                        type="number"
-                        min="1"
-                        defaultValue={20}
-                        placeholder="e.g. 20"
-                        {...register("seatsPerZone")}
-                      />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3 group">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Total Capacity Nodes</p>
+                    <Input
+                      type="number"
+                      placeholder="E.G. 50000"
+                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      {...register("totalSeats", { required: true, min: 1 })}
+                    />
+                  </div>
+                  <div className="space-y-3 group">
+                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Nodes Per Sector</p>
+                    <Input
+                      type="number"
+                      defaultValue={20}
+                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      {...register("seatsPerZone")}
+                    />
+                  </div>
+                </div>
+
+                {zoneCount > 0 && (
+                  <div className="p-8 bg-white/5 rounded-[2rem] border border-white/5 space-y-6">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Sector Valuations (₹)</p>
+                      <Badge className="bg-[#E11D48] text-white font-black text-[8px] uppercase tracking-widest">{zoneCount} SECTORS</Badge>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {Array.from({ length: zoneCount }, (_, i) => (
+                        <div key={i} className="space-y-2 group">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest group-focus-within:text-[#E11D48]">SECTOR {String.fromCharCode(65 + i)}</p>
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-600">₹</span>
+                            <Input
+                              type="number"
+                              className="bg-black/40 border-white/10 rounded-xl h-10 pl-8 text-[10px] font-black tracking-widest focus:ring-[#E11D48]/30"
+                              value={zonePrices[i] || ""}
+                              onChange={(e) => handleZonePriceChange(i, e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  {zoneCount > 0 && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Label>Zone Pricing</Label>
-                        <Badge variant="secondary">{zoneCount} zones</Badge>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                        {Array.from({ length: zoneCount }, (_, i) => (
-                          <div key={i} className="space-y-1">
-                            <Label className="text-sm font-medium">
-                              Zone {String.fromCharCode(65 + i)}
-                            </Label>
-                            <div className="relative">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                                ₹
-                              </span>
-                              <Input
-                                type="number"
-                                min="0"
-                                className="pl-8"
-                                value={zonePrices[i] || ""}
-                                onChange={(e) => handleZonePriceChange(i, e.target.value)}
-                                placeholder="100"
-                                required
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Image Upload */}
-              <div className="space-y-2">
-                <Label htmlFor="image" className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Stadium Image
-                </Label>
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                {image && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected: {image.name}
-                  </p>
                 )}
               </div>
 
-              {/* Hidden coordinates */}
+              {/* IMAGE SELECTION */}
+              <div className="space-y-3 group">
+                <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Visual Identification Matrix</p>
+                <div className="relative">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="stadium-upload"
+                  />
+                  <label 
+                    htmlFor="stadium-upload"
+                    className="flex flex-col items-center justify-center gap-4 w-full h-40 bg-white/5 border-2 border-dashed border-white/10 rounded-[2rem] cursor-pointer hover:border-[#E11D48]/50 hover:bg-[#E11D48]/5 transition-all group/upload"
+                  >
+                    <Upload className="w-8 h-8 text-gray-600 group-hover/upload:text-[#E11D48] transition-colors" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 group-hover/upload:text-[#E11D48]">
+                      {image ? image.name : "Transmit Structural Image"}
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               <input type="hidden" {...register("latitude")} />
               <input type="hidden" {...register("longitude")} />
 
-              {/* Map */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Stadium Location
-                </Label>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Use the search bar or drag the marker to set the exact location
-                </p>
-                <div 
-                  ref={mapContainer} 
-                  className="h-80 w-full rounded-lg border border-input shadow-sm"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-center pt-6">
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                size="lg"
-                className="w-full md:w-auto px-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                >
-              
-                {isSubmitting ? "Adding Stadium..." : "Add Stadium"}
+                className="w-full h-20 bg-white text-black font-black uppercase tracking-[0.4em] text-[11px] rounded-[2rem] hover:bg-[#E11D48] hover:text-white transition-all shadow-2xl relative group overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-4">
+                   {isSubmitting ? "INTEGRATING MODULE..." : "INITIATE DEPLOYMENT"}
+                   {!isSubmitting && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                </span>
+                <div className="absolute inset-0 bg-[#E11D48] translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </Button>
-              </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
 
-        {/* Message Display */}
-        {message && (
-          <Alert className={messageType === "error" ? "border-red-500 text-red-600" : "border-green-500 text-green-600"}>
-            <AlertDescription className="font-medium">
-              {message}
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* MAP SIDE (2/5) */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          className="lg:col-span-2 space-y-8"
+        >
+          <div className="border border-white/5 bg-[#0A0A0A] rounded-[2.5rem] p-10 space-y-8 shadow-2xl h-full flex flex-col">
+            <div className="flex items-center gap-4 border-b border-white/5 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                <Globe className="w-4 h-4 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-black uppercase tracking-tight text-white">Geospatial Link</h3>
+            </div>
+
+            <div className="space-y-4 flex-1 flex flex-col">
+              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
+                Calibrate the precise deployment coordinates. Use high-resolution positioning for grid synchronization.
+              </p>
+              
+              <div className="relative flex-1 min-h-[400px] rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                <div ref={mapContainer} className="absolute inset-0" />
+                <div className="absolute bottom-6 left-6 right-6 p-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between">
+                  <div>
+                    <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Global Coordinates</p>
+                    <p className="text-[9px] font-black text-white">{lat.toFixed(4)}N / {lng.toFixed(4)}E</p>
+                  </div>
+                  <div className="w-2 h-2 rounded-full bg-[#E11D48] animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
+
+      <AnimatePresence>
+        {message && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              "fixed bottom-10 left-1/2 -translate-x-1/2 px-10 py-6 rounded-[2rem] border backdrop-blur-3xl shadow-2xl flex items-center gap-6 z-50",
+              messageType === "error" ? "bg-red-500/10 border-red-500/20 text-red-500" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+            )}
+          >
+            <div className={cn(
+              "w-10 h-10 rounded-xl flex items-center justify-center border",
+              messageType === "error" ? "bg-red-500/20 border-red-500/30" : "bg-emerald-500/20 border-emerald-500/30"
+            )}>
+              {messageType === "error" ? <ShieldAlert className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
+            </div>
+            <p className="text-[11px] font-black uppercase tracking-[0.3em]">{message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
 export default AddStadiumForm;
-
-// import React, { useEffect, useRef, useState } from "react";
-// import mapboxgl from "mapbox-gl";
-// import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-// import "mapbox-gl/dist/mapbox-gl.css";
-// import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import axios from "axios";
-// import { useForm } from "react-hook-form";
-
-// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// const AddStadiumForm = () => {
-//   const [message, setMessage] = useState("");
-//   const [image, setImage] = useState(null);
-//   const [zonePrices, setZonePrices] = useState([]);
-//   const [zoneCount, setZoneCount] = useState(0);
-//   const mapContainer = useRef(null);
-//   const map = useRef(null);
-//   const [lng, setLng] = useState(72.8777);
-//   const [lat, setLat] = useState(19.0760);
-
-//   const { register, handleSubmit, setValue, watch } = useForm();
-//   const token = localStorage.getItem("token");
-
-//   const totalSeats = watch("totalSeats");
-//   const seatsPerZone = watch("seatsPerZone");
-
-//   // Calculate zones on totalSeats/seatsPerZone change
-//   useEffect(() => {
-//     const total = parseInt(totalSeats || 0);
-//     const perZone = parseInt(seatsPerZone || 20);
-//     const count = Math.ceil(total / perZone);
-//     setZoneCount(count);
-//     setZonePrices(Array(count).fill(100)); // Default ₹100
-//   }, [totalSeats, seatsPerZone]);
-
-//   useEffect(() => {
-//     if (map.current) return;
-
-//     map.current = new mapboxgl.Map({
-//       container: mapContainer.current,
-//       style: "mapbox://styles/mapbox/streets-v11",
-//       center: [lng, lat],
-//       zoom: 10,
-//     });
-
-//     const marker = new mapboxgl.Marker({ draggable: true })
-//       .setLngLat([lng, lat])
-//       .addTo(map.current);
-
-//     marker.on("dragend", () => {
-//       const lngLat = marker.getLngLat();
-//       setLng(lngLat.lng);
-//       setLat(lngLat.lat);
-//       setValue("latitude", lngLat.lat);
-//       setValue("longitude", lngLat.lng);
-//     });
-
-//     const geocoder = new MapboxGeocoder({
-//       accessToken: mapboxgl.accessToken,
-//       mapboxgl: mapboxgl,
-//       marker: false,
-//     });
-
-//     map.current.addControl(geocoder);
-//     geocoder.on("result", (e) => {
-//       const [newLng, newLat] = e.result.center;
-//       setLng(newLng);
-//       setLat(newLat);
-//       setValue("latitude", newLat);
-//       setValue("longitude", newLng);
-//       marker.setLngLat([newLng, newLat]);
-//       map.current.flyTo({ center: [newLng, newLat], zoom: 13 });
-//     });
-
-//     setValue("latitude", lat);
-//     setValue("longitude", lng);
-//   }, []);
-
-//   const handleImageChange = (e) => {
-//     setImage(e.target.files[0]);
-//   };
-
-//   const handleZonePriceChange = (index, value) => {
-//     const newPrices = [...zonePrices];
-//     newPrices[index] = value;
-//     setZonePrices(newPrices);
-//   };
-
-//   const onSubmit = async (data) => {
-//     if (!image) return setMessage("Image is required.");
-
-//     const formData = new FormData();
-//     formData.append("name", data.name);
-//     formData.append("totalSeats", data.totalSeats);
-//     formData.append("seatsPerZone", data.seatsPerZone || 20);
-//     formData.append("zonePrices", JSON.stringify(zonePrices));
-//     formData.append("address", data.address);
-//     formData.append("latitude", data.latitude);
-//     formData.append("longitude", data.longitude);
-//     formData.append("image", image);
-
-//     try {
-//       const res = await axios.post("/admin/stadium", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       setMessage("✅ Stadium added successfully!");
-//       return;
-//     } catch (err) {
-//       console.error(err);
-//       setMessage("❌ Failed to add stadium");
-//     }
-//   };
-
-//   return (
-//     <div className="container mt-4">
-//       <h2>Add Indoor Stadium</h2>
-//       <form onSubmit={handleSubmit(onSubmit)} className="shadow p-4 rounded bg-light">
-//         <div className="mb-3">
-//           <label>Stadium Name</label>
-//           <input className="form-control" {...register("name")} required />
-//         </div>
-
-//         <div className="mb-3">
-//           <label>Total Seats</label>
-//           <input type="number" className="form-control" {...register("totalSeats")} required />
-//         </div>
-
-//         <div className="mb-3">
-//           <label>Seats per Zone</label>
-//           <input type="number" className="form-control" defaultValue={20} {...register("seatsPerZone")} />
-//         </div>
-
-//         {zoneCount > 0 && (
-//           <div className="mb-3">
-//             <label>Zone Prices (₹)</label>
-//             <div className="d-flex flex-wrap gap-3">
-//               {Array.from({ length: zoneCount }, (_, i) => (
-//                 <div key={i}>
-//                   <label className="form-label">Zone {String.fromCharCode(65 + i)}</label>
-//                   <input
-//                     type="number"
-//                     className="form-control"
-//                     value={zonePrices[i] || ""}
-//                     onChange={(e) => handleZonePriceChange(i, e.target.value)}
-//                     required
-//                   />
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         )}
-
-//         <div className="mb-3">
-//           <label>Address</label>
-//           <input className="form-control" {...register("address")} required />
-//         </div>
-
-//         <div className="mb-3">
-//           <label>Upload Image</label>
-//           <input type="file" accept="image/*" className="form-control" onChange={handleImageChange} required />
-//         </div>
-
-//         <input type="hidden" {...register("latitude")} />
-//         <input type="hidden" {...register("longitude")} />
-
-//         <div className="mb-3">
-//           <label>Select Location (Drag or Search)</label>
-//           <div ref={mapContainer} style={{ height: "300px", borderRadius: "10px", border: "1px solid #ccc" }} />
-//         </div>
-
-//         <button type="submit" className="btn btn-primary">Add Stadium</button>
-//       </form>
-//       {message && <p className="mt-3 fw-bold">{message}</p>}
-//     </div>
-//   );
-// };
-
-// export default AddStadiumForm;
-
-
-
-

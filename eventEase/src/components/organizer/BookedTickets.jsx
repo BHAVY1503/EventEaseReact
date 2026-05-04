@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import {
   Card,
@@ -9,23 +9,51 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Download, Loader2, Receipt, MapPin, Calendar, User, Printer } from "lucide-react";
+import { 
+  Download, 
+  Loader2, 
+  Receipt, 
+  MapPin, 
+  Calendar, 
+  User, 
+  Printer, 
+  CheckCircle2, 
+  Clock, 
+  XCircle, 
+  AlertCircle, 
+  ArrowLeft, 
+  Ticket, 
+  Rocket,
+  ShieldCheck,
+  Activity,
+  Globe
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export const BookedTickets = () => {
   const [tickets, setTickets] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [downloadingTicket, setDownloadingTicket] = useState(null);
   const token = localStorage.getItem("token");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
         const res = await api.get(`/tickets/organizer/self`);
-        const sortedTickets = (res.data.data || []).sort((a, b) => 
-          new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setTickets(sortedTickets);
+        const raw = res.data?.data ?? [];
+        const sorted = [...raw].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setTickets(sorted);
       } catch (error) {
         console.error("Error fetching tickets:", error);
       }
@@ -42,19 +70,6 @@ export const BookedTickets = () => {
     return "ongoing";
   };
 
-  const getBadgeStyle = (status) => {
-    switch (status) {
-      case "past":
-        return "bg-gray-500";
-      case "upcoming":
-        return "bg-blue-600";
-      case "ongoing":
-        return "bg-green-600";
-      default:
-        return "bg-muted";
-    }
-  };
-
   const groupSeatsByZone = (seats) => {
     const zoneMap = {};
     seats?.forEach((label) => {
@@ -65,50 +80,24 @@ export const BookedTickets = () => {
     return zoneMap;
   };
 
-  const calculateTotal = (ticket) => {
-    return ticket.ticketRate * ticket.quantity;
-  };
-
-  const calculateTax = (ticket) => {
-    const subtotal = calculateTotal(ticket);
-    return (subtotal * 0.18).toFixed(2);
-  };
-
-  const calculateGrandTotal = (ticket) => {
-    const subtotal = calculateTotal(ticket);
-    const tax = parseFloat(calculateTax(ticket));
-    return (subtotal + tax).toFixed(2);
-  };
+  const calculateTotal = (ticket) => ticket.ticketRate * ticket.quantity;
+  const calculateTax = (ticket) => (calculateTotal(ticket) * 0.18).toFixed(2);
+  const calculateGrandTotal = (ticket) => (calculateTotal(ticket) + parseFloat(calculateTax(ticket))).toFixed(2);
 
   const downloadInvoice = async (ticketId) => {
     setDownloadingTicket(ticketId);
     try {
-      const response = await api.get(
-        `/tickets/invoice/${ticketId}/download`,
-        {
-          responseType: 'blob',
-        }
-      );
-
+      const response = await api.get(`/tickets/invoice/${ticketId}/download`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `invoice_${ticketId}.pdf`);
+      link.setAttribute("download", `invoice_${ticketId}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-
-      toast({
-        title: "Success!",
-        description: "Invoice downloaded successfully",
-      });
+      toast({ title: "Success!", description: "Invoice downloaded successfully" });
     } catch (error) {
-      console.error("Error downloading invoice:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to download invoice",
-      });
+      toast({ variant: "destructive", title: "Error", description: "Failed to download invoice" });
     } finally {
       setDownloadingTicket(null);
     }
@@ -117,599 +106,195 @@ export const BookedTickets = () => {
   const printInvoice = (ticketId) => {
     const invoiceCard = document.getElementById(`invoice-${ticketId}`);
     if (!invoiceCard) return;
-
-    const printWindow = window.open('', '', 'width=800,height=600');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Invoice - ${ticketId}</title>
-          <style>
-            body { 
-              font-family: Arial, sans-serif; 
-              padding: 20px; 
-              margin: 0;
-            }
-            .no-print { display: none !important; }
-            @media print {
-              .no-print { display: none !important; }
-              body { padding: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          ${invoiceCard.innerHTML}
-        </body>
-      </html>
-    `);
+    const printWindow = window.open("", "", "width=800,height=600");
+    printWindow.document.write(`<html><head><title>Invoice</title><style>body{font-family:sans-serif;padding:20px;}</style></head><body>${invoiceCard.innerHTML}</body></html>`);
     printWindow.document.close();
     printWindow.print();
   };
 
-  // Helper to get location for display
-  const getEventLocation = (event, ticket) => {
-    if (event?.eventCategory === "ZoomMeeting") {
-      return null;
-    }
-    
-    // Try multiple location sources
-    const location = 
-      event?.location || 
-      event?.stadiumId?.location?.address || 
-      event?.stadiumId?.name ||
-      (ticket.cityId?.name && ticket.stateId?.Name 
-        ? `${ticket.cityId.name}, ${ticket.stateId.Name}` 
-        : null);
-    
-    return location;
-  };
-
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              🎟️ My Booked Tickets & Invoices
-            </h2>
-            <Button variant="outline" size="sm" asChild className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
-              <Link to="/organizer">← Back to Home</Link>
-            </Button>
+      <div className="min-h-screen bg-transparent text-white selection:bg-[#E11D48]/30">
+        {/* Header Bar */}
+        <div className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-2xl border-b border-white/5 px-8 py-6">
+          <div className="max-w-[1600px] mx-auto flex items-center justify-between">
+            <button onClick={() => navigate("/organizer")} className="flex items-center gap-3 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-all border border-white/5 hover:bg-white/5">
+              <ArrowLeft className="w-4 h-4" /> BACK TO DASHBOARD
+            </button>
+            <div className="flex flex-col items-center">
+               <h2 className="text-2xl font-black uppercase tracking-tighter">PRODUCTION <span className="text-[#E11D48]">MANIFEST</span></h2>
+               <p className="text-[7px] font-black tracking-[0.5em] text-gray-600 mt-1 uppercase">Operational Ticket Archive</p>
+            </div>
+            <div className="flex items-center gap-4">
+               <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/5">
+                  <Activity className="w-3 h-3 text-[#E11D48] animate-pulse" />
+                  <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{tickets.length} ACTIVE RECORDS</span>
+               </div>
+            </div>
           </div>
+        </div>
 
+        <div className="max-w-[1600px] mx-auto px-8 py-16">
           {tickets.length === 0 ? (
-            <div className="text-center py-12">
-              <Receipt className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 text-lg">No tickets booked yet.</p>
+            <div className="py-40 text-center border border-white/5 rounded-[3rem] bg-white/5 backdrop-blur-3xl">
+              <Receipt className="w-16 h-16 mx-auto text-gray-800 mb-8" />
+              <h3 className="text-2xl font-black uppercase tracking-widest">No Records Found</h3>
+              <p className="text-gray-600 font-bold uppercase tracking-widest text-[10px] mt-4">Synchronization complete: 0 bookings detected.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
               {tickets.map((ticket) => {
                 const event = ticket.eventId;
                 const status = getEventStatus(event?.startDate, event?.endDate);
-                const groupedSeats = groupSeatsByZone(ticket.selectedSeats);
-                const isIndoor = event?.eventCategory === "Indoor";
-                const isZoom = event?.eventCategory === "ZoomMeeting";
-                const today = new Date().toLocaleDateString();
-                const location = getEventLocation(event, ticket);
-
                 return (
-                  <Card 
-                    key={ticket._id} 
-                    className="shadow-lg border border-gray-200 hover:shadow-xl transition-shadow overflow-hidden bg-white"
-                    id={`invoice-${ticket._id}`}
+                  <div
+                    key={ticket._id}
+                    onClick={() => { setSelectedTicket(ticket); setIsSheetOpen(true); }}
+                    className="group relative cursor-pointer bg-white rounded-[2.5rem] p-8 transition-all duration-700 hover:scale-[1.05] hover:rotate-1 shadow-2xl overflow-hidden border-4 border-transparent hover:border-[#E11D48]/20"
                   >
-                    {/* Invoice Header */}
-                    <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white p-4">
+                    {/* Cinematic Stub Notches */}
+                    <div className="absolute top-1/2 -left-4 w-8 h-8 bg-[#050505] rounded-full" />
+                    <div className="absolute top-1/2 -right-4 w-8 h-8 bg-[#050505] rounded-full" />
+                    
+                    <div className="flex flex-col h-full space-y-6">
+                      <div className="relative h-40 -mt-2 -mx-2 mb-4 overflow-hidden rounded-[1.8rem]">
+                         <img src={event?.eventImgUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
+                      </div>
                       <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Receipt className="w-5 h-5" />
-                            <h1 className="text-xl font-bold">INVOICE</h1>
-                          </div>
-                          <div className="space-y-0.5 text-xs opacity-95">
-                            <p className="font-mono">#{ticket._id.slice(-8).toUpperCase()}</p>
-                            <p>{today}</p>
-                          </div>
+                        <div className="p-3 bg-gray-100 rounded-2xl group-hover:bg-[#E11D48] transition-colors duration-500">
+                          <Ticket className="w-6 h-6 text-[#E11D48] group-hover:text-white" />
                         </div>
-                        
-                        <div className="text-right">
-                          <Badge className={`${getBadgeStyle(status)} text-xs px-2 py-1 mb-2`}>
-                            {status.toUpperCase()}
-                          </Badge>
-                          <p className="text-sm font-bold">EventEase</p>
+                        <Badge className={cn("text-[9px] font-black px-3 py-1 uppercase rounded-full", 
+                          status === "past" ? "bg-gray-100 text-gray-500" : "bg-[#E11D48] text-white")}>
+                          {status}
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-black uppercase leading-none tracking-tighter text-black group-hover:text-[#E11D48] transition-colors truncate">
+                          {event?.eventName || "RESERVED NODE"}
+                        </h3>
+                        <div className="flex items-center gap-3 text-gray-500 font-bold text-[9px] uppercase tracking-widest">
+                           <Calendar className="w-3 h-3 text-[#E11D48]" /> {new Date(event?.startDate).toLocaleDateString()}
+                        </div>
+                      </div>
+
+                      <div className="pt-6 border-t border-dashed border-gray-200 flex justify-between items-center mt-auto">
+                        <div className="flex flex-col">
+                           <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">RECORD ID</span>
+                           <span className="text-[10px] font-black text-black uppercase">#{ticket._id.slice(-8)}</span>
+                        </div>
+                        <div className="text-[#E11D48] font-black text-xl italic tracking-tighter">
+                           ₹{calculateGrandTotal(ticket)}
                         </div>
                       </div>
                     </div>
-
-                    <CardContent className="p-4 space-y-3 bg-white">
-                      {/* Event Image */}
-                      {event?.eventImgUrl && (
-                        <div className="relative rounded-lg overflow-hidden shadow-sm">
-                          <img
-                            src={event.eventImgUrl}
-                            alt={event.eventName}
-                            className="w-full h-32 object-cover"
-                          />
-                          <div className="absolute top-2 right-2">
-                            <Badge className="bg-white/90 text-gray-800 text-xs border-0">
-                              {event.eventType}
-                            </Badge>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Event Info */}
-                      <div className="space-y-2">
-                        <h3 className="font-bold text-base text-gray-900">
-                          {event?.eventName || "Event"}
-                        </h3>
-
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <Calendar className="w-3 h-3 text-blue-600" />
-                          {new Date(event?.startDate).toLocaleDateString()} - {new Date(event?.endDate).toLocaleDateString()}
-                        </div>
-
-                        {location && (
-                          <div className="flex items-start gap-1 text-xs text-gray-600">
-                            <MapPin className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="line-clamp-2">{location}</span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <User className="w-3 h-3 text-gray-600" />
-                          {ticket.userId?.fullName || ticket.userId?.name || 'Guest User'}
-                        </div>
-                      </div>
-
-                      {/* Seats */}
-                      {isIndoor && ticket.selectedSeats?.length > 0 && (
-                        <div className="bg-purple-50 p-2 rounded border border-purple-200">
-                          <p className="text-xs font-semibold text-purple-900 mb-1">🎯 Seats</p>
-                          <div className="flex flex-wrap gap-1">
-                            {Object.entries(groupedSeats).map(([zone, seats]) => (
-                              <div key={zone} className="flex gap-1">
-                                {seats.slice(0, 5).map((s, i) => (
-                                  <Badge 
-                                    key={i}
-                                    className="text-xs px-1.5 py-0 bg-white text-gray-800 border border-purple-300"
-                                  >
-                                    {s}
-                                  </Badge>
-                                ))}
-                                {seats.length > 5 && (
-                                  <Badge className="text-xs px-1.5 py-0 bg-white text-gray-800 border border-purple-300">
-                                    +{seats.length - 5}
-                                  </Badge>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <Separator className="bg-gray-200" />
-
-                      {/* Pricing */}
-                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs">
-                        <div className="flex justify-between mb-1 text-gray-700">
-                          <span>{ticket.quantity} × ₹{ticket.ticketRate.toLocaleString()}</span>
-                          <span className="font-medium text-gray-900">₹{calculateTotal(ticket).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between mb-1 text-gray-600">
-                          <span>GST (18%)</span>
-                          <span className="text-gray-900">₹{calculateTax(ticket)}</span>
-                        </div>
-                        <Separator className="my-1 bg-gray-300" />
-                        <div className="flex justify-between font-bold text-sm">
-                          <span className="text-gray-900">Total</span>
-                          <span className="text-blue-600">₹{calculateGrandTotal(ticket)}</span>
-                        </div>
-                      </div>
-
-                      {/* Payment Status */}
-                      <div className="bg-green-50 p-2 rounded-lg border-l-2 border-green-500">
-                        <p className="text-xs font-semibold text-green-800 flex items-center gap-1">
-                          <Receipt className="w-3 h-3" />
-                          PAID via Razorpay
-                        </p>
-                        {ticket.paymentId && (
-                          <p className="text-xs text-gray-600 font-mono mt-0.5 truncate">
-                            {ticket.paymentId}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="grid grid-cols-2 gap-2 no-print">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => printInvoice(ticket._id)}
-                          className="text-xs h-8 bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        >
-                          <Printer className="w-3 h-3 mr-1" />
-                          Print
-                        </Button>
-                        
-                        <Button
-                          size="sm"
-                          onClick={() => downloadInvoice(ticket._id)}
-                          disabled={downloadingTicket === ticket._id}
-                          className="text-xs h-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
-                        >
-                          {downloadingTicket === ticket._id ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <>
-                              <Download className="w-3 h-3 mr-1" />
-                              PDF
-                            </>
-                          )}
-                        </Button>
-                      </div>
-
-                      {/* Zoom/Directions */}
-                      {isZoom && event?.zoomUrl && (
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="w-full text-xs h-8 bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        >
-                          <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer">
-                            🔗 Join Zoom
-                          </a>
-                        </Button>
-                      )}
-                      
-                      {!isZoom && event?.latitude && event?.longitude && (
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="w-full text-xs h-8 bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        >
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            📍 Directions
-                          </a>
-                        </Button>
-                      )}
-                    </CardContent>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
           )}
 
+          {/* DETAIL PANEL (DRAWER) */}
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetContent side="right" className="bg-white border-l border-gray-100 w-full sm:max-w-2xl p-0 overflow-y-auto no-scrollbar">
+              {selectedTicket && (() => {
+                const ticket = selectedTicket;
+                const event = ticket.eventId;
+                const status = getEventStatus(event?.startDate, event?.endDate);
+                const groupedSeats = groupSeatsByZone(ticket.selectedSeats);
+                return (
+                  <div className="flex flex-col min-h-screen text-black">
+                    <div className="bg-gradient-to-br from-black via-gray-900 to-[#E11D48] p-12 shrink-0 relative overflow-hidden">
+                      {event?.eventImgUrl && (
+                        <img src={event.eventImgUrl} className="absolute inset-0 w-full h-full object-cover opacity-30 grayscale blur-sm" />
+                      )}
+                      <SheetHeader className="text-left space-y-6 relative z-10">
+                        <div className="flex justify-between items-center">
+                          <div className="w-16 h-16 bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[2rem] flex items-center justify-center">
+                            <ShieldCheck className="w-8 h-8 text-white" />
+                          </div>
+                          <Badge className="bg-white text-black text-[10px] font-black px-6 py-2 rounded-full uppercase shadow-2xl">
+                             AUTHORIZED ACCESS
+                          </Badge>
+                        </div>
+                        <div>
+                          <SheetTitle className="text-5xl font-black uppercase tracking-tighter text-white leading-none">PRODUCTION<br />RECORD</SheetTitle>
+                          <p className="text-white/50 font-black uppercase tracking-[0.4em] text-[10px] mt-4">NODE-ARCHIVE: {ticket._id.toUpperCase()}</p>
+                        </div>
+                      </SheetHeader>
+                    </div>
+
+                    <div className="p-12 space-y-12">
+                      <div className="space-y-6">
+                         <div className="space-y-4">
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Entity Identification</span>
+                            <h2 className="text-5xl font-black uppercase leading-[0.9] tracking-tighter">{event?.eventName}</h2>
+                         </div>
+                         {event?.eventImgUrl && (
+                           <div className="w-full h-64 rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-2xl">
+                             <img src={event.eventImgUrl} className="w-full h-full object-cover" />
+                           </div>
+                         )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-8 py-10 border-y border-gray-100">
+                        <div className="space-y-2">
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2"><Calendar className="w-3.5 h-3.5 text-[#E11D48]" /> TRANSMISSION</p>
+                          <p className="text-lg font-black">{new Date(event?.startDate).toLocaleDateString()}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2"><User className="w-3.5 h-3.5 text-[#E11D48]" /> HOLDER</p>
+                          <p className="text-lg font-black truncate">{ticket.userId?.fullName || "AUTHORIZED GUEST"}</p>
+                        </div>
+                        <div className="col-span-2 space-y-2">
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2"><MapPin className="w-3.5 h-3.5 text-[#E11D48]" /> COORDINATES</p>
+                          <p className="text-sm font-bold leading-relaxed">{event?.location || "GLOBAL NODE ARCHIVE"}</p>
+                        </div>
+                      </div>
+
+                      {ticket.selectedSeats?.length > 0 && (
+                        <div className="bg-gray-50 p-10 rounded-[3rem] border border-gray-100">
+                          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-6 flex items-center gap-2">
+                            <Rocket className="w-4 h-4" /> SECTOR ASSIGNMENTS
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {ticket.selectedSeats.map((s, i) => (
+                              <Badge key={i} className="text-[11px] font-black px-4 py-2 bg-white text-black border border-gray-200 rounded-xl shadow-sm">
+                                {s}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="bg-black p-10 rounded-[3rem] shadow-2xl flex justify-between items-center text-white">
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Node Value</p>
+                          <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest italic">Authorized by Razorpay Protocol</p>
+                        </div>
+                        <div className="text-5xl font-black tracking-tighter italic">₹{calculateGrandTotal(ticket)}</div>
+                      </div>
+
+                      <div className="flex flex-col gap-4 pt-8 pb-12">
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button variant="outline" onClick={() => printInvoice(ticket._id)} className="h-20 rounded-[2rem] bg-white border-gray-200 text-black hover:bg-gray-50 text-[10px] font-black uppercase tracking-widest">
+                            <Printer className="w-5 h-5 mr-3" /> PRINT DATA
+                          </Button>
+                          <Button onClick={() => downloadInvoice(ticket._id)} disabled={downloadingTicket === ticket._id} className="h-20 rounded-[2rem] bg-black text-white hover:bg-[#E11D48] transition-all text-[10px] font-black uppercase tracking-widest">
+                            {downloadingTicket === ticket._id ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Download className="w-5 h-5 mr-3" /> EXPORT PDF</>}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </TooltipProvider>
   );
 };
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import {
-//   Card,
-//   CardHeader,
-//   CardTitle,
-//   CardContent,
-// } from "@/components/ui/card";
-// import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
-// import { Separator } from "@/components/ui/separator";
-// import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-// import { Download, FileText, Loader2 } from "lucide-react";
-// import { useToast } from "@/components/ui/use-toast";
-
-// export const BookedTickets = () => {
-//   const [tickets, setTickets] = useState([]);
-//   const [downloadingTicket, setDownloadingTicket] = useState(null);
-//   const token = localStorage.getItem("token");
-//   const { toast } = useToast();
-
-//   useEffect(() => {
-//     const fetchTickets = async () => {
-//       try {
-//         const res = await axios.get(`/tickets/organizer/:organizerId`, {
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-//         setTickets(res.data.data);
-//       } catch (error) {
-//         console.error("Error fetching tickets:", error);
-//       }
-//     };
-//     if (token) fetchTickets();
-//   }, [token]);
-
-//   const getEventStatus = (startDate, endDate) => {
-//     const now = new Date();
-//     const start = new Date(startDate);
-//     const end = new Date(endDate);
-//     if (end < now) return "past";
-//     if (start > now) return "upcoming";
-//     return "ongoing";
-//   };
-
-//   const getBadgeStyle = (status) => {
-//     switch (status) {
-//       case "past":
-//         return "bg-destructive";
-//       case "upcoming":
-//         return "bg-primary";
-//       case "ongoing":
-//         return "bg-green-600";
-//       default:
-//         return "bg-muted";
-//     }
-//   };
-
-//   const groupSeatsByZone = (seats) => {
-//     const zoneMap = {};
-//     seats?.forEach((label) => {
-//       const zone = label[0];
-//       if (!zoneMap[zone]) zoneMap[zone] = [];
-//       zoneMap[zone].push(label);
-//     });
-//     return zoneMap;
-//   };
-
-//   const downloadInvoice = async (ticketId) => {
-//     setDownloadingTicket(ticketId);
-//     try {
-//       const response = await axios.get(
-//         `/tickets/invoice/${ticketId}/download`,
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//           responseType: 'blob', // Important for file download
-//         }
-//       );
-
-//       // Create blob link to download
-//       const url = window.URL.createObjectURL(new Blob([response.data]));
-//       const link = document.createElement('a');
-//       link.href = url;
-//       link.setAttribute('download', `invoice_${ticketId}.pdf`);
-//       document.body.appendChild(link);
-//       link.click();
-//       link.remove();
-
-//       toast({
-//         title: "Success!",
-//         description: "Invoice downloaded successfully",
-//       });
-//     } catch (error) {
-//       console.error("Error downloading invoice:", error);
-//       toast({
-//         variant: "destructive",
-//         title: "Error",
-//         description: "Failed to download invoice",
-//       });
-//     } finally {
-//       setDownloadingTicket(null);
-//     }
-//   };
-
-//   return (
-//     <TooltipProvider>
-//       <div className="max-w-5xl mx-auto px-4 py-8">
-//         <h2 className="text-3xl font-bold text-center mb-6">🎟️ My Tickets</h2>
-
-//         {tickets.length === 0 ? (
-//           <p className="text-center text-muted-foreground">No tickets booked yet.</p>
-//         ) : (
-//           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-//             {tickets.map((ticket) => {
-//               const event = ticket.eventId;
-//               const status = getEventStatus(event?.startDate, event?.endDate);
-//               const groupedSeats = groupSeatsByZone(ticket.selectedSeats);
-//               const isIndoor = event?.eventCategory === "Indoor";
-//               const isZoom = event?.eventCategory === "ZoomMeeting";
-
-//               return (
-//                 <Card key={ticket._id} className="shadow-md">
-//                   {event?.eventImage && (
-//                     <img
-//                       src={event.eventImage}
-//                       alt="Event"
-//                       className="w-full h-48 object-cover rounded-t-md"
-//                     />
-//                   )}
-//                   <CardHeader className="flex justify-between items-start">
-//                     <CardTitle>{event?.eventName || "Unnamed Event"}</CardTitle>
-//                     <Badge className={getBadgeStyle(status)}>
-//                       {status.toUpperCase()}
-//                     </Badge>
-//                   </CardHeader>
-//                   <Separator />
-//                   <CardContent className="space-y-2 text-sm">
-//                     <p><strong>📅 Booked On:</strong> {new Date(ticket.createdAt).toLocaleDateString()}</p>
-//                     <p><strong>🆔 Ticket ID:</strong> {ticket._id}</p>
-//                     <p><strong>📅 Start:</strong> {new Date(event?.startDate).toLocaleDateString()}</p>
-//                     <p><strong>📅 End:</strong> {new Date(event?.endDate).toLocaleDateString()}</p>
-//                     <p>
-//                       <strong>💵 Booked at:</strong> ₹{ticket.ticketRate} ({ticket.quantity} seat{ticket.quantity > 1 ? "s" : ""})
-//                     </p>
-
-//                     {!isZoom && (
-//                       <>
-//                         <p>
-//                           <strong>📍 Location:</strong>{" "}
-//                           {ticket.cityId?.name}, {ticket.stateId?.Name}
-//                         </p>
-//                         {event?.latitude && event?.longitude && (
-//                           <Button
-//                             asChild
-//                             variant="outline"
-//                             size="sm"
-//                             className="mt-1"
-//                           >
-//                             <a
-//                               href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`}
-//                               target="_blank"
-//                               rel="noopener noreferrer"
-//                             >
-//                               📍 View Directions
-//                             </a>
-//                           </Button>
-//                         )}
-//                       </>
-//                     )}
-
-//                     {isZoom && event.zoomUrl && (
-//                       <p>
-//                         <strong>🔗 Zoom URL:</strong>{" "}
-//                         <a
-//                           href={event.zoomUrl}
-//                           className="underline text-blue-500"
-//                           target="_blank"
-//                           rel="noopener noreferrer"
-//                         >
-//                           Join Meeting
-//                         </a>
-//                       </p>
-//                     )}
-
-//                     {isIndoor && ticket.selectedSeats?.length > 0 && (
-//                       <div>
-//                         <strong>🎯 Selected Seats by Zone:</strong>
-//                         {Object.entries(groupedSeats).map(([zone, seats]) => (
-//                           <div key={zone} className="mt-2">
-//                             <div className="font-medium text-sm">Zone {zone}</div>
-//                             <div className="flex flex-wrap gap-2 mt-1">
-//                               {seats.map((s, i) => (
-//                                 <Tooltip key={i}>
-//                                   <TooltipTrigger asChild>
-//                                     <Badge variant="outline" className="bg-muted text-sm">
-//                                       {s}
-//                                     </Badge>
-//                                   </TooltipTrigger>
-//                                   <TooltipContent>
-//                                     Seat {s} in Zone {zone}
-//                                   </TooltipContent>
-//                                 </Tooltip>
-//                               ))}
-//                             </div>
-//                           </div>
-//                         ))}
-//                       </div>
-//                     )}
-
-//                     {/* Invoice Download Button */}
-//                     <div className="pt-4 border-t">
-//                       <Button
-//                         variant="outline"
-//                         size="sm"
-//                         className="w-full"
-//                         onClick={() => downloadInvoice(ticket._id)}
-//                         disabled={downloadingTicket === ticket._id}
-//                       >
-//                         {downloadingTicket === ticket._id ? (
-//                           <>
-//                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-//                             Downloading...
-//                           </>
-//                         ) : (
-//                           <>
-//                             <Download className="mr-2 h-4 w-4" />
-//                             Download Invoice
-//                           </>
-//                         )}
-//                       </Button>
-//                     </div>
-//                   </CardContent>
-//                 </Card>
-//               );
-//             })}
-//           </div>
-//         )}
-
-//         <div className="text-center mt-6">
-//           <Button variant="outline" asChild>
-//             <a href="/organizer">Back to Home</a>
-//           </Button>
-//         </div>
-//       </div>
-//     </TooltipProvider>
-//   );
-// };
-
-
-
-
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-
-// export const BookedTickets = () => {
-//   const [tickets, setTickets] = useState([]);
-
-//   useEffect(() => {
-//     const fetchTickets = async () => {
-//       // const organizerId = localStorage.getItem("organizerId");
-//       // if (!organizerId) return;
-//       const token = localStorage.getItem("token")
-
-//       try {
-//           const res = await axios.get("/tickets/organizer/self", {
-//         headers: {
-//         Authorization: `Bearer ${token}`,
-//          },
-//         });
-//         setTickets(res.data.data || []);
-//       } catch (error) {
-//         console.error("Error fetching tickets:", error);
-//       }
-//     };
-
-//     fetchTickets();
-//   }, []);
-
-//   if (!tickets.length) {
-//     return <div className="container mt-4"><h4>No tickets booked yet.</h4></div>;
-//   }
-
-//   return (
-//     <div className="container mt-4">
-//       <h3>Booked Tickets</h3>
-//       <table className="table table-bordered table-striped">
-//         <thead>
-//           <tr>
-//             <th>Event Name</th>
-//             <th>Event Type</th>
-//             <th>Booked By organizer</th>
-//             {/* <th>Booked By user</th> */}
-//             {/* <th>Email</th> */}
-//             <th>State</th>     
-//             <th>City</th> 
-//             {/* <th>organizer</th>  */}
-//             <th>Quantity</th>
-//             <th>Booking Date</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {tickets.map((ticket, index) => (
-//             <tr key={index}>
-//               <td>{ticket.eventId?.eventName || "N/A"}</td>
-//               <td>{ticket.eventId?.eventType || "N/A"}</td>
-//               <td>{ticket.organizerId?.name || "Unknown"}</td>
-//               {/* <td>{ticket.userId?.fullName || "Unknown"}</td> */}
-//               <td>{ticket.stateId?.Name || "Unknown"}</td>
-//               <td>{ticket.cityId?.name || "Unknown"}</td>
-//               {/* <td>{ticket.organizerId?.name || "Unknown"}</td> */}
-//               <td>{ticket.quantity}</td>
-//               <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-

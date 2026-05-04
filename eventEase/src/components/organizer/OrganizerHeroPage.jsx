@@ -75,7 +75,7 @@ export const OrganizerHeroPage = () => {
       }
 
       try {
-        const res = await axios.get("organizer/organizer/self", {
+        const res = await axios.get("/organizer/organizer/self", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -182,7 +182,7 @@ export const OrganizerHeroPage = () => {
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contact
               </Button>
-              <Link to="/bookingofmyevents">
+              <Link to="/organizer/bookingofmyevents">
                 <Button 
                   variant="ghost" 
                   className="hover:bg-orange-50 dark:hover:bg-gray-800 hover:text-orange-700 dark:hover:text-orange-300 transition-colors"
@@ -275,7 +275,7 @@ export const OrganizerHeroPage = () => {
                     Contact
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/bookingofmyevents" className="flex items-center">
+                    <Link to="/organizer/bookingofmyevents" className="flex items-center">
                       <Ticket className="w-4 h-4 mr-3" />
                       Tickets
                     </Link>

@@ -40,11 +40,16 @@ import {
   AlertCircle,
   ArrowRight,
   LogIn,
+  Sparkles,
+  X,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
 import SignInModal from "@/components/user/SignInModal";
+import { cn } from "@/lib/utils";
 
 /*
-   EventCard - extracted */
+   EventCard - Cinematic Redesign */
 const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSignInClick, onBookClick, dimmed = false }) => {
   const eventStatus = getEventStatus(event);
   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
@@ -52,145 +57,143 @@ const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSign
 
   const handleActionClick = (e) => {
     e.stopPropagation();
-    
     if (!isAuthenticated) {
-      // User not signed in - show sign in modal
       onSignInClick(event);
       return;
     }
-    
-    // User is signed in
     if (event.eventCategory === "Indoor") {
-      // For indoor events, redirect to seat selection
       onBookClick(event, { redirectToSeatSelection: true });
     } else {
-      // For outdoor events, open the drawer to select quantity and pay
       onCardClick(event);
     }
   };
 
   return (
-    <Card
-      className={
-        "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm  overflow-hidden dark:boarder-none dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-none h-full flex flex-col hover:-translate-y-2  " +
-        (dimmed ? "opacity-60 filter grayscale" : "")
-      }
+    <div
+      className={cn(
+        "group relative flex flex-col bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+        dimmed
+          ? "opacity-50 grayscale scale-95 hover:grayscale-0 hover:opacity-100 hover:scale-[1.08] hover:shadow-[0_0_100px_rgba(225,29,72,0.25)] hover:border-white/20 hover:z-50"
+          : "hover:border-[#E11D48]/30 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(225,29,72,0.1)]"
+      )}
       onClick={() => onCardClick(event)}
     >
-      <div className="relative overflow-hidden">
+      {/* Aura Background (Only for hovered ended events) */}
+      {dimmed && (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#E11D48]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-[2.5rem] blur-3xl pointer-events-none" />
+      )}
+
+      {/* Top Section: Image */}
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[2.2rem] m-2">
         <img
           src={event.eventImgUrl}
           alt={event.eventName}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+          className={cn(
+            "w-full h-full object-cover transition-transform duration-[1200ms] ease-out",
+            dimmed ? "group-hover:scale-125" : "group-hover:scale-110"
+          )}
         />
-        <div className="absolute top-3 right-3">
-          <Badge variant={eventStatus.variant} className="shadow-lg">
-            <StatusIcon className="w-3 h-3 mr-1" />
-            {eventStatus.label}
-          </Badge>
-        </div>
-        {event.eventType && (
-          <Badge className="absolute top-3 left-3 bg-white/90 text-slate-700 shadow-lg dark:text-gray-900">
-            {event.eventType}
-          </Badge>
-        )}
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      <CardHeader className="pb-1">
-        <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 line-clamp-2">
-          {event.eventName}
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent className="space-y-2 pb-0 flex-grow">
-        <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-          <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-          <span>
-            {new Date(event.startDate).toLocaleDateString()}
-            {" — "}
-            {new Date(event.endDate).toLocaleDateString()}
-          </span>
-        </div>
-
-        {event.eventCategory === "ZoomMeeting" && event.zoomUrl ? (
-          <div className="flex items-center text-sm text-blue-600 dark:text-gray-100">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            <span className="truncate">Zoom Meeting</span>
-          </div>
-        ) : event.eventCategory === "Indoor" && event.stadiumId?.location?.address ? (
-          <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-            <MapPin className="w-4 h-4 mr-2 text-green-500" />
-            <span className="truncate">{event.stadiumId.location.address}</span>
-          </div>
-        ) : event.cityId?.name ? (
-          <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-            <MapPin className="w-4 h-4 mr-2 text-green-500" />
-            <span>{event.cityId.name}{event.stateId ? `, ${event.stateId?.Name || event.stateId?.name}` : ""}</span>
-          </div>
-        ) : null}
-
-        {/* Price Display */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-gray-800">
-          <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-            <Users className="w-4 h-4 mr-2 text-purple-500" />
-            <span>{availableSeats} seats</span>
-          </div>
-          <div className="text-sm font-semibold">
+        {/* Floating Price Tag */}
+        <div className="absolute top-4 right-4">
+          <div className="bg-white text-black px-4 py-2 rounded-full font-black text-[9px] shadow-2xl tracking-widest transform transition-transform group-hover:-translate-y-1">
             {(() => {
               if (event.eventCategory === "Indoor" && event.zonePrices?.length > 0) {
                 const validPrices = event.zonePrices.filter(p => p > 0);
-                if (validPrices.length === 0) {
-                  return <span className="text-green-600 dark:text-green-400">FREE</span>;
-                }
+                if (validPrices.length === 0) return "FREE";
                 const minPrice = Math.min(...validPrices);
-                const maxPrice = Math.max(...validPrices);
-                return (
-                  <span className="text-slate-900 dark:text-gray-100">
-                    {minPrice === maxPrice 
-                      ? `₹${minPrice.toLocaleString()}`
-                      : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`
-                    }
-                  </span>
-                );
+                return `FROM ₹${minPrice.toLocaleString()}`;
               } else if (event.ticketRate) {
-                return <span className="text-slate-900 dark:text-gray-100">₹{event.ticketRate.toLocaleString()}</span>;
+                return `₹${event.ticketRate.toLocaleString()}`;
               } else {
-                return <span className="text-green-600 dark:text-green-400">FREE</span>;
+                return "FREE";
               }
             })()}
           </div>
         </div>
-      </CardContent>
 
-      <CardFooter className="pt-4 border-t border-slate-100 dark:border-gray-800">
-        <div className="w-full text-center">
-          {eventStatus.status === "ended" ? (
-            <Badge variant="secondary" className="w-full justify-center py-2 text-sm">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Event Completed
-            </Badge>
-          ) : eventStatus.status === "soldout" ? (
-            <Badge variant="destructive" className="w-full justify-center py-2 text-sm">
-              <AlertCircle className="w-4 h-4 mr-2" />
-              Sold Out
-            </Badge>
-          ) : (
+        {/* 3D Archive Badge (Only for dimmed) */}
+        {dimmed && (
+          <div className="absolute bottom-4 left-4 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 flex items-center gap-2 px-3 py-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-[8px] font-black tracking-widest text-white uppercase">
+            <Clock className="w-3 h-3 text-[#E11D48]" />
+            Relive Experience
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Section: Structured Info */}
+      <div className="p-8 flex flex-col flex-1 relative z-10">
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex-1">
+            <p className={cn(
+              "text-[9px] font-black uppercase tracking-[0.4em] mb-3 transition-colors duration-500",
+              dimmed ? "text-gray-600 group-hover:text-[#E11D48]" : "text-[#E11D48]"
+            )}>
+              {event.eventType || "Premium Experience"}
+            </p>
+            <h3 className={cn(
+              "text-2xl md:text-3xl font-black leading-[1.1] uppercase tracking-tighter transition-all duration-500",
+              dimmed ? "text-gray-500 group-hover:text-white group-hover:translate-x-2" : "text-white group-hover:translate-x-1"
+            )}>
+              {event.eventName}
+            </h3>
+          </div>
+          <div className={cn(
+            "w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 transform group-hover:rotate-12",
+            dimmed ? "bg-white/5 border border-white/5 group-hover:bg-[#E11D48] group-hover:shadow-[0_0_20px_rgba(225,29,72,0.4)]" : "bg-white/5 border border-white/10 group-hover:bg-[#E11D48]"
+          )}>
+            <Ticket className="w-5 h-5 text-white" />
+          </div>
+        </div>
+
+        <div className="mt-auto pt-8 border-t border-white/5 flex items-end justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              {eventStatus.status === 'ongoing' ? (
+                <div className="flex items-center gap-2">
+                  <div className="live-indicator" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white">Live Status</span>
+                </div>
+              ) : (
+                <div className={cn(
+                  "flex items-center gap-2 transition-colors duration-500",
+                  dimmed ? "text-gray-700 group-hover:text-[#E11D48]" : "text-gray-500"
+                )}>
+                  <StatusIcon className="w-3 h-3" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">{eventStatus.label}</span>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              <Calendar className="w-3 h-3 text-[#E11D48]" />
+              {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </div>
+          </div>
+
+          <div className="text-right">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest justify-end mb-2">
+              <MapPin className="w-3 h-3 text-[#E11D48]" />
+              {event.cityId?.name || 'Global'}
+            </div>
             <Button
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
+              className={cn(
+                "h-8 px-4 border-white/10 text-[8px] font-black tracking-widest uppercase rounded-full transition-all duration-500",
+                dimmed
+                  ? "bg-white/5 text-gray-600 group-hover:bg-white group-hover:text-black group-hover:scale-110"
+                  : "bg-white/5 hover:bg-[#E11D48] text-white"
+              )}
               onClick={handleActionClick}
             >
-              <Ticket className="w-4 h-4 mr-2" />
-              {event.eventCategory === "Indoor" 
-                ? "Select Seats" 
-                : (!isAuthenticated ? "Sign in to Book" : "Book Now")
-              }
+              {dimmed ? "ARCHIVE" : "DETAILS"}
             </Button>
-          )}
+          </div>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
+
 
 /* -------------------------
    Main ViewEvents component
@@ -306,7 +309,7 @@ export const ViewEvents = () => {
       const userId = localStorage.getItem("userId") || localStorage.getItem("id");
       if (!token) throw new Error("Authentication required");
 
-      await api.post(`/event/bookseat/${booking.eventId}`, {
+      const res = await api.post(`/event/bookseat/${booking.eventId}`, {
         quantity: booking.quantity,
         selectedSeats: booking.selectedSeats || [],
         organizerId: booking.organizerId,
@@ -314,10 +317,18 @@ export const ViewEvents = () => {
         cityId: booking.cityId,
         paymentId: booking.paymentId,
       });
-      setBookingInfo("Booking successful! 🎉");
-      navigate(`/mytickets`);
-      getAllEvents();
-      setIsDrawerOpen(false);
+      const message = res.data?.message || "Booking successful! 🎉";
+      alert(message);
+      setBookingInfo(message);
+
+      const userRole = localStorage.getItem("role");
+      const targetPath = userRole === "Organizer" ? "/bookedtickets" : "/mytickets";
+      
+      setTimeout(() => {
+        navigate(targetPath);
+        getAllEvents();
+        setIsDrawerOpen(false);
+      }, 1500);
     } catch (err) {
       console.error("Booking failed:", err);
       alert("Booking failed: " + (err.response?.data?.message || err.message || "Unknown error"));
@@ -396,7 +407,7 @@ export const ViewEvents = () => {
             console.error("Verification failed:", error);
             alert(
               "Payment successful but booking verification failed. Please contact support with your payment ID: " +
-                response.razorpay_payment_id
+              response.razorpay_payment_id
             );
           } finally {
             setProcessingPayment(false);
@@ -536,6 +547,17 @@ export const ViewEvents = () => {
   const endedEvents = sortedEvents.filter((e) => getEventStatus(e).status === "ended");
   const activeEvents = sortedEvents.filter((e) => getEventStatus(e).status !== "ended");
 
+  useEffect(() => {
+    if (events.length > 0) {
+      console.log("--- EVENTEASE DEBUG ---");
+      console.log("Total Events from API:", events.length);
+      console.log("Active Events (Upcoming/Live):", activeEvents.length);
+      console.log("Past Events (Ended):", endedEvents.length);
+      if (endedEvents.length > 0) console.log("Sample Ended Event:", endedEvents[0].eventName, "End Date:", endedEvents[0].endDate);
+      console.log("-----------------------");
+    }
+  }, [events, activeEvents, endedEvents]);
+
   /* Lightweight loading skeleton */
   const LoadingSkeleton = () => (
     <div className="space-y-12">
@@ -565,255 +587,395 @@ export const ViewEvents = () => {
     </div>
   );
 
+  const [hoveringArchive, setHoveringArchive] = useState(false);
+  const archiveScrollRef = React.useRef(null);
+
+  useEffect(() => {
+    let interval;
+    const container = archiveScrollRef.current;
+
+    if (container && endedEvents.length > 0 && !hoveringArchive) {
+      interval = setInterval(() => {
+        if (!container) return;
+        container.scrollLeft += 2;
+
+        // Seamless loop: when we reach the end of the first set, jump back to start
+        if (container.scrollLeft >= container.scrollWidth / 2) {
+          container.scrollLeft = 0;
+        }
+      }, 25);
+    }
+
+    return () => clearInterval(interval);
+  }, [endedEvents, hoveringArchive]);
+
   /* UI */
   return (
     <>
-      <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-        <div className="w-full py-16 px-4 md:px-8 space-y-8">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Discover Amazing Events
-            </h1>
-            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Find and book your next unforgettable experience. Click any event card for details.
-            </p>
-          </div>
+      <div className="w-full min-h-screen bg-transparent text-white selection:bg-[#E11D48]/30">
+        <div className="w-full py-24 px-6 md:px-12 space-y-24">
 
-          {/* Filters */}
-          <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg hover  border p-6 mb-8 dark:bg-gray-900 dark:border-none hover:-translate-y-2 transition-all duration-200">
-            <div className="flex items-center gap-2 mb-4 ">
-              <Filter className="w-5 h-5 text-blue-600 " />
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
+          {/* Header */}
+          <div className="max-w-[1800px] mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="w-8 h-[2px] bg-[#E11D48]" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Show Discovery</span>
+                </div>
+                <h1 className="text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter uppercase">
+                  FIND YOUR<br />NEXT SHOW
+                </h1>
+              </div>
+              <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] max-w-[200px] text-right">
+                Access the world's most exclusive events and live performances.
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <Input
-                  placeholder="Search by Event Name"
+
+            {/* Minimalist Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-white/10">
+              <div className="relative group">
+                <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
+                <input
+                  placeholder="SEARCH SHOWS"
                   value={filterName}
                   onChange={(e) => setFilterName(e.target.value)}
-                  className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
+                  className="w-full bg-transparent border-none pl-10 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-700 outline-none"
                 />
+                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#E11D48] transition-all group-focus-within:w-full" />
               </div>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <Input
-                  placeholder="Search by City"
+
+              <div className="relative group">
+                <MapPin className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
+                <input
+                  placeholder="LOCATION"
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
-                  className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
+                  className="w-full bg-transparent border-none pl-10 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-700 outline-none"
                 />
+                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#E11D48] transition-all group-focus-within:w-full" />
               </div>
-              <Select value={filterEventType} onValueChange={setFilterEventType}>
-                <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:text-gray-100 dark:bg-gray-700">
-                  <SelectValue placeholder="All Event Types" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800">
-                  <SelectItem value="all">All Event Types</SelectItem>
-                  <SelectItem value="Conference">Conference</SelectItem>
-                  <SelectItem value="Exhibition">Exhibition</SelectItem>
-                  <SelectItem value="Gala Dinner">Gala Dinner</SelectItem>
-                  <SelectItem value="Incentive">Incentive</SelectItem>
-                  <SelectItem value="Music concert">Music Concert</SelectItem>
-                  <SelectItem value="Meeting">Meeting</SelectItem>
-                  <SelectItem value="ZoomMeeting">Zoom Meeting</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+
+              <div className="relative group">
+                <Filter className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
+                <select
+                  value={filterEventType}
+                  onChange={(e) => setFilterEventType(e.target.value)}
+                  className="w-full bg-transparent border-none pl-10 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 appearance-none cursor-pointer text-white outline-none"
+                >
+                  <option value="all" className="bg-black">ALL CATEGORIES</option>
+                  <option value="Conference" className="bg-black">CONFERENCE</option>
+                  <option value="Exhibition" className="bg-black">EXHIBITION</option>
+                  <option value="Gala Dinner" className="bg-black">GALA DINNER</option>
+                  <option value="Music concert" className="bg-black">MUSIC CONCERT</option>
+                  <option value="ZoomMeeting" className="bg-black">ZOOM MEETING</option>
+                </select>
+                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#E11D48] transition-all group-focus-within:w-full" />
+              </div>
             </div>
           </div>
-
-          {/* Alerts */}
-          <div className="w-full max-w-7xl mx-auto">
-            {error && (
-              <Alert className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/50 dark:border-red-700">
-                <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
-              </Alert>
-            )}
-            {bookingInfo && (
-              <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/50 dark:border-green-700">
-                <AlertDescription className="text-green-800 dark:text-green-200">{bookingInfo}</AlertDescription>
-              </Alert>
-            )}
-          </div>
-
           {/* Main content */}
-          <div className="w-full px-4 md:px-8">
+          <div className="max-w-[1800px] mx-auto">
             {loading ? (
-              <LoadingSkeleton />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[3/4] bg-white/5 animate-pulse" />)}
+              </div>
             ) : activeEvents.length === 0 && endedEvents.length === 0 ? (
-              <div className="w-full max-w-7xl mx-auto text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg dark:bg-gray-800">
-                <Calendar className="mx-auto w-12 h-12 text-blue-500 mb-4" />
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-gray-100">No events found</h3>
-                <p className="text-slate-600 dark:text-slate-300 mt-2">Try adjusting filters to find events.</p>
+              <div className="py-40 text-center border border-white/5 bg-white/5">
+                <Calendar className="mx-auto w-12 h-12 text-gray-700 mb-8" />
+                <h3 className="text-2xl font-black uppercase tracking-widest text-white">No Shows Found</h3>
+                <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-4">Try adjusting your filters.</p>
               </div>
             ) : (
-              <>
-                {/* Active events carousel */}
-                <section className="mb-12">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">All Events</h2>
-                    <Button variant="link" className="text-blue-600 dark:text-blue-400">
-                      See All <ArrowRight className="w-4 h-4 ml-1" />
-                    </Button>
+              <div className="space-y-40">
+                {/* Active shows */}
+                <section>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
+                    {activeEvents.map((event) => (
+                      <EventCard key={event._id} event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} isAuthenticated={isAuthenticated} onSignInClick={handleCardSignIn} onBookClick={handleCardBook} />
+                    ))}
                   </div>
-
-                  <Carousel opts={{ align: "start", loop: activeEvents.length > 4 }} className="w-full">
-                    <CarouselContent className="-ml-4">
-                      {activeEvents.map((event) => (
-                        <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                          <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} isAuthenticated={isAuthenticated} onSignInClick={handleCardSignIn} onBookClick={handleCardBook} />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="hidden md:flex" />
-                    <CarouselNext className="hidden md:flex" />
-                  </Carousel>
                 </section>
 
-                {/* Ended events */}
                 {endedEvents.length > 0 && (
-                  <section className="mt-12">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ended Events</h2>
-                      <div className="text-sm text-slate-600 dark:text-slate-400">{endedEvents.length} items</div>
+                  <section className="space-y-16">
+                    <div className="flex items-center justify-between px-2">
+                      <div className="flex items-center gap-8">
+                        <h2 className="text-4xl font-black uppercase tracking-tighter text-white leading-none">PAST SHOWS</h2>
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-px bg-[#E11D48]" />
+                          <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.5em] animate-pulse">Historical Archive</span>
+                        </div>
+                      </div>
+                      <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] group cursor-pointer">
+                        EXPLORE ARCHIVE <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center group-hover:border-[#E11D48] group-hover:text-white transition-all"><ArrowRight className="w-4 h-4 text-[#E11D48] group-hover:translate-x-1 transition-transform" /></div>
+                      </div>
                     </div>
 
-                    <Carousel opts={{ align: "start", loop: endedEvents.length > 4 }} className="w-full">
-                      <CarouselContent className="-ml-4">
-                        {endedEvents.map((event) => (
-                          <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                            <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} isAuthenticated={isAuthenticated} onSignInClick={handleCardSignIn} onBookClick={handleCardBook} dimmed />
-                          </CarouselItem>
+                    <div className="relative group/scroll px-2">
+                      <div
+                        ref={archiveScrollRef}
+                        className="flex gap-10 overflow-x-auto no-scrollbar pb-20 scroll-smooth h-fit pt-10"
+                        onMouseEnter={() => setHoveringArchive(true)}
+                        onMouseLeave={() => setHoveringArchive(false)}
+                      >
+                        {/* Duplicate the array to create an infinite loop effect */}
+                        {[...endedEvents, ...endedEvents].map((event, index) => (
+                          <div
+                            key={`${event._id}-${index}`}
+                            className="min-w-[75vw] md:min-w-[360px] animate-fade-in-right first:ml-0"
+                            style={{ animationDelay: `${(index % endedEvents.length) * 150}ms` }}
+                          >
+                            <EventCard
+                              event={event}
+                              getEventStatus={getEventStatus}
+                              onCardClick={handleEventClick}
+                              dimmed
+                              isAuthenticated={isAuthenticated}
+                              onSignInClick={handleCardSignIn}
+                              onBookClick={handleCardBook}
+                            />
+                          </div>
                         ))}
-                      </CarouselContent>
-                      <CarouselPrevious className="hidden md:flex" />
-                      <CarouselNext className="hidden md:flex" />
-                    </Carousel>
+                      </div>
+
+                      {/* Subtle fade edges for scroll awareness */}
+                      <div className="absolute top-0 right-0 bottom-0 w-64 bg-gradient-to-l from-black via-black/40 to-transparent pointer-events-none z-10 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-1000" />
+                      <div className="absolute top-0 left-0 bottom-0 w-64 bg-gradient-to-r from-black via-black/40 to-transparent pointer-events-none z-10 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-1000" />
+                    </div>
                   </section>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Side Drawer - simplified design */}
+        {/* Cinematic Side Drawer - Redesigned */}
         {selectedEvent && isDrawerOpen && (
-          <div className="fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 z-[100] flex">
             <div
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity duration-700"
               onClick={() => setIsDrawerOpen(false)}
             />
 
             <aside
-              className={`relative ml-auto w-full max-w-md h-full shadow-lg transform transition duration-200 ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}
-              style={{
-                backgroundColor: prefersDark ? '#071027' : '#ffffff',
-                color: prefersDark ? '#E6EEF8' : undefined,
-              }}
+              className={cn(
+                "relative ml-auto w-full max-w-xl h-full bg-[#050505] border-l border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.8)] transform transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)",
+                isDrawerOpen ? "translate-x-0" : "translate-x-full"
+              )}
             >
-              <div className="flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-start gap-4 p-4 border-b border-gray-200 dark:border-gray-700" style={{ backgroundColor: 'transparent' }}>
-                  <img src={selectedEvent.eventImgUrl} alt={selectedEvent.eventName} className="w-20 h-20 rounded-md object-cover shadow-sm" />
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold line-clamp-2" style={{ color: prefersDark ? '#E6EEF8' : undefined }}>{selectedEvent.eventName}</h3>
-                    {selectedEvent.eventType && <p className="text-sm" style={{ color: prefersDark ? '#AFC3D9' : '#6B7280' }}>{selectedEvent.eventType}</p>}
-                    <div className="mt-2">
-                      <Badge className={`text-xs px-2 py-1 ${prefersDark ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'}`}>{getEventStatus(selectedEvent).label}</Badge>
-                    </div>
+              <div className="flex flex-col h-full overflow-hidden">
+                {/* Hero Header Section */}
+                <div className="relative h-[48vh] flex-shrink-0 overflow-hidden group">
+                  <div className="absolute inset-0 transition-transform duration-[2000ms] group-hover:scale-110">
+                    <img
+                      src={selectedEvent.eventImgUrl}
+                      alt={selectedEvent.eventName}
+                      className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-1000"
+                    />
                   </div>
-                  <button onClick={() => setIsDrawerOpen(false)} className={`p-2 rounded ${prefersDark ? 'text-gray-200 hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'}`}>
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+
+                  {/* Overlays */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/60 to-transparent" />
+
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="absolute top-10 right-10 w-12 h-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#E11D48] transition-all duration-500 hover:rotate-90 shadow-2xl z-20"
+                  >
+                    <X className="w-5 h-5" />
                   </button>
-                </div>
 
-                {/* Content */}
-                <div className="p-4 space-y-4 overflow-y-auto flex-1" style={{ backgroundColor: 'transparent' }}>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
-                      <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Date</p>
-                      <p className="text-sm font-medium" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>{new Date(selectedEvent.startDate).toLocaleDateString()}</p>
-                    </div>
-                    <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
-                      <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Available</p>
-                      <p className="text-sm font-medium" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>{(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} seats</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded" style={{ backgroundColor: prefersDark ? '#0e1622' : '#F8FAFC' }}>
-                    <p className="text-xs" style={{ color: prefersDark ? '#94A7BF' : '#6B7280' }}>Ticket Price</p>
-                    <p className="text-sm font-semibold" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>
-                      {(() => {
-                        if (selectedEvent.eventCategory === 'Indoor' && selectedEvent.zonePrices?.length > 0) {
-                          const validPrices = selectedEvent.zonePrices.filter(p => p > 0);
-                          if (validPrices.length === 0) {
-                            return 'FREE';
-                          }
-                          const minPrice = Math.min(...validPrices);
-                          const maxPrice = Math.max(...validPrices);
-                          return minPrice === maxPrice 
-                            ? `₹${minPrice.toLocaleString()}`
-                            : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`;
-                        } else if (selectedEvent.ticketRate) {
-                          return `₹${selectedEvent.ticketRate.toLocaleString()}`;
-                        } else {
-                          return 'FREE';
-                        }
-                      })()}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium" style={{ color: prefersDark ? '#E6EEF8' : '#111827' }}>Details</h4>
-                    {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-                      <a href={selectedEvent.zoomUrl} target="_blank" rel="noreferrer" className="text-sm underline" style={{ color: prefersDark ? '#7FB0FF' : '#2563EB' }}>Join Zoom Meeting</a>
-                    ) : selectedEvent.stadiumId?.location?.address ? (
-                      <p className="text-sm" style={{ color: prefersDark ? '#B6C9DB' : '#374151' }}>{selectedEvent.stadiumId.location.address}</p>
-                    ) : selectedEvent.cityId?.name ? (
-                      <p className="text-sm" style={{ color: prefersDark ? '#B6C9DB' : '#374151' }}>{selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ''}</p>
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* Footer Actions */}
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700" style={{ backgroundColor: 'transparent' }}>
-                  {(() => {
-                    const eventStatus = getEventStatus(selectedEvent);
-                    const availableSeats = (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0);
-
-                    if (eventStatus.status === 'ended') return <div className="text-center text-sm text-gray-500">Event Ended</div>;
-                    if (eventStatus.status === 'soldout') return <div className="text-center text-sm text-red-500">Sold Out</div>;
-
-                    if (selectedEvent.eventCategory === 'Indoor') {
-                      return (
-                        <Button onClick={(e) => { e.stopPropagation(); handleSeatSelectionClick(selectedEvent); }} className="w-full">Select Seats</Button>
-                      );
-                    }
-
-                    return (
-                      <div className="space-y-2">
-                        <Select value={String(ticketQuantities[selectedEvent._id] || 1)} onValueChange={(v) => setTicketQuantities({ ...ticketQuantities, [selectedEvent._id]: parseInt(v) })}>
-                          <SelectTrigger className="w-full" style={{ backgroundColor: prefersDark ? '#071026' : undefined, color: prefersDark ? '#E6EEF8' : undefined }}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
-                              <SelectItem key={i+1} value={String(i+1)}>{i+1} Ticket{i>0?'s':''}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <Button disabled={processingPayment} onClick={(e) => { e.stopPropagation(); handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1); }} className="w-full">
-                          { !isAuthenticated ? 'Sign in to Book' : processingPayment ? 'Processing...' : `Pay ₹${((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}` }
-                        </Button>
-
-                        {isAuthenticated && !isVerified && (<p className="text-xs text-red-500 text-center">Please verify your email to book tickets</p>)}
+                  <div className="absolute bottom-12 left-12 right-12 z-10">
+                    <div className="flex flex-wrap items-center gap-4 mb-10">
+                      <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48] text-white text-[9px] font-black uppercase tracking-[0.4em] shadow-[0_0_30px_rgba(225,29,72,0.4)]">
+                        <Sparkles className="w-3 h-3" />
+                        {selectedEvent.eventType || "Exclusive Access"}
                       </div>
-                    );
-                  })()}
+                      {getEventStatus(selectedEvent).status === 'ongoing' && (
+                        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 backdrop-blur-2xl border border-white/10 text-white text-[9px] font-black uppercase tracking-[0.4em]">
+                          <div className="live-indicator animate-pulse" />
+                          Live Experience
+                        </div>
+                      )}
+                    </div>
+                    <h2 className="text-6xl md:text-[5.5rem] font-black text-white leading-[0.8] uppercase tracking-[-0.04em] mb-6 drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+                      {selectedEvent.eventName}
+                    </h2>
+                    <div className="flex items-center gap-4">
+                      <div className="h-px w-12 bg-[#E11D48]" />
+                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.5em]">{selectedEvent.eventCategory} Protocol • Level 01</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="flex-1 overflow-y-auto p-12 md:p-16 space-y-16 no-scrollbar">
+                  {/* Glass Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-8 bg-white/5 border border-white/5 backdrop-blur-sm group/card hover:bg-white/10 transition-colors duration-500 rounded-3xl">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-8 h-8 rounded-xl bg-[#E11D48]/10 flex items-center justify-center">
+                          <Calendar className="w-4 h-4 text-[#E11D48]" />
+                        </div>
+                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Date & Time</p>
+                      </div>
+                      <p className="text-xl font-black text-white uppercase leading-tight">
+                        {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        <br />
+                        <span className="text-gray-500 text-sm font-bold tracking-widest">{new Date(selectedEvent.startDate).getFullYear()} • 19:00 PM</span>
+                      </p>
+                    </div>
+
+                    <div className="p-8 bg-white/5 border border-white/5 backdrop-blur-sm group/card hover:bg-white/10 transition-colors duration-500 rounded-3xl">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-8 h-8 rounded-xl bg-[#E11D48]/10 flex items-center justify-center">
+                          <Users className="w-4 h-4 text-[#E11D48]" />
+                        </div>
+                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Availability</p>
+                      </div>
+                      <div className="space-y-4">
+                        <p className="text-xl font-black text-white uppercase leading-tight">
+                          {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} <span className="text-gray-500 text-sm font-bold tracking-widest">SEATS LEFT</span>
+                        </p>
+                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#E11D48] shadow-[0_0_10px_rgba(225,29,72,0.5)] transition-all duration-1000"
+                            style={{ width: `${Math.max(5, 100 - (((selectedEvent.bookedSeats || 0) / (selectedEvent.numberOfSeats || 1)) * 100))}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Venue Block */}
+                  <div className="p-8 bg-white/5 border border-white/5 backdrop-blur-sm rounded-3xl">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-8 h-8 rounded-xl bg-[#E11D48]/10 flex items-center justify-center">
+                        <MapPin className="w-4 h-4 text-[#E11D48]" />
+                      </div>
+                      <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Security Sector / Venue</p>
+                    </div>
+                    {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
+                      <a href={selectedEvent.zoomUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-4 text-2xl font-black text-white hover:text-[#E11D48] transition-colors uppercase group">
+                        Secure Virtual Link <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                      </a>
+                    ) : (
+                      <p className="text-2xl font-black text-white uppercase leading-tight">
+                        {selectedEvent.stadiumId?.location?.address || selectedEvent.cityId?.name || "Access Point Restricted"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Pricing & Booking */}
+                  <div className="pt-12 border-t border-white/5">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 mb-12">
+                      <div>
+                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Pricing Protocol</p>
+                        <div className="flex items-baseline gap-4">
+                          <span className="text-6xl font-black text-white leading-none tracking-tighter">
+                            {(() => {
+                              if (selectedEvent.eventCategory === 'Indoor' && selectedEvent.zonePrices?.length > 0) {
+                                const validPrices = selectedEvent.zonePrices.filter(p => p > 0);
+                                if (validPrices.length === 0) return 'FREE';
+                                const minPrice = Math.min(...validPrices);
+                                return `₹${minPrice.toLocaleString()}`;
+                              } else if (selectedEvent.ticketRate) {
+                                return `₹${selectedEvent.ticketRate.toLocaleString()}`;
+                              } else {
+                                return 'FREE';
+                              }
+                            })()}
+                          </span>
+                          {selectedEvent.eventCategory === 'Indoor' && <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em]">BASE TIER</span>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-8">
+                      {(() => {
+                        const eventStatus = getEventStatus(selectedEvent);
+                        if (eventStatus.status === 'ended') return (
+                          <div className="flex items-center justify-center p-8 border border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">
+                            MISSION COMPLETE • ARCHIVED
+                          </div>
+                        );
+                        if (eventStatus.status === 'soldout') return (
+                          <div className="flex items-center justify-center p-8 border border-red-500/20 bg-red-500/5 text-[10px] font-black uppercase tracking-[0.4em] text-red-500">
+                            CAPACITY REACHED • SOLD OUT
+                          </div>
+                        );
+
+                        if (selectedEvent.eventCategory === 'Indoor') {
+                          return (
+                            <Button
+                              onClick={(e) => { e.stopPropagation(); handleSeatSelectionClick(selectedEvent); }}
+                              className="w-full h-20 bg-white text-black hover:bg-gray-200 rounded-full text-[11px] font-black tracking-[0.5em] uppercase transition-all duration-500 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transform hover:scale-[1.02]"
+                            >
+                              INITIALIZE SEAT SELECTION
+                            </Button>
+                          );
+                        }
+
+                        return (
+                          <div className="space-y-8">
+                            <div className="relative">
+                              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Transmission Units</p>
+                              <div className="relative group">
+                                <select
+                                  value={String(ticketQuantities[selectedEvent._id] || 1)}
+                                  onChange={(e) => setTicketQuantities({ ...ticketQuantities, [selectedEvent._id]: parseInt(e.target.value) })}
+                                  className="w-full bg-white/5 border border-white/10 px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] appearance-none focus:ring-0 focus:border-[#E11D48] transition-all cursor-pointer rounded-2xl"
+                                >
+                                  {Array.from({ length: Math.min(10, Math.max(1, (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0))) }, (_, i) => (
+                                    <option key={i + 1} value={String(i + 1)} className="bg-black">{i + 1} TICKET UNITS</option>
+                                  ))}
+                                </select>
+                                <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600 group-focus-within:text-[#E11D48] transition-colors">
+                                  <Ticket className="w-4 h-4" />
+                                </div>
+                              </div>
+                            </div>
+
+                            <Button
+                              disabled={processingPayment}
+                              onClick={(e) => { e.stopPropagation(); handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1); }}
+                              className="w-full h-24 bg-[#E11D48] hover:bg-red-700 text-white rounded-full text-[11px] font-black tracking-[0.5em] uppercase transition-all duration-500 shadow-[0_0_50px_rgba(225,29,72,0.2)] hover:shadow-[0_0_70px_rgba(225,29,72,0.4)] transform hover:scale-[1.02] group"
+                            >
+                              {!isAuthenticated ? (
+                                <span className="flex items-center gap-4">
+                                  <LogIn className="w-5 h-5" /> AUTHORIZE ACCESS
+                                </span>
+                              ) : processingPayment ? (
+                                <span className="flex items-center gap-4">
+                                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                  TRANSMITTING...
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-4">
+                                  CONFIRM PROTOCOL <ArrowRight className="w-5 h-5 group-hover:translate-x-3 transition-transform duration-500" />
+                                </span>
+                              )}
+                            </Button>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Footer Badges */}
+                      <div className="pt-8 flex justify-center items-center gap-10 opacity-30 group-hover:opacity-60 transition-opacity">
+                        <div className="flex items-center gap-3">
+                          <ShieldCheck className="w-4 h-4" />
+                          <span className="text-[8px] font-black uppercase tracking-widest text-white">Secure Encrypted</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Zap className="w-4 h-4" />
+                          <span className="text-[8px] font-black uppercase tracking-widest text-white">Instant Fulfillment</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -904,3570 +1066,3 @@ export const ViewEvents = () => {
 };
 
 export default ViewEvents;
-
-
-
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// import {
-//   Card,
-//   CardContent,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Badge } from "@/components/ui/badge";
-// import { Alert, AlertDescription } from "@/components/ui/alert";
-// import { Skeleton } from "@/components/ui/skeleton";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel";
-// import {
-//   Calendar,
-//   MapPin,
-//   Users,
-//   ExternalLink,
-//   Ticket,
-//   Clock,
-//   CheckCircle,
-//   Search,
-//   Filter,
-//   AlertCircle,
-//   ArrowRight,
-//   LogIn,
-// } from "lucide-react";
-// import SignInModal from "@/components/user/SignInModal";
-
-// /* EventCard extracted for readability */
-// const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
-//   const eventStatus = getEventStatus(event);
-//   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-//   const StatusIcon = eventStatus.icon;
-
-//   return (
-//     <Card
-//       className={
-//         "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-black text-gray-900 dark:text-gray-100 dark:border-gray-700 shadow-inner rounded-none h-full flex flex-col hover:-translate-y-2  " +
-//         (dimmed ? "opacity-60 filter grayscale" : "")
-//       }
-//       onClick={() => onCardClick(event)}
-//     >
-//       <div className="relative overflow-hidden">
-//         <img
-//           src={event.eventImgUrl}
-//           alt={event.eventName}
-//           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-//         />
-//         <div className="absolute top-3 right-3">
-//           <Badge variant={eventStatus.variant} className="shadow-lg">
-//             <StatusIcon className="w-3 h-3 mr-1" />
-//             {eventStatus.label}
-//           </Badge>
-//         </div>
-//         {event.eventType && (
-//           <Badge className="absolute top-3 left-3 bg-white/90 text-slate-700 shadow-lg dark:text-gray-900">
-//             {event.eventType}
-//           </Badge>
-//         )}
-//       </div>
-
-//       <CardHeader className="pb-1">
-//         <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 line-clamp-2">
-//           {event.eventName}
-//         </CardTitle>
-//       </CardHeader>
-
-//       <CardContent className="space-y-2 pb-0 flex-grow">
-//         <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//           <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-//           <span>
-//             {new Date(event.startDate).toLocaleDateString()}
-//             {" — "}
-//             {new Date(event.endDate).toLocaleDateString()}
-//           </span>
-//         </div>
-
-//         {event.eventCategory === "ZoomMeeting" && event.zoomUrl ? (
-//           <div className="flex items-center text-sm text-blue-600 dark:text-gray-100">
-//             <ExternalLink className="w-4 h-4 mr-2" />
-//             <span className="truncate">Zoom Meeting</span>
-//           </div>
-//         ) : event.eventCategory === "Indoor" && event.stadiumId?.location?.address ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span className="truncate">{event.stadiumId.location.address}</span>
-//           </div>
-//         ) : event.cityId?.name ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span>{event.cityId.name}{event.stateId ? `, ${event.stateId?.Name || event.stateId?.name}` : ""}</span>
-//           </div>
-//         ) : null}
-
-//         {/* <div className="flex items-center justify-between">
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <Users className="w-4 h-4 mr-2 text-purple-500" />
-//             <span>{availableSeats} seats</span>
-//           </div>
-
-//           {(() => {
-//             if (event.eventCategory === "Indoor" && event.zonePrices?.length > 0) {
-//               const validPrices = event.zonePrices.filter(p => p > 0);
-//               if (validPrices.length === 0) {
-//                 return <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>;
-//               }
-//               const minPrice = Math.min(...validPrices);
-//               const maxPrice = Math.max(...validPrices);
-//               return (
-//                 <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//                   {minPrice === maxPrice 
-//                     ? `₹${minPrice.toLocaleString()}`
-//                     : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`
-//                   }
-//                 </div>
-//               );
-//             } else if (event.ticketRate) {
-//               return (
-//                 <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//                   ₹{event.ticketRate.toLocaleString()}
-//                 </div>
-//               );
-//             } else {
-//               return <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>;
-//             }
-//           })()}
-//         </div> */}
-//       </CardContent>
-
-//       <CardFooter className="pt-4 border-t border-slate-100 dark:border-gray-800">
-//         <div className="w-full text-center">
-//           {eventStatus.status === "ended" ? (
-//             <Badge variant="secondary" className="w-full justify-center py-2 text-sm">
-//               <CheckCircle className="w-4 h-4 mr-2" />
-//               Event Completed
-//             </Badge>
-//           ) : eventStatus.status === "soldout" ? (
-//             <Badge variant="destructive" className="w-full justify-center py-2 text-sm">
-//               <AlertCircle className="w-4 h-4 mr-2" />
-//               Sold Out
-//             </Badge>
-//           ) : (
-//             <Button
-//               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-//               onClick={(e) => {
-//                 e.stopPropagation();
-//                 onCardClick(event);
-//               }}
-//             >
-//               <Ticket className="w-4 h-4 mr-2" />
-//               View Details
-//             </Button>
-//           )}
-//         </div>
-//       </CardFooter>
-//     </Card>
-//   );
-// };
-
-// const ViewEvents = () => {
-//   const [events, setEvents] = useState([]);
-//   const [ticketQuantities, setTicketQuantities] = useState({});
-//   const [bookingInfo, setBookingInfo] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [filterName, setFilterName] = useState("");
-//   const [filterCity, setFilterCity] = useState("");
-//   const [filterEventType, setFilterEventType] = useState("");
-//   const [selectedEvent, setSelectedEvent] = useState(null);
-//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-//   const [showSignInModal, setShowSignInModal] = useState(false);
-//   const [pendingPayment, setPendingPayment] = useState(null);
-//   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
-
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const [isVerified, setIsVerified] = useState(false);
-//   const [showVerifyModal, setShowVerifyModal] = useState(false);
-
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const loadRazorpay = () => {
-//       if (window.Razorpay) {
-//         setRazorpayLoaded(true);
-//         return;
-//       }
-//       const script = document.createElement("script");
-//       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-//       script.async = true;
-//       script.onload = () => setRazorpayLoaded(true);
-//       script.onerror = () => setError("Payment system unavailable. Please refresh the page.");
-//       document.body.appendChild(script);
-//     };
-//     loadRazorpay();
-//   }, []);
-
-//   useEffect(() => {
-//     const checkAuth = () => {
-//       const token = localStorage.getItem("token");
-//       const verified = localStorage.getItem("isVerified") === "true";
-//       setIsAuthenticated(!!token);
-//       setIsVerified(verified);
-//     };
-
-//     checkAuth();
-//     window.addEventListener("storage", checkAuth);
-//     return () => window.removeEventListener("storage", checkAuth);
-//   }, []);
-
-//   useEffect(() => {
-//     getAllEvents();
-//   }, []);
-
-//   useEffect(() => {
-//     if (bookingInfo) {
-//       const timer = setTimeout(() => setBookingInfo(null), 5000);
-//       return () => clearTimeout(timer);
-//     }
-//   }, [bookingInfo]);
-
-//   const getAllEvents = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const res = await axios.get(`/event/getallevents`);
-//       setEvents(res.data.data || []);
-//     } catch (err) {
-//       setError("Failed to load events");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleEventClick = (event) => {
-//     setSelectedEvent(event);
-//     setIsDrawerOpen(true);
-//   };
-
-//   const bookEventWithoutSeats = async (booking) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       const userId = localStorage.getItem("userId");
-//       if (!token) throw new Error("Authentication required");
-
-//       await axios.post(
-//         `/event/bookseat/${booking.eventId}`,
-//         {
-//           quantity: booking.quantity,
-//           selectedSeats: [],
-//           organizerId: booking.organizerId,
-//           stateId: booking.stateId,
-//           cityId: booking.cityId,
-//           paymentId: booking.paymentId,
-//         },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-
-//       alert("Booking successful! 🎉");
-//       navigate(`/mytickets/${userId}`);
-//       getAllEvents();
-//       setIsDrawerOpen(false);
-//     } catch (err) {
-//       console.error("Booking error:", err);
-//       alert("Booking failed: " + (err.response?.data?.message || err.message || "Unknown error"));
-//     }
-//   };
-
-//   const handlePayment = (eventDetails, quantity) => {
-//     if (!razorpayLoaded || !window.Razorpay) {
-//       alert("Payment system is still loading. Please wait a moment and try again.");
-//       return;
-//     }
-
-//     const options = {
-//       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//       amount: quantity * (eventDetails.ticketRate || 0) * 100,
-//       currency: "INR",
-//       name: "EventEase",
-//       description: `Booking for ${eventDetails.eventName}`,
-//       handler: async function (response) {
-//         try {
-//           const booking = {
-//             eventId: eventDetails._id,
-//             organizerId: eventDetails.organizerId,
-//             quantity: quantity,
-//             selectedSeats: [],
-//             stateId: eventDetails.stateId?._id || eventDetails.stateId,
-//             cityId: eventDetails.cityId?._id || eventDetails.cityId,
-//             paymentId: response.razorpay_payment_id,
-//           };
-//           await bookEventWithoutSeats(booking);
-//         } catch (error) {
-//           console.error("Booking failed:", error);
-//           alert("Payment successful but booking failed. Please contact support.");
-//         }
-//       },
-//       prefill: {
-//         name: localStorage.getItem("name") || "Guest User",
-//         email: localStorage.getItem("email") || "",
-//         contact: localStorage.getItem("phone") || "",
-//       },
-//       theme: {
-//         color: "#3B82F6",
-//       },
-//     };
-
-//     try {
-//       const paymentObject = new window.Razorpay(options);
-//       paymentObject.open();
-//     } catch (error) {
-//       console.error("Error opening Razorpay:", error);
-//       alert("Failed to open payment gateway. Please try again.");
-//     }
-//   };
-
-//   const handleBookingClick = (event, quantity) => {
-//     console.log("Booking clicked. Is authenticated:", isAuthenticated);
-
-//     if (!isAuthenticated) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         amount: quantity * (event.ticketRate || 0),
-//         quantity,
-//         booking: {
-//           eventId: event._id,
-//           organizerId: event.organizerId,
-//           quantity,
-//           selectedSeats: [],
-//           stateId: event.stateId?._id || event.stateId,
-//           cityId: event.cityId?._id || event.cityId,
-//         },
-//       });
-//       setShowSignInModal(true);
-//       return;
-//     }
-
-//     const verified = localStorage.getItem("isVerified") === "true";
-//     if (!verified) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         amount: quantity * (event.ticketRate || 0),
-//         quantity,
-//         booking: {
-//           eventId: event._id,
-//           organizerId: event.organizerId,
-//           quantity,
-//           selectedSeats: [],
-//           stateId: event.stateId?._id || event.stateId,
-//           cityId: event.cityId?._id || event.cityId,
-//         },
-//       });
-//       setShowVerifyModal(true);
-//       return;
-//     }
-
-//     handlePayment(event, quantity);
-//   };
-
-//   const handleSeatSelectionClick = (event) => {
-//     console.log("Seat selection clicked. Is authenticated:", isAuthenticated);
-
-//     if (!isAuthenticated) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         redirectToSeatSelection: true,
-//       });
-//       setShowSignInModal(true);
-//       return;
-//     }
-
-//     const verified = localStorage.getItem("isVerified") === "true";
-//     if (!verified) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         redirectToSeatSelection: true,
-//       });
-//       setShowVerifyModal(true);
-//       return;
-//     }
-
-//     navigate(`/select-seats/${event._id}`);
-//   };
-
-//   const getEventStatus = (event) => {
-//     const now = new Date();
-//     const startDate = new Date(event.startDate);
-//     const endDate = new Date(event.endDate);
-//     const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-
-//     if (endDate < now) {
-//       return { status: "ended", label: "Event Ended", variant: "destructive", icon: Clock };
-//     }
-//     if (availableSeats <= 0) {
-//       return { status: "soldout", label: "Sold Out", variant: "destructive", icon: AlertCircle };
-//     }
-//     if (startDate <= now && endDate >= now) {
-//       return { status: "ongoing", label: "Ongoing", variant: "default", icon: CheckCircle };
-//     }
-//     return { status: "upcoming", label: "Available", variant: "outline", icon: Ticket };
-//   };
-
-//   const filteredEvents = events.filter((event) => {
-//     const matchName = filterName ? event.eventName?.toLowerCase().includes(filterName.toLowerCase()) : true;
-//     const matchCity = filterCity ? event.cityId?.name?.toLowerCase().includes(filterCity.toLowerCase()) : true;
-//     const matchType = filterEventType === "all" || !filterEventType ? true : event.eventType === filterEventType;
-//     return matchName && matchCity && matchType;
-//   });
-
-//   const sortedEvents = filteredEvents.sort((a, b) => {
-//     const now = new Date();
-//     const aEnded = new Date(a.endDate) < now;
-//     const bEnded = new Date(b.endDate) < now;
-
-//     if (aEnded === bEnded) {
-//       return new Date(a.startDate) - new Date(b.startDate);
-//     }
-//     return aEnded ? 1 : -1;
-//   });
-
-//   const endedEvents = sortedEvents.filter((e) => getEventStatus(e).status === "ended");
-//   const activeEvents = sortedEvents.filter((e) => getEventStatus(e).status !== "ended");
-
-//   const LoadingSkeleton = () => (
-//     <div className="space-y-12">
-//       {[1, 2].map((section) => (
-//         <div key={section}>
-//           <Skeleton className="h-8 w-48 mb-6" />
-//           <div className="flex space-x-6">
-//             {[1, 2, 3, 4].map((i) => (
-//               <Card key={i} className="w-80">
-//                 <Skeleton className="h-48 w-full rounded-t-lg" />
-//                 <CardHeader>
-//                   <Skeleton className="h-6 w-3/4 mb-2" />
-//                   <Skeleton className="h-4 w-full mb-1" />
-//                 </CardHeader>
-//                 <CardContent>
-//                   <Skeleton className="h-4 w-full mb-2" />
-//                   <Skeleton className="h-4 w-2/3 mb-2" />
-//                 </CardContent>
-//                 <CardFooter>
-//                   <Skeleton className="h-10 w-full" />
-//                 </CardFooter>
-//               </Card>
-//             ))}
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-
-//   return (
-//     <>
-//       <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-//         <div className="w-full py-16 px-4 md:px-8 space-y-8">
-//           <div className="text-center mb-10">
-//             <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-//               Discover Amazing Events
-//             </h1>
-//             <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-//               Find and book your next unforgettable experience. Click any event card for details.
-//             </p>
-//           </div>
-
-//           {/* Filters */}
-//           <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 p-6 mb-8 dark:bg-gray-800">
-//             <div className="flex items-center gap-2 mb-4">
-//               <Filter className="w-5 h-5 text-blue-600" />
-//               <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
-//             </div>
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//               <div className="relative">
-//                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by Event Name"
-//                   value={filterName}
-//                   onChange={(e) => setFilterName(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <div className="relative">
-//                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by City"
-//                   value={filterCity}
-//                   onChange={(e) => setFilterCity(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <Select value={filterEventType} onValueChange={setFilterEventType}>
-//                 <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:text-gray-100 dark:bg-gray-700">
-//                   <SelectValue placeholder="All Event Types" />
-//                 </SelectTrigger>
-//                 <SelectContent className="dark:bg-gray-800">
-//                   <SelectItem value="all">All Event Types</SelectItem>
-//                   <SelectItem value="Conference">Conference</SelectItem>
-//                   <SelectItem value="Exhibition">Exhibition</SelectItem>
-//                   <SelectItem value="Gala Dinner">Gala Dinner</SelectItem>
-//                   <SelectItem value="Incentive">Incentive</SelectItem>
-//                   <SelectItem value="Music concert">Music Concert</SelectItem>
-//                   <SelectItem value="Meeting">Meeting</SelectItem>
-//                   <SelectItem value="ZoomMeeting">Zoom Meeting</SelectItem>
-//                   <SelectItem value="Other">Other</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </div>
-
-//           {/* Alerts */}
-//           <div className="w-full max-w-7xl mx-auto">
-//             {error && (
-//               <Alert className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/50 dark:border-red-700">
-//                 <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
-//               </Alert>
-//             )}
-//             {bookingInfo && (
-//               <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/50 dark:border-green-700">
-//                 <AlertDescription className="text-green-800 dark:text-green-200">{bookingInfo}</AlertDescription>
-//               </Alert>
-//             )}
-//           </div>
-
-//           {/* Main content */}
-//           <div className="w-full px-4 md:px-8">
-//             {loading ? (
-//               <LoadingSkeleton />
-//             ) : activeEvents.length === 0 && endedEvents.length === 0 ? (
-//               <div className="w-full max-w-7xl mx-auto text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg dark:bg-gray-800">
-//                 <Calendar className="mx-auto w-12 h-12 text-blue-500 mb-4" />
-//                 <h3 className="text-xl font-semibold text-slate-900 dark:text-gray-100">No events found</h3>
-//                 <p className="text-slate-600 dark:text-slate-300 mt-2">Try adjusting filters to find events.</p>
-//               </div>
-//             ) : (
-//               <>
-//                 {/* Active events carousel */}
-//                 <section className="mb-12">
-//                   <div className="flex justify-between items-center mb-4">
-//                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">All Events</h2>
-//                     <Button variant="link" className="text-blue-600 dark:text-blue-400">
-//                       See All <ArrowRight className="w-4 h-4 ml-1" />
-//                     </Button>
-//                   </div>
-
-//                   <Carousel opts={{ align: "start", loop: activeEvents.length > 4 }} className="w-full">
-//                     <CarouselContent className="-ml-4">
-//                       {activeEvents.map((event) => (
-//                         <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-//                           <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} />
-//                         </CarouselItem>
-//                       ))}
-//                     </CarouselContent>
-//                     <CarouselPrevious className="hidden md:flex" />
-//                     <CarouselNext className="hidden md:flex" />
-//                   </Carousel>
-//                 </section>
-
-//                 {/* Ended events */}
-//                 {endedEvents.length > 0 && (
-//                   <section className="mt-12">
-//                     <div className="flex items-center justify-between mb-4">
-//                       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ended Events</h2>
-//                       <div className="text-sm text-slate-600 dark:text-slate-400">{endedEvents.length} items</div>
-//                     </div>
-
-//                     <Carousel opts={{ align: "start", loop: endedEvents.length > 4 }} className="w-full">
-//                       <CarouselContent className="-ml-4">
-//                         {endedEvents.map((event) => (
-//                           <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-//                             <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} dimmed />
-//                           </CarouselItem>
-//                         ))}
-//                       </CarouselContent>
-//                       <CarouselPrevious className="hidden md:flex" />
-//                       <CarouselNext className="hidden md:flex" />
-//                     </Carousel>
-//                   </section>
-//                 )}
-//               </>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Side Drawer - NEW DESIGN */}
-//         {selectedEvent && isDrawerOpen && (
-//           <div className="fixed inset-0 z-50 flex">
-//             {/* Backdrop */}
-//             <div 
-//               className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-//               onClick={() => setIsDrawerOpen(false)}
-//             />
-            
-//             {/* Drawer Panel */}
-//             <div className={`relative ml-auto w-full max-w-lg h-full bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-out ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-//               <div className="h-full flex flex-col overflow-hidden">
-//                 {/* Hero Image Section */}
-//                 <div className="relative h-64 flex-shrink-0">
-//                   <img 
-//                     src={selectedEvent.eventImgUrl} 
-//                     alt={selectedEvent.eventName} 
-//                     className="w-full h-full object-cover"
-//                   />
-//                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                  
-//                   {/* Close Button */}
-//                   <button
-//                     onClick={() => setIsDrawerOpen(false)}
-//                     className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-white dark:bg-black dark:hover:bg-gray-500 shadow-lg transition-all"
-//                   >
-//                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-//                     </svg>
-//                   </button>
-
-//                   {/* Event Status Badge */}
-//                   <div className="absolute top-4 left-4">
-//                     <Badge variant={getEventStatus(selectedEvent).variant} className="shadow-lg text-sm px-3 py-1">
-//                       {React.createElement(getEventStatus(selectedEvent).icon, { className: "w-4 h-4 mr-1 inline" })}
-//                       {getEventStatus(selectedEvent).label}
-//                     </Badge>
-//                   </div>
-
-//                   {/* Title Overlay */}
-//                   <div className="absolute bottom-0 left-0 right-0 p-6">
-//                     <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-lg">
-//                       {selectedEvent.eventName}
-//                     </h2>
-//                     {selectedEvent.eventType && (
-//                       <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30">
-//                         {selectedEvent.eventType}
-//                       </Badge>
-//                     )}
-//                   </div>
-//                 </div>
-
-//                 {/* Scrollable Content */}
-//                 <div className="flex-1 overflow-y-auto">
-//                   <div className="p-6 space-y-6 dark:bg-black">
-//                     {/* Quick Info Cards */}
-//                     <div className="grid grid-cols-2 gap-3">
-//                       <div className="bg-blue-50 dark:bg-blue-50 rounded-lg p-4 border border-blue-100 dark:border-blue-100">
-//                         <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1">
-//                           <Calendar className="w-4 h-4" />
-//                           <span className="text-xs font-medium">Date</span>
-//                         </div>
-//                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-900">
-//                           {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-//                         </p>
-//                       </div>
-
-//                       <div className="bg-purple-50 dark:bg-purple-50 rounded-lg p-4 border border-purple-100 dark:border-purple-100">
-//                         <div className="flex items-center gap-2 text-purple-600 dark:text-purple-600 mb-1">
-//                           <Users className="w-4 h-4" />
-//                           <span className="text-xs font-medium">Available</span>
-//                         </div>
-//                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-900">
-//                           {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} seats
-//                         </p>
-//                       </div>
-//                     </div>
-
-//                     {/* Price Section */}
-//                     <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:bg-gray-900 rounded-lg p-4 border border-orange-100 dark:border-orange-100">
-//                       <div className="flex items-center justify-between">
-//                         <div className="flex items-center gap-2 text-orange-600 dark:text-orange-600">
-//                           <Ticket className="w-5 h-5" />
-//                           <span className="text-sm font-medium">Ticket Price</span>
-//                         </div>
-//                         <div className="text-right">
-//                           {(() => {
-//                             if (selectedEvent.eventCategory === "Indoor" && selectedEvent.zonePrices?.length > 0) {
-//                               const valid = selectedEvent.zonePrices.filter(p => p > 0);
-//                               if (valid.length === 0) return <span className="text-lg font-bold text-green-600">FREE</span>;
-//                               const minPrice = Math.min(...valid);
-//                               const maxPrice = Math.max(...valid);
-//                               return <span className="text-lg font-bold text-gray-900 dark:text-gray-900">{minPrice === maxPrice ? `₹${minPrice.toLocaleString()}` : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`}</span>;
-//                             }
-//                             if (selectedEvent.ticketRate) {
-//                               return <span className="text-lg font-bold text-gray-900 dark:text-gray-900">₹{selectedEvent.ticketRate.toLocaleString()}</span>;
-//                             }
-//                             return <span className="text-lg font-bold text-green-600">FREE</span>;
-//                           })()}
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     {/* Event Details */}
-//                     <div className="space-y-4">
-//                       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 ">Event Details</h3>
-                      
-//                       <div className="space-y-3">
-//                         <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-//                           <Calendar className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-//                           <div>
-//                             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Event Duration</p>
-//                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-//                               {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-//                               <br />
-//                               <span className="text-gray-500">to</span>
-//                               <br />
-//                               {new Date(selectedEvent.endDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-//                             </p>
-//                           </div>
-//                         </div>
-
-//                         {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-//                           <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-//                             <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-//                             <div className="flex-1">
-//                               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Online Meeting</p>
-//                               <a href={selectedEvent.zoomUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:text-blue-800 underline">
-//                                 Join Zoom Meeting →
-//                               </a>
-//                             </div>
-//                           </div>
-//                         ) : selectedEvent.eventCategory === "Indoor" && selectedEvent.stadiumId?.location?.address ? (
-//                           <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-//                             <MapPin className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-//                             <div>
-//                               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Venue Location</p>
-//                               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-//                                 {selectedEvent.stadiumId.location.address}
-//                               </p>
-//                             </div>
-//                           </div>
-//                         ) : selectedEvent.cityId?.name ? (
-//                           <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-//                             <MapPin className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-//                             <div>
-//                               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
-//                               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-//                                 {selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ""}
-//                               </p>
-//                             </div>
-//                           </div>
-//                         ) : null}
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-
-//                 {/* Fixed Bottom Action Section */}
-//                 <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-300 dark:bg-black p-4 space-y-3">
-//                   {(() => {
-//                     const eventStatus = getEventStatus(selectedEvent);
-//                     const availableSeats = (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0);
-
-//                     if (eventStatus.status === "ended") {
-//                       return (
-//                         <div className="text-center py-5">
-//                           <Badge variant="secondary" className="text-base px-8 py-3">
-//                             <CheckCircle className="w-5 h-5 mr-2" />
-//                             Event Completed
-//                           </Badge>
-//                         </div>
-//                       );
-//                     } else if (eventStatus.status === "soldout") {
-//                       return (
-//                         <div className="text-center py-4">
-//                           <Badge variant="destructive" className="text-base px-8 py-3">
-//                             <AlertCircle className="w-5 h-5 mr-2" />
-//                             Sold Out
-//                           </Badge>
-//                         </div>
-//                       );
-//                     } else if (selectedEvent.eventCategory === "Indoor") {
-//                       return (
-//                         <Button
-//                           onClick={(e) => {
-//                             e.stopPropagation();
-//                             handleSeatSelectionClick(selectedEvent);
-//                           }}
-//                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg py-6 text-base font-semibold"
-//                         >
-//                           {!isAuthenticated && <LogIn className="w-5 h-5 mr-2" />}
-//                           <Ticket className="w-5 h-5 mr-2" />
-//                           {isAuthenticated ? "Select Your Seats" : "Sign in to Select Seats"}
-//                         </Button>
-//                       );
-//                     } else {
-//                       return (
-//                         <div className="space-y-2 ">
-//                           <Select value={String(ticketQuantities[selectedEvent._id] || 1)} onValueChange={(value) =>
-//                             setTicketQuantities({
-//                               ...ticketQuantities,
-//                               [selectedEvent._id]: parseInt(value),
-//                             })
-//                           }>
-//                             <SelectTrigger className="w-full py-6 text-base bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-700">
-//                               <SelectValue placeholder="Select quantity" />
-//                             </SelectTrigger>
-//                             <SelectContent className="dark:bg-gray-800">
-//                               {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
-//                                 <SelectItem key={i + 1} value={String(i + 1)} className="py-3">
-//                                   {i + 1} Ticket{i > 0 ? 's' : ''} - ₹{((i + 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-//                                 </SelectItem>
-//                               ))}
-//                             </SelectContent>
-//                           </Select>
-
-//                           <Button
-//                             disabled={!razorpayLoaded && isAuthenticated}
-//                             onClick={(e) => {
-//                               e.stopPropagation();
-//                               handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1);
-//                             }}
-//                             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white justify-items-center py-6 text-base font-semibold  shadow-lg"
-//                           >
-//                             {!isAuthenticated ? (
-//                               <>
-//                                 <LogIn className="w-5 h-5 mr-2" />
-//                                 Sign in to Book Tickets
-//                               </>
-//                             ) : !razorpayLoaded ? (
-//                               "Loading Payment System..."
-//                             ) : (
-//                               <>
-//                                 <Ticket className="w-5 h-5 mr-2" />
-//                                 Pay ₹{((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-//                               </>
-//                             )}
-//                           </Button>
-
-//                           {isAuthenticated && !isVerified && (
-//                             <p className="text-sm text-red-500 text-center">
-//                               ⚠️ Please verify your email to book tickets
-//                             </p>
-//                           )}
-//                         </div>
-//                       );
-//                     }
-//                   })()}
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Sign In Modal */}
-//       {showSignInModal && (
-//         <SignInModal
-//           open={showSignInModal}
-//           pendingPayment={pendingPayment}
-//           onClose={() => {
-//             setShowSignInModal(false);
-//             setPendingPayment(null);
-//           }}
-//           onLoginSuccess={(token, userData) => {
-//             localStorage.setItem("token", token);
-//             localStorage.setItem("userId", userData._id);
-//             localStorage.setItem("role", userData.roleId?.name || "User");
-//             localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
-//             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-//             setIsAuthenticated(true);
-//             setIsVerified(userData.isVerified === true);
-
-//             if (pendingPayment?.redirectToSeatSelection) {
-//               navigate(`/select-seats/${pendingPayment.eventId}`);
-//               setShowSignInModal(false);
-//               setPendingPayment(null);
-//               setIsDrawerOpen(false);
-//               return;
-//             }
-
-//             if (pendingPayment && (localStorage.getItem("isVerified") === "true") && razorpayLoaded && window.Razorpay) {
-//               const options = {
-//                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//                 amount: pendingPayment.amount * 100,
-//                 currency: "INR",
-//                 name: "EventEase",
-//                 description: `Booking for ${selectedEvent?.eventName || ""}`,
-//                 handler: async function (response) {
-//                   try {
-//                     await bookEventWithoutSeats({
-//                       ...pendingPayment.booking,
-//                       paymentId: response.razorpay_payment_id
-//                     });
-//                     setPendingPayment(null);
-//                   } catch (error) {
-//                     console.error("Booking failed:", error);
-//                     alert("Payment successful but booking failed. Please contact support.");
-//                   }
-//                 },
-//                 prefill: {
-//                   name: userData.fullName || userData.name || "Guest User",
-//                   email: userData.email || "",
-//                   contact: userData.phone || ""
-//                 },
-//                 theme: { color: "#3B82F6" }
-//               };
-
-//               try {
-//                 const paymentObject = new window.Razorpay(options);
-//                 paymentObject.open();
-//               } catch (err) {
-//                 console.error("Error opening Razorpay after login:", err);
-//                 alert("Failed to open payment gateway. Please try again.");
-//               }
-//             }
-
-//             setShowSignInModal(false);
-//           }}
-//         />
-//       )}
-
-//       {/* Verify Email Modal */}
-//       {showVerifyModal && (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-//           <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg text-center">
-//             <h3 className="text-lg font-semibold mb-2 text-red-600">Email Not Verified</h3>
-//             <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-//               Please verify your email before booking tickets. Check your inbox for the verification link.
-//             </p>
-
-//             <div className="flex gap-2 justify-center">
-//               <Button onClick={() => setShowVerifyModal(false)} className="px-4">OK</Button>
-
-//               <Button
-//                 variant="outline"
-//                 onClick={async () => {
-//                   try {
-//                     const token = localStorage.getItem("token");
-//                     if (!token) {
-//                       setShowSignInModal(true);
-//                       setShowVerifyModal(false);
-//                       return;
-//                     }
-//                     await axios.post("/user/resend-verification", {}, {
-//                       headers: { Authorization: `Bearer ${token}` }
-//                     });
-//                     alert("Verification email resent. Check your inbox.");
-//                   } catch (err) {
-//                     console.error("Resend verification failed:", err);
-//                     alert(err.response?.data?.message || "Failed to resend verification email.");
-//                   } finally {
-//                     setShowVerifyModal(false);
-//                   }
-//                 }}
-//               >
-//                 Resend Email
-//               </Button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default ViewEvents;
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// import {
-//   Card,
-//   CardContent,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Badge } from "@/components/ui/badge";
-// import { Alert, AlertDescription } from "@/components/ui/alert";
-// import { Skeleton } from "@/components/ui/skeleton";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel";
-// import {
-//   Calendar,
-//   MapPin,
-//   Users,
-//   ExternalLink,
-//   Ticket,
-//   Clock,
-//   CheckCircle,
-//   Search,
-//   Filter,
-//   AlertCircle,
-//   ArrowRight,
-//   LogIn,
-// } from "lucide-react";
-// import {
-//   Drawer,
-//   DrawerContent,
-//   DrawerDescription,
-//   DrawerHeader,
-//   DrawerTitle,
-//   DrawerClose,
-//   DrawerFooter,
-// } from "@/components/ui/drawer";
-// import SignInModal from "@/components/user/SignInModal";
-
-// /* EventCard extracted for readability */
-// const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
-//   const eventStatus = getEventStatus(event);
-//   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-//   const StatusIcon = eventStatus.icon;
-
-//   return (
-//     <Card
-//       className={
-//         "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-gray-950 text-gray-900 dark:text-gray-100 shadow-inner h-full flex flex-col " +
-//         (dimmed ? "opacity-60 filter grayscale" : "")
-//       }
-//       onClick={() => onCardClick(event)}
-//     >
-//       <div className="relative overflow-hidden">
-//         <img
-//           src={event.eventImgUrl}
-//           alt={event.eventName}
-//           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-//         />
-//         <div className="absolute top-3 right-3">
-//           <Badge variant={eventStatus.variant} className="shadow-lg">
-//             <StatusIcon className="w-3 h-3 mr-1" />
-//             {eventStatus.label}
-//           </Badge>
-//         </div>
-//         {event.eventType && (
-//           <Badge className="absolute top-3 left-3 bg-white/90 text-slate-700 shadow-lg dark:text-gray-900">
-//             {event.eventType}
-//           </Badge>
-//         )}
-//       </div>
-
-//       <CardHeader className="pb-3">
-//         <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 line-clamp-2">
-//           {event.eventName}
-//         </CardTitle>
-//       </CardHeader>
-
-//       <CardContent className="space-y-2 pb-4 flex-grow">
-//         <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//           <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-//           <span>
-//             {new Date(event.startDate).toLocaleDateString()}
-//             {" — "}
-//             {new Date(event.endDate).toLocaleDateString()}
-//           </span>
-//         </div>
-
-//         {event.eventCategory === "ZoomMeeting" && event.zoomUrl ? (
-//           <div className="flex items-center text-sm text-blue-600 dark:text-gray-100">
-//             <ExternalLink className="w-4 h-4 mr-2" />
-//             <span className="truncate">Zoom Meeting</span>
-//           </div>
-//         ) : event.eventCategory === "Indoor" && event.stadiumId?.location?.address ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span className="truncate">{event.stadiumId.location.address}</span>
-//           </div>
-//         ) : event.cityId?.name ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span>{event.cityId.name}{event.stateId ? `, ${event.stateId?.Name || event.stateId?.name}` : ""}</span>
-//           </div>
-//         ) : null}
-
-//         <div className="flex items-center justify-between">
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <Users className="w-4 h-4 mr-2 text-purple-500" />
-//             <span>{availableSeats} seats</span>
-//           </div>
-
-//           {(() => {
-//             if (event.eventCategory === "Indoor" && event.zonePrices?.length > 0) {
-//               const validPrices = event.zonePrices.filter(p => p > 0);
-//               if (validPrices.length === 0) {
-//                 return <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>;
-//               }
-//               const minPrice = Math.min(...validPrices);
-//               const maxPrice = Math.max(...validPrices);
-//               return (
-//                 <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//                   {minPrice === maxPrice 
-//                     ? `₹${minPrice.toLocaleString()}`
-//                     : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`
-//                   }
-//                 </div>
-//               );
-//             } else if (event.ticketRate) {
-//               return (
-//                 <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//                   ₹{event.ticketRate.toLocaleString()}
-//                 </div>
-//               );
-//             } else {
-//               return <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>;
-//             }
-//           })()}
-//         </div>
-//       </CardContent>
-
-//       <CardFooter className="pt-4 border-t border-slate-100 dark:border-gray-800">
-//         <div className="w-full text-center">
-//           {eventStatus.status === "ended" ? (
-//             <Badge variant="secondary" className="w-full justify-center py-2 text-sm">
-//               <CheckCircle className="w-4 h-4 mr-2" />
-//               Event Completed
-//             </Badge>
-//           ) : eventStatus.status === "soldout" ? (
-//             <Badge variant="destructive" className="w-full justify-center py-2 text-sm">
-//               <AlertCircle className="w-4 h-4 mr-2" />
-//               Sold Out
-//             </Badge>
-//           ) : (
-//             <Button
-//               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-//               onClick={(e) => {
-//                 e.stopPropagation();
-//                 onCardClick(event);
-//               }}
-//             >
-//               <Ticket className="w-4 h-4 mr-2" />
-//               View Details
-//             </Button>
-//           )}
-//         </div>
-//       </CardFooter>
-//     </Card>
-//   );
-// };
-
-// const ViewEvents = () => {
-//   const [events, setEvents] = useState([]);
-//   const [ticketQuantities, setTicketQuantities] = useState({});
-//   const [bookingInfo, setBookingInfo] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [filterName, setFilterName] = useState("");
-//   const [filterCity, setFilterCity] = useState("");
-//   const [filterEventType, setFilterEventType] = useState("");
-//   const [selectedEvent, setSelectedEvent] = useState(null);
-//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-//   const [showSignInModal, setShowSignInModal] = useState(false);
-//   const [pendingPayment, setPendingPayment] = useState(null);
-//   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
-
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const [isVerified, setIsVerified] = useState(false);
-//   const [showVerifyModal, setShowVerifyModal] = useState(false);
-
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     // load razorpay
-//     const loadRazorpay = () => {
-//       if (window.Razorpay) {
-//         setRazorpayLoaded(true);
-//         return;
-//       }
-//       const script = document.createElement("script");
-//       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-//       script.async = true;
-//       script.onload = () => setRazorpayLoaded(true);
-//       script.onerror = () => setError("Payment system unavailable. Please refresh the page.");
-//       document.body.appendChild(script);
-//     };
-//     loadRazorpay();
-//   }, []);
-
-//   useEffect(() => {
-//     const checkAuth = () => {
-//       const token = localStorage.getItem("token");
-//       const verified = localStorage.getItem("isVerified") === "true";
-//       setIsAuthenticated(!!token);
-//       setIsVerified(verified);
-//     };
-
-//     checkAuth();
-//     window.addEventListener("storage", checkAuth);
-//     return () => window.removeEventListener("storage", checkAuth);
-//   }, []);
-
-//   useEffect(() => {
-//     getAllEvents();
-//   }, []);
-
-//   useEffect(() => {
-//     if (bookingInfo) {
-//       const timer = setTimeout(() => setBookingInfo(null), 5000);
-//       return () => clearTimeout(timer);
-//     }
-//   }, [bookingInfo]);
-
-//   const getAllEvents = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const res = await axios.get(`/event/getallevents`);
-//       setEvents(res.data.data || []);
-//     } catch (err) {
-//       setError("Failed to load events");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleEventClick = (event) => {
-//     setSelectedEvent(event);
-//     setIsDrawerOpen(true);
-//   };
-
-//   const bookEventWithoutSeats = async (booking) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       const userId = localStorage.getItem("userId");
-//       if (!token) throw new Error("Authentication required");
-
-//       await axios.post(
-//         `/event/bookseat/${booking.eventId}`,
-//         {
-//           quantity: booking.quantity,
-//           selectedSeats: [],
-//           organizerId: booking.organizerId,
-//           stateId: booking.stateId,
-//           cityId: booking.cityId,
-//           paymentId: booking.paymentId,
-//         },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-
-//       alert("Booking successful! 🎉");
-//       navigate(`/mytickets/${userId}`);
-//       getAllEvents();
-//       setIsDrawerOpen(false);
-//     } catch (err) {
-//       console.error("Booking error:", err);
-//       alert("Booking failed: " + (err.response?.data?.message || err.message || "Unknown error"));
-//     }
-//   };
-
-//   const handlePayment = (eventDetails, quantity) => {
-//     if (!razorpayLoaded || !window.Razorpay) {
-//       alert("Payment system is still loading. Please wait a moment and try again.");
-//       return;
-//     }
-
-//     const options = {
-//       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//       amount: quantity * (eventDetails.ticketRate || 0) * 100,
-//       currency: "INR",
-//       name: "EventEase",
-//       description: `Booking for ${eventDetails.eventName}`,
-//       handler: async function (response) {
-//         try {
-//           const booking = {
-//             eventId: eventDetails._id,
-//             organizerId: eventDetails.organizerId,
-//             quantity: quantity,
-//             selectedSeats: [],
-//             stateId: eventDetails.stateId?._id || eventDetails.stateId,
-//             cityId: eventDetails.cityId?._id || eventDetails.cityId,
-//             paymentId: response.razorpay_payment_id,
-//           };
-//           await bookEventWithoutSeats(booking);
-//         } catch (error) {
-//           console.error("Booking failed:", error);
-//           alert("Payment successful but booking failed. Please contact support.");
-//         }
-//       },
-//       prefill: {
-//         name: localStorage.getItem("name") || "Guest User",
-//         email: localStorage.getItem("email") || "",
-//         contact: localStorage.getItem("phone") || "",
-//       },
-//       theme: {
-//         color: "#3B82F6",
-//       },
-//     };
-
-//     try {
-//       const paymentObject = new window.Razorpay(options);
-//       paymentObject.open();
-//     } catch (error) {
-//       console.error("Error opening Razorpay:", error);
-//       alert("Failed to open payment gateway. Please try again.");
-//     }
-//   };
-
-//   /* ---------- UPDATED: handleBookingClick ---------- */
-//   const handleBookingClick = (event, quantity) => {
-//     console.log("Booking clicked. Is authenticated:", isAuthenticated);
-
-//     if (!isAuthenticated) {
-//       // Save pending payment and require login
-//       setPendingPayment({
-//         eventId: event._id,
-//         amount: quantity * (event.ticketRate || 0),
-//         quantity,
-//         booking: {
-//           eventId: event._id,
-//           organizerId: event.organizerId,
-//           quantity,
-//           selectedSeats: [],
-//           stateId: event.stateId?._id || event.stateId,
-//           cityId: event.cityId?._id || event.cityId,
-//         },
-//       });
-//       setShowSignInModal(true);
-//       return;
-//     }
-
-//     // Authenticated -> check verification
-//     const verified = localStorage.getItem("isVerified") === "true";
-//     if (!verified) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         amount: quantity * (event.ticketRate || 0),
-//         quantity,
-//         booking: {
-//           eventId: event._id,
-//           organizerId: event.organizerId,
-//           quantity,
-//           selectedSeats: [],
-//           stateId: event.stateId?._id || event.stateId,
-//           cityId: event.cityId?._id || event.cityId,
-//         },
-//       });
-//       setShowVerifyModal(true);
-//       return;
-//     }
-
-//     // Authenticated & verified: proceed to payment
-//     handlePayment(event, quantity);
-//   };
-
-//   /* ---------- UPDATED: handleSeatSelectionClick ---------- */
-//   const handleSeatSelectionClick = (event) => {
-//     console.log("Seat selection clicked. Is authenticated:", isAuthenticated);
-
-//     if (!isAuthenticated) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         redirectToSeatSelection: true,
-//       });
-//       setShowSignInModal(true);
-//       return;
-//     }
-
-//     const verified = localStorage.getItem("isVerified") === "true";
-//     if (!verified) {
-//       setPendingPayment({
-//         eventId: event._id,
-//         redirectToSeatSelection: true,
-//       });
-//       setShowVerifyModal(true);
-//       return;
-//     }
-
-//     navigate(`/select-seats/${event._id}`);
-//   };
-
-//   const getEventStatus = (event) => {
-//     const now = new Date();
-//     const startDate = new Date(event.startDate);
-//     const endDate = new Date(event.endDate);
-//     const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-
-//     if (endDate < now) {
-//       return { status: "ended", label: "Event Ended", variant: "destructive", icon: Clock };
-//     }
-//     if (availableSeats <= 0) {
-//       return { status: "soldout", label: "Sold Out", variant: "destructive", icon: AlertCircle };
-//     }
-//     if (startDate <= now && endDate >= now) {
-//       return { status: "ongoing", label: "Ongoing", variant: "default", icon: CheckCircle };
-//     }
-//     return { status: "upcoming", label: "Available", variant: "outline", icon: Ticket };
-//   };
-
-//   /* Filter/sort logic (unchanged) */
-//   const filteredEvents = events.filter((event) => {
-//     const matchName = filterName ? event.eventName?.toLowerCase().includes(filterName.toLowerCase()) : true;
-//     const matchCity = filterCity ? event.cityId?.name?.toLowerCase().includes(filterCity.toLowerCase()) : true;
-//     const matchType = filterEventType === "all" || !filterEventType ? true : event.eventType === filterEventType;
-//     return matchName && matchCity && matchType;
-//   });
-
-//   const sortedEvents = filteredEvents.sort((a, b) => {
-//     const now = new Date();
-//     const aEnded = new Date(a.endDate) < now;
-//     const bEnded = new Date(b.endDate) < now;
-
-//     if (aEnded === bEnded) {
-//       return new Date(a.startDate) - new Date(b.startDate);
-//     }
-//     return aEnded ? 1 : -1;
-//   });
-
-//   const endedEvents = sortedEvents.filter((e) => getEventStatus(e).status === "ended");
-//   const activeEvents = sortedEvents.filter((e) => getEventStatus(e).status !== "ended");
-
-//   const LoadingSkeleton = () => (
-//     <div className="space-y-12">
-//       {[1, 2].map((section) => (
-//         <div key={section}>
-//           <Skeleton className="h-8 w-48 mb-6" />
-//           <div className="flex space-x-6">
-//             {[1, 2, 3, 4].map((i) => (
-//               <Card key={i} className="w-80">
-//                 <Skeleton className="h-48 w-full rounded-t-lg" />
-//                 <CardHeader>
-//                   <Skeleton className="h-6 w-3/4 mb-2" />
-//                   <Skeleton className="h-4 w-full mb-1" />
-//                 </CardHeader>
-//                 <CardContent>
-//                   <Skeleton className="h-4 w-full mb-2" />
-//                   <Skeleton className="h-4 w-2/3 mb-2" />
-//                 </CardContent>
-//                 <CardFooter>
-//                   <Skeleton className="h-10 w-full" />
-//                 </CardFooter>
-//               </Card>
-//             ))}
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-
-//   return (
-//     <>
-//       <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-//         <div className="w-full py-16 px-4 md:px-8 space-y-8">
-//           <div className="text-center mb-10">
-//             <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-//               Discover Amazing Events
-//             </h1>
-//             <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-//               Find and book your next unforgettable experience. Click any event card for details.
-//             </p>
-//           </div>
-
-//           {/* Filters */}
-//           <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 p-6 mb-8 dark:bg-gray-800">
-//             <div className="flex items-center gap-2 mb-4">
-//               <Filter className="w-5 h-5 text-blue-600" />
-//               <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
-//             </div>
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//               <div className="relative">
-//                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by Event Name"
-//                   value={filterName}
-//                   onChange={(e) => setFilterName(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <div className="relative">
-//                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by City"
-//                   value={filterCity}
-//                   onChange={(e) => setFilterCity(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <Select value={filterEventType} onValueChange={setFilterEventType}>
-//                 <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:text-gray-100 dark:bg-gray-700">
-//                   <SelectValue placeholder="All Event Types" />
-//                 </SelectTrigger>
-//                 <SelectContent className="dark:bg-gray-800">
-//                   <SelectItem value="all">All Event Types</SelectItem>
-//                   <SelectItem value="Conference">Conference</SelectItem>
-//                   <SelectItem value="Exhibition">Exhibition</SelectItem>
-//                   <SelectItem value="Gala Dinner">Gala Dinner</SelectItem>
-//                   <SelectItem value="Incentive">Incentive</SelectItem>
-//                   <SelectItem value="Music concert">Music Concert</SelectItem>
-//                   <SelectItem value="Meeting">Meeting</SelectItem>
-//                   <SelectItem value="ZoomMeeting">Zoom Meeting</SelectItem>
-//                   <SelectItem value="Other">Other</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </div>
-
-//           {/* Alerts */}
-//           <div className="w-full max-w-7xl mx-auto">
-//             {error && (
-//               <Alert className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/50 dark:border-red-700">
-//                 <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
-//               </Alert>
-//             )}
-//             {bookingInfo && (
-//               <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/50 dark:border-green-700">
-//                 <AlertDescription className="text-green-800 dark:text-green-200">{bookingInfo}</AlertDescription>
-//               </Alert>
-//             )}
-//           </div>
-
-//           {/* Main content */}
-//           <div className="w-full px-4 md:px-8">
-//             {loading ? (
-//               <LoadingSkeleton />
-//             ) : activeEvents.length === 0 && endedEvents.length === 0 ? (
-//               <div className="w-full max-w-7xl mx-auto text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg dark:bg-gray-800">
-//                 <Calendar className="mx-auto w-12 h-12 text-blue-500 mb-4" />
-//                 <h3 className="text-xl font-semibold text-slate-900 dark:text-gray-100">No events found</h3>
-//                 <p className="text-slate-600 dark:text-slate-300 mt-2">Try adjusting filters to find events.</p>
-//               </div>
-//             ) : (
-//               <>
-//                 {/* Active events carousel */}
-//                 <section className="mb-12">
-//                   <div className="flex justify-between items-center mb-4">
-//                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">All Events</h2>
-//                     <Button variant="link" className="text-blue-600 dark:text-blue-400">
-//                       See All <ArrowRight className="w-4 h-4 ml-1" />
-//                     </Button>
-//                   </div>
-
-//                   <Carousel opts={{ align: "start", loop: activeEvents.length > 4 }} className="w-full">
-//                     <CarouselContent className="-ml-4">
-//                       {activeEvents.map((event) => (
-//                         <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-//                           <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} />
-//                         </CarouselItem>
-//                       ))}
-//                     </CarouselContent>
-//                     <CarouselPrevious className="hidden md:flex" />
-//                     <CarouselNext className="hidden md:flex" />
-//                   </Carousel>
-//                 </section>
-
-//                 {/* Ended events */}
-//                 {endedEvents.length > 0 && (
-//                   <section className="mt-12">
-//                     <div className="flex items-center justify-between mb-4">
-//                       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ended Events</h2>
-//                       <div className="text-sm text-slate-600 dark:text-slate-400">{endedEvents.length} items</div>
-//                     </div>
-
-//                     <Carousel opts={{ align: "start", loop: endedEvents.length > 4 }} className="w-full">
-//                       <CarouselContent className="-ml-4">
-//                         {endedEvents.map((event) => (
-//                           <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-//                             <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} dimmed />
-//                           </CarouselItem>
-//                         ))}
-//                       </CarouselContent>
-//                       <CarouselPrevious className="hidden md:flex" />
-//                       <CarouselNext className="hidden md:flex" />
-//                     </Carousel>
-//                   </section>
-//                 )}
-//               </>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Drawer */}
-//         {selectedEvent && (
-//           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-//             <DrawerContent className="max-w-md mx-auto bg-white/95 backdrop-blur-sm border-white/50 dark:bg-gray-950">
-//               <DrawerHeader className="border-b border-slate-100 dark:border-gray-800">
-//                 <DrawerTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-//                   {selectedEvent.eventName}
-//                 </DrawerTitle>
-//                 <DrawerDescription>
-//                   <div className="text-sm text-slate-600 space-y-2 mt-3 dark:text-gray-100">
-//                     <div className="flex items-center gap-2">
-//                       <Calendar className="w-4 h-4 text-blue-500" />
-//                       {new Date(selectedEvent.startDate).toLocaleDateString()} - {new Date(selectedEvent.endDate).toLocaleDateString()}
-//                     </div>
-
-//                     <div className="flex items-center gap-2">
-//                       <Ticket className="w-4 h-4 text-orange-500" />
-//                       {(() => {
-//                         if (selectedEvent.eventCategory === "Indoor" && selectedEvent.zonePrices?.length > 0) {
-//                           const valid = selectedEvent.zonePrices.filter(p => p > 0);
-//                           if (valid.length === 0) return <span className="font-semibold text-green-600">FREE</span>;
-//                           const minPrice = Math.min(...valid);
-//                           const maxPrice = Math.max(...valid);
-//                           return <span className="font-semibold text-slate-900 dark:text-gray-100">{minPrice === maxPrice ? `₹${minPrice.toLocaleString()}` : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`}</span>;
-//                         }
-//                         if (selectedEvent.ticketRate) {
-//                           return <span className="font-semibold text-slate-900 dark:text-gray-100">₹{selectedEvent.ticketRate.toLocaleString()}</span>;
-//                         }
-//                         return <span className="font-semibold text-green-600 dark:text-green-400">FREE</span>;
-//                       })()}
-//                     </div>
-
-//                     <div className="flex items-center gap-2">
-//                       <Users className="w-4 h-4 text-purple-500" />
-//                       {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} available
-//                     </div>
-
-//                     {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-//                       <div className="flex items-center gap-2">
-//                         <ExternalLink className="w-4 h-4 text-blue-500" />
-//                         <a href={selectedEvent.zoomUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline transition-colors">Join Zoom Meeting</a>
-//                       </div>
-//                     ) : selectedEvent.eventCategory === "Indoor" && selectedEvent.stadiumId?.location?.address ? (
-//                       <div className="flex items-center gap-2">
-//                         <MapPin className="w-4 h-4 text-green-500" />
-//                         <span>{selectedEvent.stadiumId.location.address}</span>
-//                       </div>
-//                     ) : selectedEvent.cityId?.name ? (
-//                       <div className="flex items-center gap-2">
-//                         <MapPin className="w-4 h-4 text-green-500" />
-//                         <span>{selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ""}</span>
-//                       </div>
-//                     ) : null}
-//                   </div>
-//                 </DrawerDescription>
-//               </DrawerHeader>
-
-//               <div className="px-4 pb-4">
-//                 <img src={selectedEvent.eventImgUrl} alt={selectedEvent.eventName} className="rounded-xl w-full h-40 object-cover mb-4 shadow-lg" />
-
-//                 {(() => {
-//                   const eventStatus = getEventStatus(selectedEvent);
-//                   const availableSeats = (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0);
-
-//                   if (eventStatus.status === "ended") {
-//                     return (
-//                       <div className="text-center py-4">
-//                         <Badge variant="secondary" className="text-lg px-6 py-2">
-//                           <CheckCircle className="w-5 h-5 mr-2" />
-//                           Event Completed
-//                         </Badge>
-//                       </div>
-//                     );
-//                   } else if (eventStatus.status === "soldout") {
-//                     return (
-//                       <div className="text-center py-4">
-//                         <Badge variant="destructive" className="text-lg px-6 py-2">
-//                           <AlertCircle className="w-5 h-5 mr-2" />
-//                           Sold Out
-//                         </Badge>
-//                       </div>
-//                     );
-//                   } else if (selectedEvent.eventCategory === "Indoor") {
-//                     return (
-//                       <Button
-//                         onClick={(e) => {
-//                           e.stopPropagation();
-//                           handleSeatSelectionClick(selectedEvent);
-//                         }}
-//                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
-//                       >
-//                         {!isAuthenticated && <LogIn className="w-4 h-4 mr-2" />}
-//                         <Ticket className="w-4 h-4 mr-2" />
-//                         {isAuthenticated ? "Select Seats" : "Sign in to Select Seats"}
-//                       </Button>
-//                     );
-//                   } else {
-//                     return (
-//                       <div className="space-y-3">
-//                         <Select value={String(ticketQuantities[selectedEvent._id] || 1)} onValueChange={(value) =>
-//                           setTicketQuantities({
-//                             ...ticketQuantities,
-//                             [selectedEvent._id]: parseInt(value),
-//                           })
-//                         }>
-//                           <SelectTrigger className="bg-white/50 border-slate-200 dark:bg-gray-800 dark:border-gray-700">
-//                             <SelectValue placeholder="Select quantity" />
-//                           </SelectTrigger>
-//                           <SelectContent className="dark:bg-gray-800">
-//                             {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
-//                               <SelectItem key={i + 1} value={String(i + 1)}>
-//                                 {i + 1} Ticket(s) - ₹{((i + 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-//                               </SelectItem>
-//                             ))}
-//                           </SelectContent>
-//                         </Select>
-
-//                         <Button
-//                           disabled={!razorpayLoaded && isAuthenticated}
-//                           onClick={(e) => {
-//                             e.stopPropagation();
-//                             handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1);
-//                           }}
-//                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 rounded-md font-semibold"
-//                         >
-//                           {!isAuthenticated ? (
-//                             <>
-//                               <LogIn className="w-4 h-4 mr-2" />
-//                               Sign in to Book
-//                             </>
-//                           ) : !razorpayLoaded ? (
-//                             "Loading Payment..."
-//                           ) : (
-//                             `Pay ₹${((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}`
-//                           )}
-//                         </Button>
-
-//                         {/* If user is logged in but not verified, show small notice */}
-//                         {isAuthenticated && !isVerified && (
-//                           <p className="text-sm text-red-500 text-center mt-2">
-//                             Please verify your email to book tickets.
-//                           </p>
-//                         )}
-//                       </div>
-//                     );
-//                   }
-//                 })()}
-//               </div>
-
-//               <DrawerFooter className="border-t border-slate-100 dark:border-gray-800">
-//                 <DrawerClose asChild>
-//                   <Button variant="outline" className="border-slate-200 hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800">
-//                     Close
-//                   </Button>
-//                 </DrawerClose>
-//               </DrawerFooter>
-//             </DrawerContent>
-//           </Drawer>
-//         )}
-//       </div>
-
-//       {/* Sign In Modal */}
-//       {showSignInModal && (
-//         <SignInModal
-//           open={showSignInModal}
-//           pendingPayment={pendingPayment}
-//           onClose={() => {
-//             setShowSignInModal(false);
-//             setPendingPayment(null);
-//           }}
-//           onLoginSuccess={(token, userData) => {
-//             // Store token & user info
-//             localStorage.setItem("token", token);
-//             localStorage.setItem("userId", userData._id);
-//             localStorage.setItem("role", userData.roleId?.name || "User");
-//             localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
-//             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-//             setIsAuthenticated(true);
-//             setIsVerified(userData.isVerified === true);
-
-//             // If the pending action was seat selection: redirect
-//             if (pendingPayment?.redirectToSeatSelection) {
-//               navigate(`/select-seats/${pendingPayment.eventId}`);
-//               setShowSignInModal(false);
-//               setPendingPayment(null);
-//               setIsDrawerOpen(false);
-//               return;
-//             }
-
-//             // If pending payment exists and user is verified -> open payment
-//             if (pendingPayment && (localStorage.getItem("isVerified") === "true") && razorpayLoaded && window.Razorpay) {
-//               const options = {
-//                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//                 amount: pendingPayment.amount * 100,
-//                 currency: "INR",
-//                 name: "EventEase",
-//                 description: `Booking for ${selectedEvent?.eventName || ""}`,
-//                 handler: async function (response) {
-//                   try {
-//                     await bookEventWithoutSeats({
-//                       ...pendingPayment.booking,
-//                       paymentId: response.razorpay_payment_id
-//                     });
-//                     setPendingPayment(null);
-//                   } catch (error) {
-//                     console.error("Booking failed:", error);
-//                     alert("Payment successful but booking failed. Please contact support.");
-//                   }
-//                 },
-//                 prefill: {
-//                   name: userData.fullName || userData.name || "Guest User",
-//                   email: userData.email || "",
-//                   contact: userData.phone || ""
-//                 },
-//                 theme: { color: "#3B82F6" }
-//               };
-
-//               try {
-//                 const paymentObject = new window.Razorpay(options);
-//                 paymentObject.open();
-//               } catch (err) {
-//                 console.error("Error opening Razorpay after login:", err);
-//                 alert("Failed to open payment gateway. Please try again.");
-//               }
-//             }
-
-//             setShowSignInModal(false);
-//           }}
-//         />
-//       )}
-
-//       {/* Verify Email Modal */}
-//       {showVerifyModal && (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-//           <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg text-center">
-//             <h3 className="text-lg font-semibold mb-2 text-red-600">Email Not Verified</h3>
-//             <p className="text-sm text-gray-700 dark:text-gray-700 mb-4">
-//               Please verify your email before booking tickets. Check your inbox for the verification link.
-//             </p>
-
-//             <div className="flex gap-2 justify-center">
-//               <Button onClick={() => setShowVerifyModal(false)} className="px-4">OK</Button>
-
-//               <Button
-//                 variant="outline"
-//                 onClick={async () => {
-//                   try {
-//                     const token = localStorage.getItem("token");
-//                     if (!token) {
-//                       setShowSignInModal(true);
-//                       setShowVerifyModal(false);
-//                       return;
-//                     }
-//                     // Optional endpoint to resend verification
-//                     await axios.post("/user/resend-verification", {}, {
-//                       headers: { Authorization: `Bearer ${token}` }
-//                     });
-//                     alert("Verification email resent. Check your inbox.");
-//                   } catch (err) {
-//                     console.error("Resend verification failed:", err);
-//                     alert(err.response?.data?.message || "Failed to resend verification email.");
-//                   } finally {
-//                     setShowVerifyModal(false);
-//                   }
-//                 }}
-//               >
-//                 Resend Email
-//               </Button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default ViewEvents;
-
-
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { Link, useNavigate } from "react-router-dom";
-// import {
-//   Card,
-//   CardContent,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Badge } from "@/components/ui/badge";
-// import { Alert, AlertDescription } from "@/components/ui/alert";
-// import { Skeleton } from "@/components/ui/skeleton";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel";
-// import {
-//   Calendar,
-//   MapPin,
-//   Users,
-//   ExternalLink,
-//   Ticket,
-//   Clock,
-//   CheckCircle,
-//   Search,
-//   Filter,
-//   AlertCircle,
-//   ArrowRight,
-//   LogIn,
-//   CardSimIcon,
-//   IdCardIcon,
-// } from "lucide-react";
-// import {
-//   Drawer,
-//   DrawerContent,
-//   DrawerDescription,
-//   DrawerHeader,
-//   DrawerTitle,
-//   DrawerClose,
-//   DrawerFooter,
-// } from "@/components/ui/drawer";
-// import { SignInModal } from "@/components/user/SignInModal";
-
-// // Extracted EventCard component
-// const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
-//   const eventStatus = getEventStatus(event);
-//   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-//   const StatusIcon = eventStatus.icon;
-
-//   return (
-//     <Card
-//       className={
-//         "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-gray-950 text-gray-900 dark:text-gray-100 shadow-inner h-full flex flex-col " +
-//         (dimmed ? "opacity-60 filter grayscale" : "")
-//       }
-//       onClick={() => onCardClick(event)}
-//     >
-//       <div className="relative overflow-hidden">
-//         <img
-//           src={event.eventImgUrl}
-//           alt={event.eventName}
-//           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-//         />
-//         <div className="absolute top-3 right-3">
-//           <Badge variant={eventStatus.variant} className="shadow-lg">
-//             <StatusIcon className="w-3 h-3 mr-1" />
-//             {eventStatus.label}
-//           </Badge>
-//         </div>
-//         {event.eventType && (
-//           <Badge className="absolute top-3 left-3 bg-white/90 text-slate-700 shadow-lg dark:text-gray-900">
-//             {event.eventType}
-//           </Badge>
-//         )}
-//       </div>
-
-//       <CardHeader className="pb-3">
-//         <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 line-clamp-2">
-//         {event.eventName}
-//         </CardTitle>
-        
-//       </CardHeader>
-
-//       {/* <CardContent className="space-y-2 pb-4 flex-grow">
-//         <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//           <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-//           <span>
-//             {new Date(event.startDate).toLocaleDateString()}
-//             {" — "}
-//             {new Date(event.endDate).toLocaleDateString()}
-//           </span>
-//         </div>
-
-//         {event.eventCategory === "ZoomMeeting" && event.zoomUrl ? (
-//           <div className="flex items-center text-sm text-blue-600 dark:text-gray-100">
-//             <ExternalLink className="w-4 h-4 mr-2" />
-//             <span className="truncate">Zoom Meeting</span>
-//           </div>
-//         ) : event.eventCategory === "Indoor" && event.stadiumId?.location?.address ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span className="truncate">{event.stadiumId.location.address}</span>
-//           </div>
-//         ) : event.cityId?.name ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span>{event.cityId.name}{event.stateId ? `, ${event.stateId?.Name || event.stateId?.name}` : ""}</span>
-//           </div>
-//         ) : null}
-
-//         <div className="flex items-center justify-between">
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <Users className="w-4 h-4 mr-2 text-purple-500" />
-//             <span>{availableSeats} seats</span>
-//           </div>
-
-//           {(() => {
-//             // Indoor events: show price range from zonePrices
-//             if (event.eventCategory === "Indoor" && event.zonePrices?.length > 0) {
-//               const validPrices = event.zonePrices.filter(p => p > 0);
-//               if (validPrices.length === 0) {
-//                 return <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>;
-//               }
-//               const minPrice = Math.min(...validPrices);
-//               const maxPrice = Math.max(...validPrices);
-//               return (
-//                 <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//                   {minPrice === maxPrice 
-//                     ? `₹${minPrice.toLocaleString()}`
-//                     : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`
-//                   }
-//                 </div>
-//               );
-//             }
-//             // Outdoor/Zoom events: show single ticketRate
-//             else if (event.ticketRate) {
-//               return (
-//                 <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//                   ₹{event.ticketRate.toLocaleString()}
-//                 </div>
-//               );
-//             }
-//             // Free event
-//             else {
-//               return <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>;
-//             }
-//           })()}
-//         </div>
-//       </CardContent> */}
-
-//       <CardFooter className="pt-4 border-t border-slate-100 dark:border-gray-800">
-//         <div className="w-full text-center">
-//           {eventStatus.status === "ended" ? (
-//             <Badge variant="secondary" className="w-full justify-center py-2 text-sm">
-//               <CheckCircle className="w-4 h-4 mr-2" />
-//               Event Completed
-//             </Badge>
-//           ) : eventStatus.status === "soldout" ? (
-//             <Badge variant="destructive" className="w-full justify-center py-2 text-sm">
-//               <AlertCircle className="w-4 h-4 mr-2" />
-//               Sold Out
-//             </Badge>
-//           ) : (
-//             <Button
-//               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-//               onClick={(e) => {
-//                 e.stopPropagation();
-//                 onCardClick(event);
-//               }}
-//             >
-//               <Ticket className="w-4 h-4 mr-2" />
-//               View Details
-//             </Button>
-//           )}
-//         </div>
-//       </CardFooter>
-//     </Card>
-//   );
-// };
-
-// export const ViewEvents = () => {
-//   const [events, setEvents] = useState([]);
-//   const [ticketQuantities, setTicketQuantities] = useState({});
-//   const [bookingInfo, setBookingInfo] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [filterName, setFilterName] = useState("");
-//   const [filterCity, setFilterCity] = useState("");
-//   const [filterEventType, setFilterEventType] = useState("");
-//   const [selectedEvent, setSelectedEvent] = useState(null);
-//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-//   const [showSignInModal, setShowSignInModal] = useState(false);
-//   const [pendingPayment, setPendingPayment] = useState(null);
-//   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
-//   const [showVerifyModal, setShowVerifyModal] = useState(false);
-
-//   const navigate = useNavigate();
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-//   // Load Razorpay script
-//   useEffect(() => {
-//     const loadRazorpay = () => {
-//       if (window.Razorpay) {
-//         setRazorpayLoaded(true);
-//         return;
-//       }
-
-//       const script = document.createElement('script');
-//       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-//       script.async = true;
-//       script.onload = () => {
-//         console.log('Razorpay SDK loaded successfully');
-//         setRazorpayLoaded(true);
-//       };
-//       script.onerror = () => {
-//         console.error('Failed to load Razorpay SDK');
-//         setError('Payment system unavailable. Please refresh the page.');
-//       };
-//       document.body.appendChild(script);
-//     };
-
-//     loadRazorpay();
-//   }, []);
-
-//   // Check authentication status
-//   useEffect(() => {
-//     const checkAuth = () => {
-//       const token = localStorage.getItem("token");
-//       setIsAuthenticated(!!token);
-//       console.log("Auth status:", !!token); // Debug log
-//     };
-    
-//     checkAuth();
-//     window.addEventListener('storage', checkAuth);
-//     return () => window.removeEventListener('storage', checkAuth);
-//   }, []);
-
-//   useEffect(() => {
-//     getAllEvents();
-//   }, []);
-
-//   useEffect(() => {
-//     if (bookingInfo) {
-//       const timer = setTimeout(() => setBookingInfo(null), 5000);
-//       return () => clearTimeout(timer);
-//     }
-//   }, [bookingInfo]);
-
-//   const getAllEvents = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const res = await axios.get(`/event/getallevents`);
-//       setEvents(res.data.data || []);
-//     } catch (err) {
-//       setError("Failed to load events");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleEventClick = (event) => {
-//     setSelectedEvent(event);
-//     setIsDrawerOpen(true);
-//   };
-
-//   const bookEventWithoutSeats = async (booking) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       const userId = localStorage.getItem("id");
-      
-//       if (!token) {
-//         throw new Error("Authentication required");
-//       }
-
-//       await axios.post(
-//         `/event/bookseat/${booking.eventId}`,
-//         {
-//           quantity: booking.quantity,
-//           selectedSeats: [],
-//           organizerId: booking.organizerId,
-//           stateId: booking.stateId,
-//           cityId: booking.cityId,
-//           paymentId: booking.paymentId,
-//         },
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-//       setBookingInfo("Booking successful! 🎉");
-//       navigate(`/mytickets/${userId}`);
-//       getAllEvents();
-//       setIsDrawerOpen(false);
-//     } catch (err) {
-//       console.error("Booking error:", err);
-//       alert("Booking failed: " + (err.response?.data?.message || err.message || "Unknown error"));
-//     }
-//   };
-
-//   const handlePayment = (eventDetails, quantity) => {
-//     if (!razorpayLoaded || !window.Razorpay) {
-//       alert('Payment system is still loading. Please wait a moment and try again.');
-//       return;
-//     }
-
-//     const options = {
-//       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//       amount: quantity * (eventDetails.ticketRate || 0) * 100,
-//       currency: "INR",
-//       name: "EventEase",
-//       description: `Booking for ${eventDetails.eventName}`,
-//       handler: async function (response) {
-//         try {
-//           const booking = {
-//             eventId: eventDetails._id,
-//             organizerId: eventDetails.organizerId,
-//             quantity: quantity,
-//             selectedSeats: [],
-//             stateId: eventDetails.stateId?._id || eventDetails.stateId,
-//             cityId: eventDetails.cityId?._id || eventDetails.cityId,
-//             paymentId: response.razorpay_payment_id
-//           };
-//           await bookEventWithoutSeats(booking);
-//         } catch (error) {
-//           console.error("Booking failed:", error);
-//           alert("Payment successful but booking failed. Please contact support.");
-//         }
-//       },
-//       prefill: {
-//         name: localStorage.getItem("name") || "Guest User",
-//         email: localStorage.getItem("email") || "",
-//         contact: localStorage.getItem("phone") || ""
-//       },
-//       theme: {
-//         color: "#3B82F6"
-//       }
-//     };
-
-//     try {
-//       const paymentObject = new window.Razorpay(options);
-//       paymentObject.open();
-//     } catch (error) {
-//       console.error("Error opening Razorpay:", error);
-//       alert("Failed to open payment gateway. Please try again.");
-//     }
-//   };
-
-//   // Add near top of component if not already present:
-// // const [showVerifyModal, setShowVerifyModal] = useState(false);
-
-// const handleBookingClick = (event, quantity) => {
-//   console.log("Booking clicked. Is authenticated:", isAuthenticated);
-
-//   // 1) Not logged in — open sign-in modal (same as before)
-//   if (!isAuthenticated) {
-//     console.log("User not authenticated, showing login modal");
-//     setPendingPayment({
-//       eventId: event._id,
-//       amount: quantity * (event.ticketRate || 0),
-//       quantity: quantity,
-//       booking: {
-//         eventId: event._id,
-//         organizerId: event.organizerId,
-//         quantity: quantity,
-//         selectedSeats: [],
-//         stateId: event.stateId?._id || event.stateId,
-//         cityId: event.cityId?._id || event.cityId,
-//       }
-//     });
-//     setShowSignInModal(true);
-//     return;
-//   }
-
-//   // 2) Logged in: check verified status (read from localStorage)
-//   // Note: ensure SignInModal/store sets localStorage.setItem("isVerified", "true"/"false")
-//   const isVerified = localStorage.getItem("isVerified") === "true";
-//   if (!isVerified) {
-//     console.log("User authenticated but not verified — show verify modal");
-//     // Optionally keep pendingPayment so after verification you can auto-proceed
-//     setPendingPayment({
-//       eventId: event._id,
-//       amount: quantity * (event.ticketRate || 0),
-//       quantity,
-//       booking: {
-//         eventId: event._id,
-//         organizerId: event.organizerId,
-//         quantity,
-//         selectedSeats: [],
-//         stateId: event.stateId?._id || event.stateId,
-//         cityId: event.cityId?._id || event.cityId,
-//       }
-//     });
-//     setShowVerifyModal(true);
-//     return;
-//   }
-
-//   // 3) Authenticated + verified -> proceed
-//   console.log("User authenticated & verified, proceeding with payment");
-//   handlePayment(event, quantity);
-// };
-
-
-// const handleSeatSelectionClick = (event) => {
-//   console.log("Seat selection clicked. Is authenticated:", isAuthenticated);
-
-//   // 1) Not logged in -> open sign-in modal and remember redirect
-//   if (!isAuthenticated) {
-//     console.log("User not authenticated, showing login modal");
-//     setPendingPayment({
-//       eventId: event._id,
-//       redirectToSeatSelection: true,
-//     });
-//     setShowSignInModal(true);
-//     return;
-//   }
-
-//   // 2) Logged in -> check verification
-//   const isVerified = localStorage.getItem("isVerified") === "true";
-//   if (!isVerified) {
-//     console.log("User authenticated but not verified — show verify modal");
-//     // Save pending redirect so you can redirect after verification if desired
-//     setPendingPayment({
-//       eventId: event._id,
-//       redirectToSeatSelection: true,
-//     });
-//     setShowVerifyModal(true);
-//     return;
-//   }
-
-//   // 3) Authenticated + verified -> navigate to seat selection
-//   console.log("User authenticated & verified, navigating to seat selection");
-//   navigate(`/select-seats/${event._id}`);
-// };
-
-//   // THIS IS THE KEY FUNCTION - Check auth BEFORE opening payment
-//   // const handleBookingClick = (event, quantity) => {
-//   //   console.log("Booking clicked. Is authenticated:", isAuthenticated); // Debug log
-    
-//   //   // Check if user is authenticated FIRST
-//   //   if (!isAuthenticated) {
-//   //     console.log("User not authenticated, showing login modal"); // Debug log
-//   //     // Store pending payment details
-//   //     setPendingPayment({
-//   //       eventId: event._id,
-//   //       amount: quantity * (event.ticketRate || 0),
-//   //       quantity: quantity,
-//   //       booking: {
-//   //         eventId: event._id,
-//   //         organizerId: event.organizerId,
-//   //         quantity: quantity,
-//   //         selectedSeats: [],
-//   //         stateId: event.stateId?._id || event.stateId,
-//   //         cityId: event.cityId?._id || event.cityId,
-//   //       }
-//   //     });
-//   //     setShowSignInModal(true);
-//   //     return; // STOP HERE - don't open payment
-//   //   }
-
-//   //   // If authenticated, proceed with payment
-//   //   console.log("User authenticated, proceeding with payment"); // Debug log
-//   //   handlePayment(event, quantity);
-//   // };
-
-//   // // THIS IS THE KEY FUNCTION - Check auth BEFORE seat selection
-//   // const handleSeatSelectionClick = (event) => {
-//   //   console.log("Seat selection clicked. Is authenticated:", isAuthenticated); // Debug log
-    
-//   //   if (!isAuthenticated) {
-//   //     console.log("User not authenticated, showing login modal"); // Debug log
-//   //     // For Indoor events with seat selection
-//   //     setPendingPayment({
-//   //       eventId: event._id,
-//   //       redirectToSeatSelection: true,
-//   //     });
-//   //     setShowSignInModal(true);
-//   //     return; // STOP HERE - don't navigate
-//   //   }
-
-//   //   // If authenticated, navigate to seat selection
-//   //   console.log("User authenticated, navigating to seat selection"); // Debug log
-//   //   navigate(`/select-seats/${event._id}`);
-//   // };
-
-//   const getEventStatus = (event) => {
-//     const now = new Date();
-//     const startDate = new Date(event.startDate);
-//     const endDate = new Date(event.endDate);
-//     const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-
-//     if (endDate < now) {
-//       return { status: "ended", label: "Event Ended", variant: "destructive", icon: Clock };
-//     }
-//     if (availableSeats <= 0) {
-//       return { status: "soldout", label: "Sold Out", variant: "destructive", icon: AlertCircle };
-//     }
-//     if (startDate <= now && endDate >= now) {
-//       return { status: "ongoing", label: "Ongoing", variant: "default", icon: CheckCircle };
-//     }
-//     return { status: "upcoming", label: "Available", variant: "outline", icon: Ticket };
-//   };
-
-//   const filteredEvents = events.filter((event) => {
-//     const matchName = filterName ? event.eventName?.toLowerCase().includes(filterName.toLowerCase()) : true;
-//     const matchCity = filterCity ? event.cityId?.name?.toLowerCase().includes(filterCity.toLowerCase()) : true;
-//     const matchType = filterEventType === "all" || !filterEventType ? true : event.eventType === filterEventType;
-//     return matchName && matchCity && matchType;
-//   });
-
-//   const sortedEvents = filteredEvents.sort((a, b) => {
-//     const now = new Date();
-//     const aEnded = new Date(a.endDate) < now;
-//     const bEnded = new Date(b.endDate) < now;
-
-//     if (aEnded === bEnded) {
-//       return new Date(a.startDate) - new Date(b.startDate);
-//     }
-//     return aEnded ? 1 : -1;
-//   });
-
-//   const endedEvents = sortedEvents.filter((e) => getEventStatus(e).status === "ended");
-//   const activeEvents = sortedEvents.filter((e) => getEventStatus(e).status !== "ended");
-
-//   const LoadingSkeleton = () => (
-//     <div className="space-y-12">
-//       {[1, 2].map((section) => (
-//         <div key={section}>
-//           <Skeleton className="h-8 w-48 mb-6" />
-//           <div className="flex space-x-6">
-//             {[1, 2, 3, 4].map((i) => (
-//               <Card key={i} className="w-80">
-//                 <Skeleton className="h-48 w-full rounded-t-lg" />
-//                 <CardHeader>
-//                   <Skeleton className="h-6 w-3/4 mb-2" />
-//                   <Skeleton className="h-4 w-full mb-1" />
-//                 </CardHeader>
-//                 <CardContent>
-//                   <Skeleton className="h-4 w-full mb-2" />
-//                   <Skeleton className="h-4 w-2/3 mb-2" />
-//                 </CardContent>
-//                 <CardFooter>
-//                   <Skeleton className="h-10 w-full" />
-//                 </CardFooter>
-//               </Card>
-//             ))}
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-
-//   return (
-//     <>
-//       <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-//         <div className="w-full py-16 px-4 md:px-8 space-y-8">
-//           <div className="text-center mb-10">
-//             <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-//               Discover Amazing Events
-//             </h1>
-//             <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-//               Find and book your next unforgettable experience. Click any event card for details.
-//             </p>
-//           </div>
-
-//           {/* Filters Section */}
-//           <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 p-6 mb-8 dark:bg-gray-800">
-//             <div className="flex items-center gap-2 mb-4">
-//               <Filter className="w-5 h-5 text-blue-600" />
-//               <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
-//             </div>
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//               <div className="relative">
-//                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by Event Name"
-//                   value={filterName}
-//                   onChange={(e) => setFilterName(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <div className="relative">
-//                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by City"
-//                   value={filterCity}
-//                   onChange={(e) => setFilterCity(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <Select value={filterEventType} onValueChange={setFilterEventType}>
-//                 <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:text-gray-100 dark:bg-gray-700">
-//                   <SelectValue placeholder="All Event Types" />
-//                 </SelectTrigger>
-//                 <SelectContent className="dark:bg-gray-800">
-//                   <SelectItem value="all">All Event Types</SelectItem>
-//                   <SelectItem value="Conference">Conference</SelectItem>
-//                   <SelectItem value="Exhibition">Exhibition</SelectItem>
-//                   <SelectItem value="Gala Dinner">Gala Dinner</SelectItem>
-//                   <SelectItem value="Incentive">Incentive</SelectItem>
-//                   <SelectItem value="Music consert">Music Concert</SelectItem>
-//                   <SelectItem value="Meeting">Meeting</SelectItem>
-//                   <SelectItem value="ZoomMeeting">Zoom Meeting</SelectItem>
-//                   <SelectItem value="Other">Other</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </div>
-
-//           {/* Alerts */}
-//           <div className="w-full max-w-7xl mx-auto">
-//             {error && (
-//               <Alert className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/50 dark:border-red-700">
-//                 <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
-//               </Alert>
-//             )}
-//             {bookingInfo && (
-//               <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/50 dark:border-green-700">
-//                 <AlertDescription className="text-green-800 dark:text-green-200">{bookingInfo}</AlertDescription>
-//               </Alert>
-//             )}
-//           </div>
-
-//           {/* Main Content Section */}
-//           <div className="w-full px-4 md:px-8">
-//             {loading ? (
-//               <LoadingSkeleton />
-//             ) : activeEvents.length === 0 && endedEvents.length === 0 ? (
-//               <div className="w-full max-w-7xl mx-auto text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg dark:bg-gray-800">
-//                 <Calendar className="mx-auto w-12 h-12 text-blue-500 mb-4" />
-//                 <h3 className="text-xl font-semibold text-slate-900 dark:text-gray-100">No events found</h3>
-//                 <p className="text-slate-600 dark:text-slate-300 mt-2">Try adjusting filters to find events.</p>
-//               </div>
-//             ) : (
-//               <>
-//                 {/* Active Events Section */}
-//                 <section className="mb-12">
-//                   <div className="flex justify-between items-center mb-4">
-//                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">All Events</h2>
-//                     <Button variant="link" className="text-blue-600 dark:text-blue-400">
-//                       See All <ArrowRight className="w-4 h-4 ml-1" />
-//                     </Button>
-//                   </div>
-
-//                   <Carousel
-//                     opts={{
-//                       align: "start",
-//                       loop: activeEvents.length > 4,
-//                     }}
-//                     className="w-full"
-//                   >
-//                     <CarouselContent className="-ml-4">
-//                       {activeEvents.map((event) => (
-//                         <CarouselItem
-//                           key={event._id}
-//                           className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-//                         >
-//                           <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} />
-//                         </CarouselItem>
-//                       ))}
-//                     </CarouselContent>
-//                     <CarouselPrevious className="hidden md:flex" />
-//                     <CarouselNext className="hidden md:flex" />
-//                   </Carousel>
-//                 </section>
-
-//                 {/* Ended Events Section */}
-//                 {endedEvents.length > 0 && (
-//                   <section className="mt-12">
-//                     <div className="flex items-center justify-between mb-4">
-//                       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ended Events</h2>
-//                       <div className="text-sm text-slate-600 dark:text-slate-400">{endedEvents.length} items</div>
-//                     </div>
-
-//                     <Carousel
-//                       opts={{
-//                         align: "start",
-//                         loop: endedEvents.length > 4,
-//                       }}
-//                       className="w-full"
-//                     >
-//                       <CarouselContent className="-ml-4">
-//                         {endedEvents.map((event) => (
-//                           <CarouselItem
-//                             key={event._id}
-//                             className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-//                           >
-//                             <EventCard 
-//                               event={event} 
-//                               getEventStatus={getEventStatus} 
-//                               onCardClick={handleEventClick} 
-//                               dimmed 
-//                             />
-//                           </CarouselItem>
-//                         ))}
-//                       </CarouselContent>
-//                       <CarouselPrevious className="hidden md:flex" />
-//                       <CarouselNext className="hidden md:flex" />
-//                     </Carousel>
-//                   </section>
-//                 )}
-//               </>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Drawer - THIS IS WHERE THE MAIN CHANGES ARE */}
-//         {selectedEvent && (
-//           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-//             <DrawerContent className="max-w-md mx-auto bg-white/95 backdrop-blur-sm border-white/50 dark:bg-gray-950">
-//               <DrawerHeader className="border-b border-slate-100 dark:border-gray-800">
-//                 <DrawerTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-//                   {selectedEvent.eventName}
-//                 </DrawerTitle>
-//                 <DrawerDescription>
-//                   <div className="text-sm text-slate-600 space-y-2 mt-3 dark:text-gray-100">
-//                     <div className="flex items-center gap-2">
-//                       <Calendar className="w-4 h-4 text-blue-500" />
-//                       {new Date(selectedEvent.startDate).toLocaleDateString()} - {new Date(selectedEvent.endDate).toLocaleDateString()}
-//                     </div>
-//                     {/* <div className="flex items-center gap-2">
-//                       <Ticket className="w-4 h-4 text-orange-500" />
-//                       ₹{selectedEvent.ticketRate || "Free"}
-//                     </div> */}
-//                      <div className="flex items-center gap-2">
-//                      <Ticket className="w-4 h-4 text-orange-500" />
-
-//                       {(() => {
-//                      // Indoor events with zone prices
-//                       if (selectedEvent.eventCategory === "Indoor" && selectedEvent.zonePrices?.length > 0) {
-//                       const valid = selectedEvent.zonePrices.filter(p => p > 0);
-//                       if (valid.length === 0) return <span className="font-semibold text-green-600">FREE</span>;
-      
-//                        const minPrice = Math.min(...valid);
-//                        const maxPrice = Math.max(...valid);
-
-//                        return (
-//                         <span className="font-semibold text-slate-900 dark:text-gray-100">
-//                           {minPrice === maxPrice 
-//                            ? `₹${minPrice.toLocaleString()}`
-//                            : `₹${minPrice.toLocaleString()} - ₹${maxPrice.toLocaleString()}`
-//                            }
-//                         </span>
-//                        );
-//                      }
-
-//                        // Outdoor or Zoom price
-//                      if (selectedEvent.ticketRate) {
-//                        return (
-//                        <span className="font-semibold text-slate-900 dark:text-gray-100">
-//                        ₹{selectedEvent.ticketRate.toLocaleString()}
-//                        </span>
-//                        );
-//                      }
-
-//                    // Free event
-//                     return <span className="font-semibold text-green-600 dark:text-green-400">FREE</span>;
-//                     })()}
-//                      </div>
-
-//                     <div className="flex items-center gap-2">
-//                       <Users className="w-4 h-4 text-purple-500" />
-//                       {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} available
-//                     </div>
-//                     {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-//                       <div className="flex items-center gap-2">
-//                         <ExternalLink className="w-4 h-4 text-blue-500" />
-//                         <a
-//                           href={selectedEvent.zoomUrl}
-//                           target="_blank"
-//                           rel="noopener noreferrer"
-//                           className="text-blue-600 hover:text-blue-800 underline transition-colors"
-//                         >
-//                           Join Zoom Meeting
-//                         </a>
-//                       </div>
-//                     ) : selectedEvent.eventCategory === "Indoor" && selectedEvent.stadiumId?.location?.address ? (
-//                       <div className="flex items-center gap-2">
-//                         <MapPin className="w-4 h-4 text-green-500" />
-//                         <span>{selectedEvent.stadiumId.location.address}</span>
-//                       </div>
-//                     ) : selectedEvent.cityId?.name ? (
-//                       <div className="flex items-center gap-2">
-//                         <MapPin className="w-4 h-4 text-green-500" />
-//                         <span>{selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ""}</span>
-//                       </div>
-//                     ) : null}
-//                   </div>
-//                 </DrawerDescription>
-//               </DrawerHeader>
-
-//               <div className="px-4 pb-4">
-//                 <img
-//                   src={selectedEvent.eventImgUrl}
-//                   alt={selectedEvent.eventName}
-//                   className="rounded-xl w-full h-40 object-cover mb-4 shadow-lg"
-//                 />
-
-//                 {(() => {
-//                   const eventStatus = getEventStatus(selectedEvent);
-//                   const availableSeats = (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0);
-
-//                   if (eventStatus.status === "ended") {
-//                     return (
-//                       <div className="text-center py-4">
-//                         <Badge variant="secondary" className="text-lg px-6 py-2">
-//                           <CheckCircle className="w-5 h-5 mr-2" />
-//                           Event Completed
-//                         </Badge>
-//                       </div>
-//                     );
-//                   } else if (eventStatus.status === "soldout") {
-//                     return (
-//                       <div className="text-center py-4">
-//                         <Badge variant="destructive" className="text-lg px-6 py-2">
-//                           <AlertCircle className="w-5 h-5 mr-2" />
-//                           Sold Out
-//                         </Badge>
-//                       </div>
-//                     );
-//                   } else if (selectedEvent.eventCategory === "Indoor") {
-//                     // SEAT SELECTION BUTTON - Uses handleSeatSelectionClick
-//                     return (
-//                       <Button 
-//                         onClick={(e) => {
-//                           e.stopPropagation();
-//                           handleSeatSelectionClick(selectedEvent);
-//                         }}
-//                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
-//                       >
-//                         {!isAuthenticated && <LogIn className="w-4 h-4 mr-2" />}
-//                         <Ticket className="w-4 h-4 mr-2" />
-//                         {isAuthenticated ? "Select Seats" : "Sign in to Select Seats"}
-//                       </Button>
-//                     );
-//                   } else {
-//                     // DIRECT BOOKING - Uses handleBookingClick
-//                     return (
-//                       <div className="space-y-3">
-//                         <Select
-//                           value={String(ticketQuantities[selectedEvent._id] || 1)}
-//                           onValueChange={(value) =>
-//                             setTicketQuantities({
-//                               ...ticketQuantities,
-//                               [selectedEvent._id]: parseInt(value),
-//                             })
-//                           }
-//                         >
-//                           <SelectTrigger className="bg-white/50 border-slate-200 dark:bg-gray-800 dark:border-gray-700">
-//                             <SelectValue placeholder="Select quantity" />
-//                           </SelectTrigger>
-//                           <SelectContent className="dark:bg-gray-800">
-//                             {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
-//                               <SelectItem key={i + 1} value={String(i + 1)}>
-//                                 {i + 1} Ticket(s) - ₹{((i + 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-//                               </SelectItem>
-//                             ))}
-//                           </SelectContent>
-//                         </Select>
-
-//                         <Button
-//                           disabled={!razorpayLoaded && isAuthenticated}
-//                           onClick={(e) => {
-//                             e.stopPropagation();
-//                             handleBookingClick(selectedEvent, ticketQuantities[selectedEvent._id] || 1);
-//                           }}
-//                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 rounded-md font-semibold"
-//                         >
-//                           {!isAuthenticated ? (
-//                             <>
-//                               <LogIn className="w-4 h-4 mr-2" />
-//                               Sign in to Book
-//                             </>
-//                           ) : !razorpayLoaded ? (
-//                             "Loading Payment..."
-//                           ) : (
-//                             `Pay ₹${((ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}`
-//                           )}
-//                         </Button>
-//                       </div>
-//                     );
-//                   }
-//                 })()}
-//               </div>
-
-//               <DrawerFooter className="border-t border-slate-100 dark:border-gray-800">
-//                 <DrawerClose asChild>
-//                   <Button variant="outline" className="border-slate-200 hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800">
-//                     Close
-//                   </Button>
-//                 </DrawerClose>
-//               </DrawerFooter>
-//             </DrawerContent>
-//           </Drawer>
-//         )}
-//       </div>
-
-//       {/* Sign In Modal */}
-//       {showSignInModal && (
-//         <SignInModal 
-//           pendingPayment={pendingPayment}
-//           onLoginSuccess={(token, userData) => {
-//             console.log("Login successful, processing pending payment"); // Debug log
-//             setIsAuthenticated(true);
-            
-//             // Handle seat selection redirect
-//             if (pendingPayment?.redirectToSeatSelection) {
-//               console.log("Redirecting to seat selection"); // Debug log
-//               navigate(`/select-seats/${pendingPayment.eventId}`);
-//               setShowSignInModal(false);
-//               setPendingPayment(null);
-//               setIsDrawerOpen(false);
-//               return;
-//             }
-
-//             // Handle payment after login
-//             if (pendingPayment && razorpayLoaded && window.Razorpay) {
-//               console.log("Opening Razorpay after login"); // Debug log
-//               const options = {
-//                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//                 amount: pendingPayment.amount * 100,
-//                 currency: "INR",
-//                 name: "EventEase",
-//                 description: `Booking for ${selectedEvent?.eventName}`,
-//                 handler: async function (response) {
-//                   try {
-//                     await bookEventWithoutSeats({
-//                       ...pendingPayment.booking,
-//                       paymentId: response.razorpay_payment_id
-//                     });
-//                     setPendingPayment(null);
-//                   } catch (error) {
-//                     console.error("Booking failed:", error);
-//                     alert("Payment successful but booking failed. Please contact support.");
-//                   }
-//                 },
-//                 prefill: {
-//                   name: userData.fullName || userData.name || "Guest User",
-//                   email: userData.email || "",
-//                   contact: userData.phone || ""
-//                 },
-//                 theme: {
-//                   color: "#3B82F6"
-//                 }
-//               };
-
-//               try {
-//                 const paymentObject = new window.Razorpay(options);
-//                 paymentObject.open();
-//               } catch (error) {
-//                 console.error("Error opening Razorpay:", error);
-//                 alert("Failed to open payment gateway. Please try again.");
-//               }
-//             }
-//             setShowSignInModal(false);
-//           }}
-//           onClose={() => {
-//             console.log("Login modal closed"); // Debug log
-//             setShowSignInModal(false);
-//             setPendingPayment(null);
-//           }}
-//         />
-//       )}
-//     </>
-//   );
-// };
-
-// export default ViewEvents;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { Link, useNavigate } from "react-router-dom";
-// import {
-//   Card,
-//   CardContent,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Badge } from "@/components/ui/badge";
-// import { Alert, AlertDescription } from "@/components/ui/alert";
-// import { Skeleton } from "@/components/ui/skeleton";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel";
-// import {
-//   Calendar,
-//   MapPin,
-//   Users,
-//   ExternalLink,
-//   Ticket,
-//   Clock,
-//   CheckCircle,
-//   Search,
-//   Filter,
-//   AlertCircle,
-//   ArrowRight,
-// } from "lucide-react";
-// import {
-//   Drawer,
-//   DrawerContent,
-//   DrawerDescription,
-//   DrawerHeader,
-//   DrawerTitle,
-//   DrawerClose,
-//   DrawerFooter,
-// } from "@/components/ui/drawer";
-// import { SignInModal } from "@/components/user/SignInModal";
-
-// // Extracted EventCard component
-// const EventCard = ({ event, getEventStatus, onCardClick, dimmed = false }) => {
-//   const eventStatus = getEventStatus(event);
-//   const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-//   const StatusIcon = eventStatus.icon;
-
-//   return (
-//     <Card
-//       key={event._id}
-//       className={
-//         "group cursor-pointer hover:shadow-xl transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-gray-950 text-gray-900 dark:text-gray-100 h-full flex flex-col " +
-//         (dimmed ? "opacity-60 filter grayscale" : "")
-//       }
-//       onClick={() => onCardClick(event)}
-//     >
-//       {/* Event Image */}
-//       <div className="relative overflow-hidden">
-//         <img
-//           src={event.eventImgUrl}
-//           alt={event.eventName}
-//           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-//         />
-//         <div className="absolute top-3 right-3">
-//           <Badge variant={eventStatus.variant} className="shadow-lg">
-//             <StatusIcon className="w-3 h-3 mr-1" />
-//             {eventStatus.label}
-//           </Badge>
-//         </div>
-//         {event.eventType && (
-//           <Badge className="absolute top-3 left-3 bg-white/90 text-slate-700 shadow-lg dark:text-gray-900">
-//             {event.eventType}
-//           </Badge>
-//         )}
-//       </div>
-
-//       <CardHeader className="pb-3">
-//         <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors dark:text-gray-100 line-clamp-2">
-//           {event.eventName}
-//         </CardTitle>
-//       </CardHeader>
-
-//       <CardContent className="space-y-2 pb-4 flex-grow">
-//         {/* Date Info */}
-//         <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//           <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-//           <span>
-//             {new Date(event.startDate).toLocaleDateString()}
-//             {" — "}
-//             {new Date(event.endDate).toLocaleDateString()}
-//           </span>
-//         </div>
-
-//         {/* Location Info */}
-//         {event.eventCategory === "ZoomMeeting" && event.zoomUrl ? (
-//           <div className="flex items-center text-sm text-blue-600 dark:text-gray-100">
-//             <ExternalLink className="w-4 h-4 mr-2" />
-//             <span className="truncate">Zoom Meeting</span>
-//           </div>
-//         ) : event.eventCategory === "Indoor" && event.stadiumId?.location?.address ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span className="truncate">{event.stadiumId.location.address}</span>
-//           </div>
-//         ) : event.cityId?.name ? (
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <MapPin className="w-4 h-4 mr-2 text-green-500" />
-//             <span>{event.cityId.name}{event.stateId ? `, ${event.stateId?.Name || event.stateId?.name}` : ""}</span>
-//           </div>
-//         ) : null}
-
-//         {/* Seats & Price */}
-//         <div className="flex items-center justify-between">
-//           <div className="flex items-center text-sm text-slate-600 dark:text-gray-100">
-//             <Users className="w-4 h-4 mr-2 text-purple-500" />
-//             <span>{availableSeats} seats</span>
-//           </div>
-
-//           {event.ticketRate ? (
-//             <div className="text-sm font-semibold text-slate-900 dark:text-gray-100">
-//               ₹{event.ticketRate.toLocaleString()}
-//             </div>
-//           ) : (
-//             <div className="text-sm font-semibold text-green-600 dark:text-green-400">FREE</div>
-//           )}
-//         </div>
-//       </CardContent>
-
-//       <CardFooter className="pt-4 border-t border-slate-100 dark:border-gray-800">
-//         <div className="w-full text-center">
-//           {eventStatus.status === "ended" ? (
-//             <Badge variant="secondary" className="w-full justify-center py-2 text-sm">
-//               <CheckCircle className="w-4 h-4 mr-2" />
-//               Event Completed
-//             </Badge>
-//           ) : eventStatus.status === "soldout" ? (
-//             <Badge variant="destructive" className="w-full justify-center py-2 text-sm">
-//               <AlertCircle className="w-4 h-4 mr-2" />
-//               Sold Out
-//             </Badge>
-//           ) : (
-//             <Button
-//               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-//               onClick={(e) => {
-//                 e.stopPropagation();
-//                 onCardClick(event);
-//               }}
-//             >
-//               <Ticket className="w-4 h-4 mr-2" />
-//               View Details
-//             </Button>
-//           )}
-//         </div>
-//       </CardFooter>
-//     </Card>
-//   );
-// };
-
-// export const ViewEvents = () => {
-//   const [events, setEvents] = useState([]);
-//   const [ticketQuantities, setTicketQuantities] = useState({});
-//   const [bookingInfo, setBookingInfo] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [filterName, setFilterName] = useState("");
-//   const [filterCity, setFilterCity] = useState("");
-//   const [filterEventType, setFilterEventType] = useState("");
-//   const [selectedEvent, setSelectedEvent] = useState(null);
-//   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-//   const [showSignInModal, setShowSignInModal] = useState(false);
-//   const [pendingPayment, setPendingPayment] = useState(null);
-
-//   const navigate = useNavigate();
-
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-//   useEffect(() => {
-//     const checkAuth = () => {
-//       const token = localStorage.getItem("token");
-//       setIsAuthenticated(!!token);
-//     };
-    
-//     checkAuth();
-//     window.addEventListener('storage', checkAuth);
-//     return () => window.removeEventListener('storage', checkAuth);
-//   }, []);
-
-//   useEffect(() => {
-//     getAllEvents();
-//   }, []);
-
-//   useEffect(() => {
-//     if (bookingInfo) {
-//       const timer = setTimeout(() => setBookingInfo(null), 5000);
-//       return () => clearTimeout(timer);
-//     }
-//   }, [bookingInfo]);
-
-//   const getAllEvents = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const res = await axios.get(`/event/getallevents`);
-//       setEvents(res.data.data || []);
-//     } catch (err) {
-//       setError("Failed to load events");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleEventClick = (event) => {
-//     setSelectedEvent(event);
-//     setIsDrawerOpen(true);
-//   };
-
-//   const bookEventWithoutSeats = async (booking) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       const userId = localStorage.getItem("id");
-      
-//       await axios.post(
-//         `/event/bookseat/${booking.eventId}`,
-//         {
-//           quantity: booking.quantity,
-//           selectedSeats: [],
-//           organizerId: booking.organizerId,
-//           stateId: booking.stateId,
-//           cityId: booking.cityId,
-//           paymentId: booking.paymentId,
-//         },
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-//       setBookingInfo("Booking successful! 🎉");
-//       navigate(`/mytickets/${userId}`);
-//       getAllEvents();
-//       setIsDrawerOpen(false);
-//     } catch (err) {
-//       alert("Booking failed: " + (err.response?.data?.message || "Unknown error"));
-//     }
-//   };
-
-//   const getEventStatus = (event) => {
-//     const now = new Date();
-//     const startDate = new Date(event.startDate);
-//     const endDate = new Date(event.endDate);
-//     const availableSeats = (event.numberOfSeats || 0) - (event.bookedSeats || 0);
-
-//     if (endDate < now) {
-//       return { status: "ended", label: "Event Ended", variant: "destructive", icon: Clock };
-//     }
-//     if (availableSeats <= 0) {
-//       return { status: "soldout", label: "Sold Out", variant: "destructive", icon: AlertCircle };
-//     }
-//     if (startDate <= now && endDate >= now) {
-//       return { status: "ongoing", label: "Ongoing", variant: "default", icon: CheckCircle };
-//     }
-//     return { status: "upcoming", label: "Available", variant: "outline", icon: Ticket };
-//   };
-
-//   const filteredEvents = events.filter((event) => {
-//     const matchName = filterName ? event.eventName?.toLowerCase().includes(filterName.toLowerCase()) : true;
-//     const matchCity = filterCity ? event.cityId?.name?.toLowerCase().includes(filterCity.toLowerCase()) : true;
-//     const matchType = filterEventType === "all" || !filterEventType ? true : event.eventType === filterEventType;
-//     return matchName && matchCity && matchType;
-//   });
-
-//   const sortedEvents = filteredEvents.sort((a, b) => {
-//     const now = new Date();
-//     const aEnded = new Date(a.endDate) < now;
-//     const bEnded = new Date(b.endDate) < now;
-
-//     if (aEnded === bEnded) {
-//       return new Date(a.startDate) - new Date(b.startDate);
-//     }
-//     return aEnded ? 1 : -1;
-//   });
-
-//   const endedEvents = sortedEvents.filter((e) => getEventStatus(e).status === "ended");
-//   const activeEvents = sortedEvents.filter((e) => getEventStatus(e).status !== "ended");
-
-//   const LoadingSkeleton = () => (
-//     <div className="space-y-12">
-//       {[1, 2].map((section) => (
-//         <div key={section}>
-//           <Skeleton className="h-8 w-48 mb-6" />
-//           <div className="flex space-x-6">
-//             {[1, 2, 3, 4].map((i) => (
-//               <Card key={i} className="w-80">
-//                 <Skeleton className="h-48 w-full rounded-t-lg" />
-//                 <CardHeader>
-//                   <Skeleton className="h-6 w-3/4 mb-2" />
-//                   <Skeleton className="h-4 w-full mb-1" />
-//                 </CardHeader>
-//                 <CardContent>
-//                   <Skeleton className="h-4 w-full mb-2" />
-//                   <Skeleton className="h-4 w-2/3 mb-2" />
-//                 </CardContent>
-//                 <CardFooter>
-//                   <Skeleton className="h-10 w-full" />
-//                 </CardFooter>
-//               </Card>
-//             ))}
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-
-//   return (
-//     <>
-//       <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-//         {/* Header Section */}
-//         <div className="w-full py-16 px-4 md:px-8 space-y-8">
-//           <div className="text-center mb-10">
-//             <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-//               Discover Amazing Events
-//             </h1>
-//             <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-//               Find and book your next unforgettable experience. Click any event card for details.
-//             </p>
-//           </div>
-
-//           {/* Filters Section */}
-//           <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 p-6 mb-8 dark:bg-gray-800">
-//             <div className="flex items-center gap-2 mb-4">
-//               <Filter className="w-5 h-5 text-blue-600" />
-//               <h3 className="text-lg font-semibold text-slate-900 dark:text-gray-100">Filter Events</h3>
-//             </div>
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//               <div className="relative">
-//                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by Event Name"
-//                   value={filterName}
-//                   onChange={(e) => setFilterName(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <div className="relative">
-//                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-//                 <Input
-//                   placeholder="Search by City"
-//                   value={filterCity}
-//                   onChange={(e) => setFilterCity(e.target.value)}
-//                   className="pl-10 bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:bg-gray-700"
-//                 />
-//               </div>
-//               <Select value={filterEventType} onValueChange={setFilterEventType}>
-//                 <SelectTrigger className="bg-white/50 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 dark:text-gray-100 dark:bg-gray-700">
-//                   <SelectValue placeholder="All Event Types" />
-//                 </SelectTrigger>
-//                 <SelectContent className="dark:bg-gray-800">
-//                   <SelectItem value="all">All Event Types</SelectItem>
-//                   <SelectItem value="Seminar">Seminar</SelectItem>
-//                   <SelectItem value="Workshop">Workshop</SelectItem>
-//                   <SelectItem value="ZoomMeeting">Zoom Meeting</SelectItem>
-//                   <SelectItem value="Concert">Concert</SelectItem>
-//                   <SelectItem value="Indoor">Indoor</SelectItem>
-//                   <SelectItem value="Outdoor">Outdoor</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </div>
-
-//           {/* Alerts */}
-//           <div className="w-full max-w-7xl mx-auto">
-//             {error && (
-//               <Alert className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/50 dark:border-red-700">
-//                 <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
-//               </Alert>
-//             )}
-//             {bookingInfo && (
-//               <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/50 dark:border-green-700">
-//                 <AlertDescription className="text-green-800 dark:text-green-200">{bookingInfo}</AlertDescription>
-//               </Alert>
-//             )}
-//           </div>
-
-//           {/* Main Content Section */}
-//           <div className="w-full px-4 md:px-8">
-//             {loading ? (
-//               <LoadingSkeleton />
-//             ) : activeEvents.length === 0 && endedEvents.length === 0 ? (
-//               <div className="w-full max-w-7xl mx-auto text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg dark:bg-gray-800">
-//                 <Calendar className="mx-auto w-12 h-12 text-blue-500 mb-4" />
-//                 <h3 className="text-xl font-semibold text-slate-900 dark:text-gray-100">No events found</h3>
-//                 <p className="text-slate-600 dark:text-slate-300 mt-2">Try adjusting filters to find events.</p>
-//               </div>
-//             ) : (
-//               <>
-//                 {/* Active Events Section */}
-//                 <section className="mb-12">
-//                   <div className="flex justify-between items-center mb-4">
-//                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">All Events</h2>
-//                     <Button variant="link" className="text-blue-600 dark:text-blue-400">
-//                       See All <ArrowRight className="w-4 h-4 ml-1" />
-//                     </Button>
-//                   </div>
-
-//                   <Carousel
-//                     opts={{
-//                       align: "start",
-//                       loop: activeEvents.length > 4,
-//                     }}
-//                     className="w-full"
-//                   >
-//                     <CarouselContent className="-ml-4">
-//                       {activeEvents.map((event) => (
-//                         <CarouselItem
-//                           key={event._id}
-//                           className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-//                         >
-//                           <EventCard event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} />
-//                         </CarouselItem>
-//                       ))}
-//                     </CarouselContent>
-//                     <CarouselPrevious className="hidden md:flex" />
-//                     <CarouselNext className="hidden md:flex" />
-//                   </Carousel>
-//                 </section>
-
-//                 {/* Ended Events Section */}
-//                 {endedEvents.length > 0 && (
-//                   <section className="mt-12">
-//                     <div className="flex items-center justify-between mb-4">
-//                       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Ended Events</h2>
-//                       <div className="text-sm text-slate-600 dark:text-slate-400">{endedEvents.length} items</div>
-//                     </div>
-
-//                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-//                       {endedEvents.map((ev) => (
-//                         <EventCard 
-//                           key={ev._id} 
-//                           event={ev} 
-//                           getEventStatus={getEventStatus} 
-//                           onCardClick={handleEventClick} 
-//                           dimmed 
-//                         />
-//                       ))}
-//                     </div>
-//                   </section>
-//                 )}
-//               </>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Drawer */}
-//         {selectedEvent && (
-//           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-//             <DrawerContent className="max-w-md mx-auto bg-white/95 backdrop-blur-sm border-white/50 dark:bg-gray-950">
-//               <DrawerHeader className="border-b border-slate-100 dark:border-gray-800">
-//                 <DrawerTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-//                   {selectedEvent.eventName}
-//                 </DrawerTitle>
-//                 <DrawerDescription>
-//                   <div className="text-sm text-slate-600 space-y-2 mt-3 dark:text-gray-100">
-//                     <div className="flex items-center gap-2">
-//                       <Calendar className="w-4 h-4 text-blue-500" />
-//                       {new Date(selectedEvent.startDate).toLocaleDateString()} - {new Date(selectedEvent.endDate).toLocaleDateString()}
-//                     </div>
-//                     <div className="flex items-center gap-2">
-//                       <Ticket className="w-4 h-4 text-orange-500" />
-//                       ₹{selectedEvent.ticketRate || "Free"}
-//                     </div>
-//                     <div className="flex items-center gap-2">
-//                       <Users className="w-4 h-4 text-purple-500" />
-//                       {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} available
-//                     </div>
-//                     {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-//                       <div className="flex items-center gap-2">
-//                         <ExternalLink className="w-4 h-4 text-blue-500" />
-//                         <a
-//                           href={selectedEvent.zoomUrl}
-//                           target="_blank"
-//                           rel="noopener noreferrer"
-//                           className="text-blue-600 hover:text-blue-800 underline transition-colors"
-//                         >
-//                           Join Zoom Meeting
-//                         </a>
-//                       </div>
-//                     ) : selectedEvent.eventCategory === "Indoor" && selectedEvent.stadiumId?.location?.address ? (
-//                       <div className="flex items-center gap-2">
-//                         <MapPin className="w-4 h-4 text-green-500" />
-//                         <span>{selectedEvent.stadiumId.location.address}</span>
-//                       </div>
-//                     ) : selectedEvent.cityId?.name ? (
-//                       <div className="flex items-center gap-2">
-//                         <MapPin className="w-4 h-4 text-green-500" />
-//                         <span>{selectedEvent.cityId.name}{selectedEvent.stateId ? `, ${selectedEvent.stateId?.Name || selectedEvent.stateId?.name}` : ""}</span>
-//                       </div>
-//                     ) : null}
-//                   </div>
-//                 </DrawerDescription>
-//               </DrawerHeader>
-
-//               <div className="px-4 pb-4">
-//                 <img
-//                   src={selectedEvent.eventImgUrl}
-//                   alt={selectedEvent.eventName}
-//                   className="rounded-xl w-full h-40 object-cover mb-4 shadow-lg"
-//                 />
-
-//                 {(() => {
-//                   const eventStatus = getEventStatus(selectedEvent);
-//                   const availableSeats = (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0);
-
-//                   if (eventStatus.status === "ended") {
-//                     return (
-//                       <div className="text-center py-4">
-//                         <Badge variant="secondary" className="text-lg px-6 py-2">
-//                           <CheckCircle className="w-5 h-5 mr-2" />
-//                           Event Completed
-//                         </Badge>
-//                       </div>
-//                     );
-//                   } else if (eventStatus.status === "soldout") {
-//                     return (
-//                       <div className="text-center py-4">
-//                         <Badge variant="destructive" className="text-lg px-6 py-2">
-//                           <AlertCircle className="w-5 h-5 mr-2" />
-//                           Sold Out
-//                         </Badge>
-//                       </div>
-//                     );
-//                   } else if (selectedEvent.eventCategory === "Indoor") {
-//                     return (
-//                       <Link to={`/select-seats/${selectedEvent._id}`} className="w-full block mb-3">
-//                         <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
-//                           <Ticket className="w-4 h-4 mr-2" /> Select Seats
-//                         </Button>
-//                       </Link>
-//                     );
-//                   } else {
-//                     return (
-//                       <div className="space-y-3">
-//                         <Select
-//                           value={String(ticketQuantities[selectedEvent._id] || 1)}
-//                           onValueChange={(value) =>
-//                             setTicketQuantities({
-//                               ...ticketQuantities,
-//                               [selectedEvent._id]: parseInt(value),
-//                             })
-//                           }
-//                         >
-//                           <SelectTrigger className="bg-white/50 border-slate-200 dark:bg-gray-800 dark:border-gray-700">
-//                             <SelectValue placeholder="Select quantity" />
-//                           </SelectTrigger>
-//                           <SelectContent className="dark:bg-gray-800">
-//                             {Array.from({ length: Math.min(10, Math.max(1, availableSeats)) }, (_, i) => (
-//                               <SelectItem key={i + 1} value={String(i + 1)}>
-//                                 {i + 1} Ticket(s) - ₹{((i + 1) * (selectedEvent.ticketRate || 0)).toLocaleString()}
-//                               </SelectItem>
-//                             ))}
-//                           </SelectContent>
-//                         </Select>
-
-//                         <Button
-//                           onClick={() => {
-//                             if (!isAuthenticated) {
-//                               setPendingPayment({
-//                                 eventId: selectedEvent._id,
-//                                 amount: (ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0),
-//                                 quantity: ticketQuantities[selectedEvent._id] || 1,
-//                                 booking: {
-//                                   eventId: selectedEvent._id,
-//                                   organizerId: selectedEvent.organizerId,
-//                                   quantity: ticketQuantities[selectedEvent._id] || 1,
-//                                   selectedSeats: [],
-//                                   stateId: selectedEvent.stateId?._id || selectedEvent.stateId,
-//                                   cityId: selectedEvent.cityId?._id || selectedEvent.cityId,
-//                                 }
-//                               });
-//                               setShowSignInModal(true);
-//                               return;
-//                             }
-
-//                             const currentToken = localStorage.getItem("token");
-//                             if (!currentToken) {
-//                               setShowSignInModal(true);
-//                               return;
-//                             }
-
-//                             const options = {
-//                               key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//                               amount: (ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0) * 100,
-//                               currency: "INR",
-//                               name: "EventEase",
-//                               description: `Booking for ${selectedEvent.eventName}`,
-//                               handler: async function (response) {
-//                                 try {
-//                                   const booking = {
-//                                     eventId: selectedEvent._id,
-//                                     organizerId: selectedEvent.organizerId,
-//                                     quantity: ticketQuantities[selectedEvent._id] || 1,
-//                                     selectedSeats: [],
-//                                     stateId: selectedEvent.stateId?._id || selectedEvent.stateId,
-//                                     cityId: selectedEvent.cityId?._id || selectedEvent.cityId,
-//                                     paymentId: response.razorpay_payment_id
-//                                   };
-//                                   await bookEventWithoutSeats(booking);
-//                                 } catch (error) {
-//                                   console.error("Booking failed:", error);
-//                                   alert("Payment successful but booking failed. Please contact support.");
-//                                 }
-//                               },
-//                               prefill: {
-//                                 name: "Guest User",
-//                                 email: "",
-//                                 contact: ""
-//                               }
-//                             };
-
-//                             const paymentObject = new window.Razorpay(options);
-//                             paymentObject.open();
-//                           }}
-//                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 rounded-md font-semibold"
-//                         >
-//                           {isAuthenticated ? `Pay ₹${(ticketQuantities[selectedEvent._id] || 1) * (selectedEvent.ticketRate || 0)}` : "Sign in to Book"}
-//                         </Button>
-//                       </div>
-//                     );
-//                   }
-//                 })()}
-//               </div>
-
-//               <DrawerFooter className="border-t border-slate-100 dark:border-gray-800">
-//                 <DrawerClose asChild>
-//                   <Button variant="outline" className="border-slate-200 hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800">
-//                     Close
-//                   </Button>
-//                 </DrawerClose>
-//               </DrawerFooter>
-//             </DrawerContent>
-//           </Drawer>
-//         )}
-//       </div>
-
-//       {showSignInModal && (
-//         <SignInModal 
-//           pendingPayment={pendingPayment}
-//           onLoginSuccess={(token, userData) => {
-//             setIsAuthenticated(true);
-//             if (pendingPayment) {
-//               const options = {
-//                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//                 amount: pendingPayment.amount * 100,
-//                 currency: "INR",
-//                 name: "EventEase",
-//                 description: `Booking for ${selectedEvent?.eventName}`,
-//                 handler: async function (response) {
-//                   try {
-//                     await bookEventWithoutSeats({
-//                       ...pendingPayment.booking,
-//                       paymentId: response.razorpay_payment_id
-//                     });
-//                     setPendingPayment(null);
-//                   } catch (error) {
-//                     console.error("Booking failed:", error);
-//                     alert("Payment successful but booking failed. Please contact support.");
-//                   }
-//                 },
-//                 prefill: {
-//                   name: userData.fullName || userData.name || "Guest User",
-//                   email: userData.email || "",
-//                   contact: userData.phone || ""
-//                 }
-//               };
-
-//               const paymentObject = new window.Razorpay(options);
-//               paymentObject.open();
-//             }
-//             setShowSignInModal(false);
-//           }}
-//           onClose={() => setShowSignInModal(false)}
-//         />
-//       )}
-//     </>
-//   );
-// };
-
-// export default ViewEvents;

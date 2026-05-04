@@ -1,20 +1,20 @@
-
 import React, { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket, Badge } from "lucide-react";
+import { Menu, Calendar, Users, Shield, Zap, Star, ArrowRight, CheckCircle, Clock, MapPin, Ticket, Badge, Sparkles, Globe, ShieldCheck, BarChart3, Rocket } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DarkModeToggle } from '@/contexts/DarkModeContext';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
-// Import images (make sure these paths are correct in your project)
+// Assets
 import img1 from '../../assets/img/hero-bg.jpg';
 import img2 from '../../assets/img/page-title-bg.webp';
 import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import { UserFeedback } from '../user/UserFeedBack';
-import ViewEvents from '../user/ViweEvents';
+import { ViewEvents } from '../user/ViweEvents';
 import { ContactUs } from './ContactUs';
 import ChatBot from './ChatBot';
 
@@ -23,6 +23,10 @@ export const LandingPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const images = [img4, img2, img3, img1];
+
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -45,66 +49,77 @@ export const LandingPage = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % images.length);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(timer);
   }, [images.length]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-transparent text-white selection:bg-rose-500/30 selection:text-rose-200 overflow-x-hidden">
       {/* Enhanced Navigation */}
-      <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${isScrolled
-        ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-lg'
-        : 'bg-transparent'
+      <header className={`fixed top-0 z-50 w-full transition-all duration-500 ${isScrolled
+        ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 py-4'
+        : 'bg-transparent py-8'
         }`}>
-        <div className="container mx-auto flex h-20 items-center justify-between px-6">
-          <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between px-6 md:px-12">
+          <Link to="/" className="flex items-center space-x-4 group">
+            <div className="w-10 h-10 bg-[#E11D48] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.5)] group-hover:scale-110 transition-transform">
               <Ticket className="h-6 w-6 text-white" />
             </div>
-            <span className={`font-bold text-2xl transition-colors ${isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
-              }`}>EventEase</span>
+            <span className="font-black text-2xl tracking-tighter uppercase text-white group-hover:text-[#E11D48] transition-colors">EventEase</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {['Home', 'Features', 'Events', 'About'].map((item) => (
+          <nav className="hidden md:flex items-center space-x-12">
+            {['Home', 'Events', 'Features', 'About'].map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className={`text-sm font-medium transition-all duration-200 hover:scale-105 ${isScrolled
-                  ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                  : 'text-white/90 hover:text-white'
-                  }`}
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all relative group"
               >
                 {item}
+                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] transition-all group-hover:w-full" />
               </a>
             ))}
           </nav>
 
-          {/* Mobile Navigation */}
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-8">
+            <DarkModeToggle />
+            <Link to="/signin" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Button
+              className="btn-primary"
+              asChild
+            >
+              <Link to="/signup">Get Started</Link>
+            </Button>
+          </div>
+
+          {/* Mobile Menu Trigger */}
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className={isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'}>
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                  <Menu className="h-8 w-8" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-80 bg-white dark:bg-gray-900">
-                <nav className="flex flex-col space-y-6 mt-8">
-                  {['Home', 'Features', 'Events', 'About'].map((item) => (
+              <SheetContent className="bg-black border-white/10 text-white w-full">
+                <nav className="flex flex-col space-y-12 mt-20">
+                  {['Home', 'Events', 'Features', 'About'].map((item) => (
                     <a
                       key={item}
                       href={`#${item.toLowerCase()}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      className="text-4xl font-black uppercase tracking-tighter hover:text-[#E11D48] transition-colors"
                     >
                       {item}
                     </a>
                   ))}
-                  <div className="flex flex-col space-y-3 pt-6 border-t dark:border-gray-700">
-                    <Button variant="outline" size="lg" asChild className="dark:border-gray-700 dark:hover:bg-gray-800">
+                  <div className="flex flex-col space-y-4 pt-12 border-t border-white/10">
+                    <Button variant="outline" className="btn-outline w-full py-6 text-lg" asChild>
                       <Link to="/signin">Sign In</Link>
                     </Button>
-                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600" asChild>
+                    <Button className="btn-primary w-full py-6 text-lg" asChild>
                       <Link to="/signup">Get Started</Link>
                     </Button>
                   </div>
@@ -112,443 +127,307 @@ export const LandingPage = () => {
               </SheetContent>
             </Sheet>
           </div>
-
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <DarkModeToggle />
-            <Button
-              variant="ghost"
-              size="lg"
-              className={`font-medium transition-all ${isScrolled
-                ? 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800'
-                : 'text-white hover:text-blue-200 hover:bg-white/10'
-                }`}
-              asChild
-            >
-              <Link to="/signin">Sign In</Link>
-            </Button>
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium px-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-              asChild
-            >
-              <Link to="/signup">Get Started</Link>
-            </Button>
-          </div>
         </div>
       </header>
 
-      {/* Modern Hero Section */}
+      {/* Cinematic Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Carousel */}
-        <div className="absolute inset-0">
+        {/* Dynamic Background */}
+        <div className="absolute inset-0 z-0">
           {images.map((img, index) => (
-            <div
+            <motion.div
               key={index}
-              className={`absolute inset-0 transition-all duration-1000 ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                }`}
-              style={{
-                backgroundImage: `url(${img})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ 
+                opacity: index === currentSlide ? 1 : 0,
+                scale: index === currentSlide ? 1 : 1.1 
               }}
+              transition={{ duration: 2, ease: "easeOut" }}
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${img})` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60" />
-            </div>
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+            </motion.div>
           ))}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <div className="inline-flex items-center px-4 py-2 bg-white/10 dark:bg-white/20 backdrop-blur-md rounded-full border border-white/20 mb-8">
-            <Star className="h-4 w-4 text-yellow-400 mr-2" />
-            <span className="text-white/90 text-sm font-medium">Trusted by 10,000+ event organizers</span>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Your Events,
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> Simplified</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-            From intimate gatherings to massive concerts - create, manage, and sell tickets for any event with our all-in-one platform.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-full shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 text-lg"
-              asChild
-            >
-              <Link to="/organizersignup">
-                Create Your Event
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white/30 text-gray-700 hover:bg-white/10 backdrop-blur-md font-semibold px-8 py-4 rounded-full text-lg dark:text-gray-100 "
-              asChild
-            >
-              <Link to="/events">Browse Events</Link>
-            </Button>
-          </div>
-
-          {/* Trust indicators */}
-          <div className="flex flex-wrap justify-center items-center gap-8 text-white/70">
-            <div className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
-              <span>Secure payments</span>
+        <div className="relative z-10 text-center px-6 max-w-7xl mx-auto pt-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center gap-3 px-6 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-12">
+              <div className="live-indicator" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Experience The Future of Events</span>
             </div>
-            <div className="flex items-center">
-              <Clock className="h-5 w-5 text-blue-400 mr-2" />
-              <span>Real-time analytics</span>
-            </div>
-            <div className="flex items-center">
-              <Shield className="h-5 w-5 text-purple-400 mr-2" />
-              <span>Data protection</span>
-            </div>
-          </div>
-        </div>
 
+            <h1 className="text-6xl md:text-[120px] font-black text-white mb-12 leading-[0.85] tracking-[-0.05em]">
+              THE WORLD'S<br />
+              <span className="text-white">PREMIER</span><br />
+              <span className="text-[#E11D48] text-glow">EXPERIENCES</span>
+            </h1>
 
-
-        {/* Carousel Navigation */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/75'
-                }`}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="py-3 bg-gray-50 dark:bg-gray-800" >
-        <ViewEvents />
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 mb-0 bg-gray-50 dark:bg-gray-800" id="features">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Everything you need to succeed
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Powerful tools and features designed to make event management effortless and ticket sales seamless.
+            <p className="text-lg md:text-2xl text-gray-400 mb-16 max-w-3xl mx-auto font-medium leading-relaxed">
+              From sold-out stadium tours to exclusive gala experiences. 
+              Manage, market, and sell with the industry standard.
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Ticket className="h-8 w-8" />,
-                title: "Smart Ticketing",
-                description: "Dynamic pricing, bulk discounts, and customizable ticket types for every event size.",
-                color: "from-blue-500 to-blue-600"
-              },
-              {
-                icon: <Users className="h-8 w-8" />,
-                title: "Audience Insights",
-                description: "Detailed analytics and attendee data to help you understand and grow your audience.",
-                color: "from-purple-500 to-purple-600"
-              },
-              {
-                icon: <Shield className="h-8 w-8" />,
-                title: "Secure Payments",
-                description: "Bank-level security with multiple payment options and instant payouts.",
-                color: "from-green-500 to-green-600"
-              },
-              {
-                icon: <Calendar className="h-8 w-8" />,
-                title: "Event Management",
-                description: "Comprehensive tools for planning, promoting, and managing events of any scale.",
-                color: "from-orange-500 to-orange-600"
-              },
-              {
-                icon: <MapPin className="h-8 w-8" />,
-                title: "Venue Integration",
-                description: "Seamless venue booking and management with our partner network.",
-                color: "from-pink-500 to-pink-600"
-              },
-              {
-                icon: <Zap className="h-8 w-8" />,
-                title: "Real-time Updates",
-                description: "Live notifications, instant updates, and real-time sales tracking.",
-                color: "from-indigo-500 to-indigo-600"
-              }
-            ].map((feature, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg dark:bg-gray-900 dark:border-gray-700">
-                <CardHeader>
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    {feature.icon}
-                  </div>
-                  <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button
+                className="btn-primary text-sm h-16 px-12"
+                asChild
+              >
+                <Link to="/organizersignup">
+                  Host An Event
+                </Link>
+              </Button>
+              <Button
+                className="btn-outline text-sm h-16 px-12"
+                asChild
+              >
+                <Link to="/events">Explore Shows</Link>
+              </Button>
+            </div>
+          </motion.div>
         </div>
-      </section>
 
-      {/* Stats Section */}
-      {/* <section className="py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="about">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Trusted by event creators worldwide
-            </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Join thousands of successful event organizers who have chosen EventEase as their go-to platform.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { 
-                number: eventStats.totalEvents || "500+", 
-                label: "Events Created",
-                icon: <Calendar className="h-8 w-8" />
-              },
-              { 
-                number: eventStats.activeEvents || "150+", 
-                label: "Active Events",
-                icon: <Zap className="h-8 w-8" />
-              },
-              { 
-                number: "1M+", 
-                label: "Tickets Sold",
-                icon: <Ticket className="h-8 w-8" />
-              },
-              { 
-                number: "10K+", 
-                label: "Happy Organizers",
-                icon: <Users className="h-8 w-8" />
-              }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="w-20 h-20 mx-auto mb-4 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-all duration-300">
-                  {stat.icon}
-                </div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
-                <div className="text-lg text-white/80">{stat.label}</div>
+        {/* Hero Footer Stats */}
+        <div className="absolute bottom-12 left-0 w-full px-6 md:px-12 z-20">
+          <div className="max-w-[1800px] mx-auto flex flex-wrap justify-between items-end gap-8">
+            <div className="flex items-center gap-12">
+              <div>
+                <div className="text-3xl font-black text-white">{eventStats.totalEvents || "500"}+</div>
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Global Events</div>
               </div>
-            ))}
+              <div className="w-px h-10 bg-white/10" />
+              <div>
+                <div className="text-3xl font-black text-white">1M+</div>
+                <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Tickets Sold</div>
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`h-1 transition-all duration-500 ${index === currentSlide ? 'w-12 bg-[#E11D48]' : 'w-6 bg-white/20'}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </section> */}
+      </section>
 
-      {/* How It Works Section */}
-      {/* <section className="py-24 bg-white dark:bg-gray-800" id="events"> */}
-      <section className="py-00 bg-gray-50 dark:bg-gray-800" id="about">
-        {/* <section className="py-20 bg-gradient-to-br  via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900 text-white" id="events"> */}
-
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Get started in 3 simple steps
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              From concept to sold-out event, our platform guides you through every step of the journey.
+      {/* Featured Shows Section */}
+      <section id="events" className="relative py-40 bg-transparent">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-3 mb-6">
+                <div className="w-8 h-[2px] bg-[#E11D48]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Now Showing</span>
+              </div>
+              <h2 className="text-5xl md:text-8xl font-black text-white leading-none">
+                CURATED<br />SHOWS
+              </h2>
+            </div>
+            <p className="text-gray-500 font-bold uppercase tracking-widest text-xs max-w-xs text-right">
+              Discover the most anticipated events across the globe, from music to industry conferences.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {[
-              {
-                step: "01",
-                title: "Create Your Event",
-                description: "Set up your event in minutes with our intuitive event builder. Add details, upload images, and configure your ticket types.",
-                image: img4,
-                features: ["Event customization", "Ticket configuration", "Venue selection"]
-              },
-              {
-                step: "02",
-                title: "Promote & Sell",
-                description: "Share your event across social media, embed tickets on your website, and track sales with real-time analytics.",
-                image: img3,
-                features: ["Social media integration", "Sales tracking", "Marketing tools"]
-              },
-              {
-                step: "03",
-                title: "Manage & Execute",
-                description: "Check-in attendees, manage your event day operations, and analyze post-event metrics for future success.",
-                image: img1,
-                features: ["Mobile check-in", "Live dashboard", "Event analytics"]
-              }
-            ].map((step, index) => (
-              <div key={index} className="relative group">
-                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border border-gray-100 dark:border-gray-700">
-                  <div className="relative h-48 rounded-2xl overflow-hidden mb-6">
-                    <img
-                      src={step.image}
-                      alt={step.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    <div className="absolute top-4 left-4 w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-                      {step.step}
+          <div className="mb-20">
+            <ViewEvents />
+          </div>
+
+          <div className="flex justify-center">
+             <Button className="btn-outline group h-14" asChild>
+                <Link to="/events" className="flex items-center">
+                   View All Shows <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform" />
+                </Link>
+             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features - The Edge */}
+      <section id="features" className="py-40 bg-transparent border-y border-white/5">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+           <div className="text-center mb-32">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-6 block">The Edge</span>
+              <h2 className="text-5xl md:text-[100px] font-black text-white leading-none tracking-[-0.05em]">
+                UNMATCHED<br />POWER
+              </h2>
+           </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border border-white/5">
+              {[
+                {
+                  icon: <Ticket className="h-10 w-10" />,
+                  title: "SMART TICKETING",
+                  desc: "Precision dynamic pricing and bulk allocation systems for scale.",
+                  accent: "border-blue-500/20"
+                },
+                {
+                  icon: <BarChart3 className="h-10 w-10" />,
+                  title: "REAL-TIME INTEL",
+                  desc: "Live sales tracking and audience behavior analytics.",
+                  accent: "border-[#E11D48]/20"
+                },
+                {
+                  icon: <ShieldCheck className="h-10 w-10" />,
+                  title: "IRONCLAD SECURITY",
+                  desc: "Bank-grade encryption and secure secondary market controls.",
+                  accent: "border-emerald-500/20"
+                },
+                {
+                  icon: <Globe className="h-10 w-10" />,
+                  title: "GLOBAL NETWORK",
+                  desc: "Reach audiences in over 150 countries with localized payments.",
+                  accent: "border-purple-500/20"
+                },
+                {
+                  icon: <Zap className="h-10 w-10" />,
+                  title: "ZERO LATENCY",
+                  desc: "High-concurrency infrastructure built for instant sold-out moments.",
+                  accent: "border-orange-500/20"
+                },
+                {
+                  icon: <Rocket className="h-10 w-10" />,
+                  title: "VIP UPGRADES",
+                  desc: "Integrated hospitality and premium experience management.",
+                  accent: "border-pink-500/20"
+                }
+              ].map((f, i) => (
+                <div key={i} className="p-16 bg-black group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-0 bg-[#E11D48] group-hover:h-full transition-all duration-500" />
+                  <div className="mb-10 text-gray-600 group-hover:text-white transition-colors duration-300">
+                    {f.icon}
+                  </div>
+                  <h3 className="text-2xl font-black mb-6 text-white">{f.title}</h3>
+                  <p className="text-gray-500 leading-relaxed font-medium group-hover:text-gray-300 transition-colors">
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
+           </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section id="about" className="py-40 bg-transparent">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-8 block">Our Process</span>
+              <h2 className="text-5xl md:text-8xl font-black text-white leading-none mb-12">
+                FROM CONCEPT<br />TO STAGE
+              </h2>
+              <div className="space-y-16">
+                {[
+                  { step: "01", title: "Curation", desc: "Build your event with our high-fidelity tools." },
+                  { step: "02", title: "Activation", desc: "Launch marketing and open global sales channels." },
+                  { step: "03", title: "Execution", desc: "Real-time entry management and live analytics." }
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-12 group">
+                    <span className="text-4xl font-black text-white/10 group-hover:text-[#E11D48] transition-colors">{item.step}</span>
+                    <div>
+                      <h4 className="text-2xl font-black text-white mb-4">{item.title}</h4>
+                      <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
-
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{step.description}</p>
-
-                  <ul className="space-y-2">
-                    {step.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Connecting line */}
-                {index < 2 && (
-                  <div className="hidden lg:block absolute top-24 -right-6 w-12 h-px bg-gradient-to-r from-blue-300 to-purple-300 dark:from-blue-600 dark:to-purple-600 z-10" />
-                )}
+                ))}
               </div>
-            ))}
+            </div>
+            <div className="relative">
+              <div className="aspect-[4/5] bg-gray-900 rounded-2xl overflow-hidden relative group">
+                 <img src={img3} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                 <div className="absolute bottom-12 left-12">
+                    <p className="text-4xl font-black text-white leading-none">
+                       THE STAGE<br />IS YOURS
+                    </p>
+                 </div>
+              </div>
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#E11D48] rounded-full flex items-center justify-center -z-10 blur-3xl opacity-20" />
+            </div>
           </div>
         </div>
-        <section id="feedback" className="py-00 bg-gradient-to-b from-gray-850  dark:from-gray-800 dark:to-gray-800 overflow-hidden">
-          <UserFeedback />
-        </section>
       </section>
 
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black dark:from-gray-950 dark:via-gray-900 dark:to-black text-white py-10">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
-            {/* Brand Section */}
-            <div className="lg:col-span-1">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Ticket className="h-7 w-7 text-white" />
-                </div>
-                <span className="font-bold text-2xl">EventEase</span>
-              </div>
-              <p className="text-gray-400 dark:text-gray-500 mb-6 leading-relaxed">
-                The modern platform for creating, managing, and selling tickets to unforgettable events.
-              </p>
-              <div className="flex space-x-4">
-                {['facebook', 'twitter', 'instagram', 'linkedin'].map((social) => (
-                  <a
-                    key={social}
-                    href="#"
-                    className="w-10 h-10 bg-gray-800 dark:bg-gray-900 hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
-                  >
-                    <span className="sr-only">{social}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
+      {/* Feedback Section */}
+      <section id="feedback" className="py-40 bg-transparent border-t border-white/5">
+         <UserFeedback />
+      </section>
 
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Platform</h4>
-              <ul className="space-y-3">
-                {['Create Events', 'Sell Tickets', 'Event Analytics', 'Mobile App'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+      {/* Cinematic Footer */}
+      <footer className="bg-transparent text-white pt-40 pb-20 border-t border-white/5">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-24 mb-40">
+            <div className="lg:col-span-2">
+               <h2 className="text-6xl md:text-9xl font-black mb-16 tracking-tighter uppercase leading-none">
+                  JOIN THE<br /><span className="text-[#E11D48]">REVOLUTION</span>
+               </h2>
+               <div className="flex flex-wrap gap-8">
+                  {['Instagram', 'Twitter', 'LinkedIn', 'YouTube'].map(s => (
+                    <a key={s} href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 hover:text-white transition-colors">{s}</a>
+                  ))}
+               </div>
             </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Support</h4>
-              <ul className="space-y-3">
-                {['Help Center', 'Contact Us', 'API Documentation', 'System Status'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div>
-              <h4 className="text-lg font-semibold mb-6">Stay Updated</h4>
-              <p className="text-gray-400 dark:text-gray-500 mb-4">Get the latest updates and event tips.</p>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 bg-gray-800 dark:bg-gray-950 border border-gray-700 dark:border-gray-800 rounded-l-lg focus:outline-none focus:border-blue-500 text-white"
-                />
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 rounded-r-lg">
-                  Subscribe
-                </Button>
-              </div>
+            
+            <div className="grid grid-cols-2 gap-12 lg:col-span-2">
+               <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-10">Platform</h4>
+                  <ul className="space-y-6">
+                    {['Home', 'Shows', 'Analytics', 'Enterprise'].map(l => (
+                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors">{l}</a></li>
+                    ))}
+                  </ul>
+               </div>
+               <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-10">Support</h4>
+                  <ul className="space-y-6">
+                    {['Help Center', 'API Docs', 'Status', 'Legal'].map(l => (
+                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors">{l}</a></li>
+                    ))}
+                  </ul>
+               </div>
             </div>
           </div>
 
-          {/* Contact Form Section */}
-          <div id="contactus" className="border-t border-white/10 dark:border-gray-700 pt-0 scroll-mt-16">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4 bg-white/10 text-white border-white/20 dark:bg-transparent dark:border-gray-700">
-                Get In Touch
-              </Badge>
-              <h3 className="text-3xl font-bold mb-4 text-white dark:text-gray-100">
-                Contact Us
-              </h3>
-              <p className="text-gray-300 dark:text-gray-400 max-w-2xl mx-auto">
-                Have questions or need support? We're here to help you create amazing events.
-              </p>
-            </div>
-            <Card className="bg-white/5 dark:bg-gray-800/60 backdrop-blur-md border-white/10 dark:border-gray-700 shadow-2xl">
-              <CardContent className="p-8">
+          {/* Contact Integration */}
+          <div id="contactus" className="mb-40 scroll-mt-32">
+             <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+                <h3 className="text-4xl font-black">GET IN TOUCH</h3>
+                <p className="text-gray-500 text-sm max-w-xs text-right uppercase font-bold tracking-widest">Our agents are available 24/7 for enterprise support.</p>
+             </div>
+             <div className="bg-white/5 border border-white/5 p-12 md:p-20">
                 <ContactUs />
-              </CardContent>
-            </Card>
+             </div>
           </div>
 
-
-          <div className="border-t border-gray-800 dark:border-gray-900 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 dark:text-gray-500 text-sm mb-4 md:mb-0">
-                © 2025 EventEase. All rights reserved. | Privacy Policy | Terms of Service
-              </p>
-              <div className="flex items-center space-x-6 text-sm text-gray-400 dark:text-gray-500">
-                <span className="flex items-center">
-                  <Shield className="h-4 w-4 mr-1" />
-                  Secure Platform
-                </span>
-                <span className="flex items-center">
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  99.9% Uptime
-                </span>
-              </div>
-
+          <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-white/5 gap-8">
+            <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest">
+              © 2025 EventEase. The Standard in Live Entertainment.
+            </p>
+            <div className="flex items-center gap-12">
+              <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-600">
+                <ShieldCheck className="h-4 w-4" /> Secure Platform
+              </span>
+              <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-600">
+                <Zap className="h-4 w-4" /> Ultra-Low Latency
+              </span>
             </div>
           </div>
         </div>
-
       </footer>
+      
       <ChatBot />
-
       <Outlet />
     </div>
   );
 };
-
-
-
-
-
-
