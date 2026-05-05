@@ -211,7 +211,7 @@ export const AllUsers = () => {
                 placeholder="IDENTIFY BY NAME, EMAIL, OR PHONE..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-14 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-800 transition-all"
+                className="h-14 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-500 transition-all"
               />
             </div>
             <Button variant="outline" className="h-14 px-8 border-white/10 bg-transparent text-gray-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-2xl hover:bg-white hover:text-black transition-all">

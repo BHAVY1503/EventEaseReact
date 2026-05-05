@@ -141,7 +141,7 @@ export const OrganizerSignup = () => {
                           {...register("name", validationSchema.nameValidator)}
                           type="text"
                           placeholder="FULL NAME"
-                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-500 outline-none transition-colors"
                        />
                        {errors.name && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.name.message}</p>}
                     </div>
@@ -152,7 +152,7 @@ export const OrganizerSignup = () => {
                           {...register("organizationName", validationSchema.OnameValidator)}
                           type="text"
                           placeholder="ENTITY NAME"
-                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-500 outline-none transition-colors"
                        />
                        {errors.organizationName && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.organizationName.message}</p>}
                     </div>
@@ -165,7 +165,7 @@ export const OrganizerSignup = () => {
                           {...register("email", validationSchema.emailValidator)}
                           type="email"
                           placeholder="EMAIL@DOMAIN.COM"
-                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-500 outline-none transition-colors"
                        />
                        {errors.email && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.email.message}</p>}
                     </div>
@@ -176,7 +176,7 @@ export const OrganizerSignup = () => {
                           {...register("PhoneNo", validationSchema.phoneValidator)}
                           type="tel"
                           placeholder="+91 00000 00000"
-                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                          className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-blue-500 placeholder:text-gray-500 outline-none transition-colors"
                        />
                        {errors.PhoneNo && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.PhoneNo.message}</p>}
                     </div>
@@ -188,7 +188,7 @@ export const OrganizerSignup = () => {
                        {...register("password", validationSchema.passwordValidator)}
                        type="password"
                        placeholder="••••••••"
-                       className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-blue-500 placeholder:text-gray-800 outline-none transition-colors"
+                       className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-blue-500 placeholder:text-gray-500 outline-none transition-colors"
                     />
                     {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.password.message}</p>}
                  </div>

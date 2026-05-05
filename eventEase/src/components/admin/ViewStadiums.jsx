@@ -179,7 +179,7 @@ const ViewStadiums = () => {
                 placeholder="SEARCH NODES BY DESIGNATION..."
                 value={filterName}
                 onChange={(e) => setFilterName(e.target.value)}
-                className="h-16 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-800 transition-all"
+                className="h-16 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-500 transition-all"
              />
           </div>
           <Button 

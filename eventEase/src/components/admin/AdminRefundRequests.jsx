@@ -377,7 +377,7 @@ export const AdminRefundRequests = () => {
                 placeholder="E.G., VIOLATION OF CANCELLATION PROTOCOLS..."
                 value={rejectRemark}
                 onChange={(e) => setRejectRemark(e.target.value)}
-                className="min-h-[140px] bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-800 transition-all p-6"
+                className="min-h-[140px] bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-500 transition-all p-6"
               />
             </div>
           </div>

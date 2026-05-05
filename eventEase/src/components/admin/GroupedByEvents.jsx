@@ -395,7 +395,7 @@ export const GroupedByEvents = () => {
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="DESCRIBE INFRASTRUCTURE DEFICIENCIES..."
                 rows={4}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-red-500/50 focus:border-red-500/50 placeholder:text-gray-800 outline-none resize-none transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] font-bold tracking-widest uppercase focus:ring-1 focus:ring-red-500/50 focus:border-red-500/50 placeholder:text-gray-500 outline-none resize-none transition-all"
               />
             </div>
           </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 const StarBackground = () => {
   const canvasRef = useRef(null);
-
+  
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -14,117 +14,138 @@ const StarBackground = () => {
     canvas.width = width;
     canvas.height = height;
 
-    const stars = [];
-    const numStars = 150; // reduced background stars for focus
-    const speedBase = 0.15;
-    let lastScrollY = window.scrollY;
+    // --- Configuration ---
+    const starColor = '#E11D48'; // Primary Brand Red/Crimson
+    const bgStarCount = 1200;
+    const heroCount = 3;
+    let scrollY = window.scrollY;
+    let targetScrollY = window.scrollY;
 
-    class Star {
+    // --- Star Classes ---
+    class BackgroundStar {
       constructor() {
-        this.init();
+        this.reset();
       }
-
-      init() {
+      reset() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.z = Math.random() * 1000;
-        this.size = Math.random() * 1.2 + 0.2;
-        this.opacity = Math.random() * 0.5 + 0.1;
-        this.color = '#FFFFFF'; 
+        this.z = Math.random() * 2000; // Depth for parallax
+        this.size = Math.random() * 1.2 + 0.1;
+        this.opacity = Math.random() * 0.6 + 0.1;
+        this.twinkle = Math.random() * 0.02 + 0.005;
       }
+      update(currentScrollY) {
+        // Parallax: Stars further away (higher z) move slower
+        const parallaxFactor = 50 / (this.z + 1);
+        this.currentY = (this.y + currentScrollY * parallaxFactor) % height;
+        if (this.currentY < 0) this.currentY += height;
 
-      update(scrollDelta) {
-        this.y += speedBase * (1000 / (this.z + 1));
-        const scrollFactor = (1000 / (this.z + 1)) * 0.4;
-        this.y -= scrollDelta * scrollFactor;
-
-        if (this.y > height) {
-          this.y = -10;
-          this.x = Math.random() * width;
-        } else if (this.y < -10) {
-          this.y = height + 10;
-          this.x = Math.random() * width;
-        }
-        this.currentSize = this.size;
+        this.opacity += this.twinkle;
+        if (this.opacity > 0.8 || this.opacity < 0.1) this.twinkle = -this.twinkle;
       }
-
       draw() {
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
+        ctx.arc(this.x, this.currentY, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    for (let i = 0; i < numStars; i++) {
-      stars.push(new Star());
-    }
-
-    const animate = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDelta = currentScrollY - lastScrollY;
-      lastScrollY = currentScrollY;
-
-      ctx.clearRect(0, 0, width, height);
-      
-      // 1. Background Nebula Glow
-      const gradient = ctx.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, width * 0.8);
-      gradient.addColorStop(0, 'rgba(5, 5, 5, 1)');
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-
-      // 2. Draw background stars
-      stars.forEach(star => {
-        star.update(scrollDelta);
-        star.draw();
-      });
-
-      // 3. Draw THE HERO STARS (3 Stars Staggered)
-      const neonColor = '#E11D48';
-      const drawHeroStar = (x, yOffset) => {
-        // Map scroll to a vertical range, with some constant drift
-        const heroYBase = ((currentScrollY * 0.9) + yOffset) % (height * 3);
-        const heroY = heroYBase - height * 0.8;
+    class HeroStar {
+      constructor(index) {
+        this.index = index;
+        this.x = width * (0.42 + index * 0.08); // Side-by-side near center
+        this.yOffset = index * 300; // Vertical stagger
+        this.rotation = 0;
+      }
+      update(currentScrollY) {
+        // Hero stars move faster (foreground)
+        this.y = ((currentScrollY * 0.8) + this.yOffset) % (height * 3) - height;
+        this.rotation += 0.01;
+      }
+      draw() {
+        const x = this.x;
+        const y = this.y;
         
-        // Trail
-        const trailLength = 1000;
-        const trailGradient = ctx.createLinearGradient(x, heroY - trailLength, x, heroY);
-        trailGradient.addColorStop(0, 'rgba(225, 29, 72, 0)');
-        trailGradient.addColorStop(0.5, 'rgba(225, 29, 72, 0.2)');
-        trailGradient.addColorStop(1, 'rgba(225, 29, 72, 0.8)');
+        // 1. Draw Vertical Trail (Streak)
+        const trailGradient = ctx.createLinearGradient(x, y - 500, x, y);
+        trailGradient.addColorStop(0, 'transparent');
+        trailGradient.addColorStop(1, `${starColor}66`); // 40% opacity
         
         ctx.beginPath();
-        ctx.moveTo(x, heroY - trailLength);
-        ctx.lineTo(x, heroY);
-        ctx.lineWidth = 3;
+        ctx.moveTo(x, y - 500);
+        ctx.lineTo(x, y);
+        ctx.lineWidth = 1.5;
         ctx.strokeStyle = trailGradient;
         ctx.stroke();
 
-        // Glowing Point
-        ctx.beginPath();
-        ctx.arc(x, heroY, 7, 0, Math.PI * 2);
-        ctx.fillStyle = neonColor;
-        ctx.shadowBlur = 70; // Increased brightness
-        ctx.shadowColor = neonColor;
-        ctx.fill();
+        // 2. Draw Glow (Multi-layered for "Bloom")
+        ctx.save();
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = starColor;
+        ctx.globalCompositeOperation = 'screen';
         
-        // Inner core
-        ctx.beginPath();
-        ctx.arc(x, heroY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.shadowBlur = 20; // Brighter core
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      };
+        // 3. Draw 4-Point Star Shape
+        ctx.translate(x, y);
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = '#FFFFFF'; // Inner core is bright white
+        
+        const drawCross = (size) => {
+          ctx.beginPath();
+          ctx.moveTo(-size, 0);
+          ctx.lineTo(size, 0);
+          ctx.moveTo(0, -size);
+          ctx.lineTo(0, size);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = starColor;
+          ctx.stroke();
+          
+          // Core point
+          ctx.beginPath();
+          ctx.arc(0, 0, 2, 0, Math.PI * 2);
+          ctx.fill();
+        };
 
-      // Draw Middle Star (First)
-      drawHeroStar(width * 0.5, 0);
-      
-      // Draw Side Stars (Closer distance, Staggered)
-      drawHeroStar(width * 0.42, -250);
-      drawHeroStar(width * 0.58, -250);
+        drawCross(10);
+        
+        // Outer faint glow
+        ctx.shadowBlur = 80;
+        ctx.shadowColor = starColor;
+        drawCross(15);
+
+        ctx.restore();
+      }
+    }
+
+    // --- Initialization ---
+    const bgStars = Array.from({ length: bgStarCount }, () => new BackgroundStar());
+    const heroes = Array.from({ length: heroCount }, (_, i) => new HeroStar(i));
+
+    const animate = () => {
+      // Smooth Scroll Interpolation
+      targetScrollY = window.scrollY;
+      scrollY += (targetScrollY - scrollY) * 0.1; // Smooth dampening
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw Background Nebula
+      const nebula = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 0.8);
+      nebula.addColorStop(0, 'rgba(20, 0, 5, 1)');
+      nebula.addColorStop(1, 'rgba(0, 0, 0, 1)');
+      ctx.fillStyle = nebula;
+      ctx.fillRect(0, 0, width, height);
+
+      // Update and Draw Background
+      bgStars.forEach(star => {
+        star.update(scrollY);
+        star.draw();
+      });
+
+      // Update and Draw Heroes
+      heroes.forEach(hero => {
+        hero.update(scrollY);
+        hero.draw();
+      });
 
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -149,8 +170,7 @@ const StarBackground = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-[-1] bg-black"
-      style={{ filter: 'contrast(1.2) brightness(0.8)' }}
+      className="fixed inset-0 pointer-events-none z-[-1]"
     />
   );
 };

@@ -74,7 +74,7 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-30">
+    <div className="fixed bottom-6 right-6 z-[100]">
       {/* Floating Chat Button */}
       {!isOpen && (
         <button
@@ -92,7 +92,7 @@ const ChatBot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="bg-[#050505] rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] w-[380px] h-[600px] flex flex-col overflow-hidden border border-white/10 animate-slideUp">
+        <div className="bg-[#050505] rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] w-[350px] h-[550px] max-h-[calc(100vh-120px)] flex flex-col overflow-hidden border border-white/10 animate-slideUp">
           {/* Header */}
           <div className="bg-black text-white p-6 flex items-center justify-between border-b border-white/5">
             <div className="flex items-center gap-4">
@@ -113,7 +113,7 @@ const ChatBot = () => {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-black">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-black scrollbar-hide">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
                 <div className={`max-w-[85%] p-4 text-[10px] font-bold uppercase tracking-widest leading-relaxed ${
@@ -150,7 +150,7 @@ const ChatBot = () => {
                   onKeyPress={handleKeyPress}
                   placeholder="TRANSMIT MESSAGE..."
                   disabled={isTyping}
-                  className="flex-1 bg-white/5 border-none rounded-full px-6 py-4 text-[10px] font-black tracking-widest text-white focus:ring-1 focus:ring-[#E11D48] outline-none placeholder:text-gray-800 disabled:opacity-50"
+                  className="flex-1 bg-white/5 border-none rounded-full px-6 py-4 text-[10px] font-black tracking-widest text-white focus:ring-1 focus:ring-[#E11D48] outline-none placeholder:text-gray-500 disabled:opacity-50"
                 />
                 <button
                   onClick={handleSendMessage}
@@ -160,7 +160,7 @@ const ChatBot = () => {
                   {isTyping ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 </button>
              </div>
-             <p className="text-center text-[7px] font-black text-gray-700 uppercase tracking-[0.4em] mt-4">
+             <p className="text-center text-[7px] font-black text-gray-500 uppercase tracking-[0.4em] mt-4">
                 Powered by EventEase Core AI
              </p>
           </div>
@@ -172,6 +172,8 @@ const ChatBot = () => {
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slideUp { animation: slideUp 0.3s ease-out; }
         .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );

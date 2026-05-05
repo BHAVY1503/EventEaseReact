@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
 import { logout } from "../../features/auth/authSlice";
 import api from "@/lib/api";
@@ -129,14 +129,12 @@ export const AdminDashboard = () => {
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
 
   const sidebarItems = [
-    { id: "home", label: "Dashboard", icon: Home },
-    { id: "events", label: "All Events", icon: Calendar },
-    { id: "groupbyevent", label: "Grouped Events", icon: BarChart3 },
-    { id: "adminevents", label: "Admin Events", icon: Shield },
-    { id: "addevent", label: "Add Event", icon: Plus },
-    { id: "addstadium", label: "Add Stadium", icon: Building2 },
-    { id: "viewstadiums", label: "Manage Stadiums", icon: Settings },
-    { id: "feedback", label: "User Feedback", icon: Star },
+    { id: "home", label: "Dashboard", icon: Home, to: "/admin" },
+    { id: "events", label: "All Events", icon: Calendar, to: "/admin/allevents" },
+    { id: "adminevents", label: "Admin Events", icon: Shield, to: "/admin/adminevents" },
+    { id: "addevent", label: "Add Event", icon: Plus, to: "/admin/addevent" },
+    { id: "addstadium", label: "Add Stadium", icon: Building2, to: "/admin/addstadium" },
+    { id: "viewstadiums", label: "Manage Stadiums", icon: Settings, to: "/admin/stadiums" },
   ];
 
   const quickLinks = [
@@ -147,8 +145,11 @@ export const AdminDashboard = () => {
     { to: "/admininbox", label: "Inbox", icon: Inbox },
   ];
 
+  const location = useLocation();
+  const isRoot = location.pathname === "/admin" || location.pathname === "/admin/";
+
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-[#E11D48]/30">
+    <div className="min-h-screen bg-transparent text-white selection:bg-[#E11D48]/30">
       {/* FIXED LEFT SIDEBAR */}
       <aside
         className={cn(
@@ -188,20 +189,21 @@ export const AdminDashboard = () => {
             )}
             {sidebarItems.map((item) => {
               const Icon = item.icon;
+              const isActive = location.pathname === item.to;
               return (
                 <Button
                   key={item.id}
                   variant="ghost"
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => navigate(item.to)}
                   className={cn(
                     "w-full h-12 transition-all duration-300 rounded-xl group",
                     sidebarCollapsed ? "justify-center px-0" : "justify-start px-4",
-                    "hover:bg-[#E11D48]/10"
+                    isActive ? "bg-[#E11D48]/20 text-white" : "hover:bg-[#E11D48]/10"
                   )}
                 >
-                  <Icon className={cn("h-5 w-5", sidebarCollapsed ? "" : "mr-3", "text-gray-400 group-hover:text-[#E11D48] transition-colors")} />
+                  <Icon className={cn("h-5 w-5", sidebarCollapsed ? "" : "mr-3", isActive ? "text-[#E11D48]" : "text-gray-400 group-hover:text-[#E11D48] transition-colors")} />
                   {!sidebarCollapsed && (
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 group-hover:text-white transition-colors">
+                    <span className={cn("text-[10px] font-black uppercase tracking-[0.2em] transition-colors", isActive ? "text-white" : "text-gray-300 group-hover:text-white")}>
                       {item.label}
                     </span>
                   )}
@@ -258,22 +260,19 @@ export const AdminDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main
+      <div
         className={cn(
-          "transition-all duration-500 min-h-screen relative",
+          "flex-1 transition-all duration-500 min-w-0 flex flex-col",
           sidebarCollapsed ? "ml-20" : "ml-72"
         )}
       >
         {/* TOP COMMAND BAR */}
         <nav
           className={cn(
-            "fixed top-0 right-0 z-40 transition-all duration-500 px-10 h-24 flex items-center",
-            isScrolled ? "bg-black/80 backdrop-blur-3xl border-b border-white/10" : "bg-transparent"
+            "fixed top-0 right-0 z-40 transition-all duration-500 px-10 h-24 flex items-center border-b border-white/5",
+            isScrolled ? "bg-black/80 backdrop-blur-3xl" : "bg-transparent",
+            sidebarCollapsed ? "left-20" : "left-72"
           )}
-          style={{
-            left: sidebarCollapsed ? "5rem" : "18rem",
-            width: sidebarCollapsed ? "calc(100% - 5rem)" : "calc(100% - 18rem)"
-          }}
         >
           <div className="w-full flex justify-between items-center">
             <div>
@@ -282,7 +281,7 @@ export const AdminDashboard = () => {
             </div>
 
             <div className="flex items-center gap-6">
-              <PendingEventsBadge onNavigate={scrollToSection} />
+              <PendingEventsBadge onNavigate={(id) => navigate('/admin')} />
               <div className="h-8 w-px bg-white/10" />
               <DarkModeToggle />
               
@@ -317,133 +316,125 @@ export const AdminDashboard = () => {
           </div>
         </nav>
 
-        {/* HERO NEXUS */}
-        <div id="home" className="relative h-[90vh] overflow-hidden">
-          {heroImages.map((img, i) => (
-            <div
-              key={i}
-              className={cn(
-                "absolute inset-0 transition-all duration-[2s] ease-out",
-                i === currentSlide ? "opacity-40 scale-100 rotate-0" : "opacity-0 scale-110 rotate-1"
+        {/* CONTENT RENDERING ENGINE */}
+        <main className="flex-1 pt-32 overflow-y-auto no-scrollbar flex flex-col">
+          <div className="flex-1 max-w-[1600px] mx-auto w-full">
+            <AnimatePresence mode="wait">
+              {isRoot ? (
+                <motion.div
+                  key="admin-dashboard-home"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col"
+                >
+                  {/* HERO NEXUS */}
+                  <div id="home" className="relative h-[80vh] min-h-[600px] overflow-hidden flex items-center mb-10 px-10">
+                    {heroImages.map((img, i) => (
+                      <motion.div
+                        key={i}
+                        className={cn(
+                          "absolute inset-0 transition-all duration-[2s] ease-out",
+                          i === currentSlide ? "opacity-30 scale-100 rotate-0" : "opacity-0 scale-110 rotate-1"
+                        )}
+                        style={{
+                          backgroundImage: `url(${img})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
+                    ))}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
+                    
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="max-w-4xl px-10 text-center">
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 1 }}
+                        >
+                          <Badge className="bg-[#E11D48] text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] mb-10 shadow-[0_0_40px_rgba(225,29,72,0.4)] border-0">
+                            Nexus Authorization Verified
+                          </Badge>
+                          <h1 className="text-7xl md:text-8xl font-black text-white leading-[0.85] uppercase tracking-tighter mb-10">
+                            Operational <br /> <span className="text-[#E11D48]">Command</span> Center
+                          </h1>
+                          <p className="text-lg text-gray-400 font-bold uppercase tracking-[0.3em] mb-12 max-w-2xl mx-auto leading-relaxed">
+                            Total system oversight across the EventEase decentralized architecture
+                          </p>
+                          <div className="flex flex-wrap gap-6 justify-center">
+                            <Button
+                              size="lg"
+                              onClick={() => navigate("/admin/addevent")}
+                              className="h-20 px-10 bg-white text-black font-black uppercase tracking-[0.4em] text-[11px] rounded-full hover:bg-[#E11D48] hover:text-white transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)] group"
+                            >
+                              <Plus className="w-5 h-5 mr-4 group-hover:rotate-90 transition-transform" /> Initialize Event
+                            </Button>
+                            <Button
+                              size="lg"
+                              variant="outline"
+                              onClick={() => navigate("/admin/allevents")}
+                              className="h-20 px-10 bg-transparent border-white/20 text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-full hover:bg-white hover:text-black transition-all"
+                            >
+                              <Calendar className="w-5 h-5 mr-4" /> Global Catalog
+                            </Button>
+                          </div>
+                        </motion.div>
+                      </div>
+                    </div>
+
+                    {/* Slide Controls */}
+                    <div className="absolute bottom-20 left-10 flex gap-4">
+                      <button onClick={prevSlide} className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><ArrowLeft className="w-5 h-5" /></button>
+                      <button onClick={nextSlide} className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><ArrowRight className="w-5 h-5" /></button>
+                    </div>
+                  </div>
+
+                  {/* CORE OPERATIONAL MODULES (Preview on Home) */}
+                  <div className="relative z-10 space-y-32 pb-40 px-10">
+                    <section id="events" className="scroll-mt-32">
+                      <div className="flex items-center gap-10 mb-16">
+                          <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Global Catalog</h2>
+                          <div className="h-px flex-1 bg-white/10" />
+                          <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Master Manifest</span>
+                      </div>
+                      <ViewEvents />
+                    </section>
+
+                    <section id="groupbyevent" className="scroll-mt-32">
+                      <div className="flex items-center gap-10 mb-16">
+                          <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Intelligence Grids</h2>
+                          <div className="h-px flex-1 bg-white/10" />
+                          <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Data Clusters</span>
+                      </div>
+                      <GroupedByEvents />
+                    </section>
+
+                    <section id="feedback" className="scroll-mt-32">
+                      <div className="flex items-center gap-10 mb-16">
+                          <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Neural Feedback</h2>
+                          <div className="h-px flex-1 bg-white/10" />
+                          <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">User Sentiment</span>
+                      </div>
+                      <UserFeedback />
+                    </section>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="admin-sub-route"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="px-6 md:px-10 pb-20"
+                >
+                  <Outlet />
+                </motion.div>
               )}
-              style={{
-                backgroundImage: `url(${img})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-          
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="max-w-4xl px-10 text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1 }}
-              >
-                <Badge className="bg-[#E11D48] text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] mb-10 shadow-[0_0_40px_rgba(225,29,72,0.4)] border-0">
-                  Nexus Authorization Verified
-                </Badge>
-                <h1 className="text-7xl md:text-8xl font-black text-white leading-[0.85] uppercase tracking-tighter mb-10">
-                  Operational <br /> <span className="text-[#E11D48]">Command</span> Center
-                </h1>
-                <p className="text-lg text-gray-400 font-bold uppercase tracking-[0.3em] mb-12 max-w-2xl mx-auto leading-relaxed">
-                  Total system oversight across the EventEase decentralized architecture
-                </p>
-                <div className="flex flex-wrap gap-6 justify-center">
-                  <Button
-                    size="lg"
-                    onClick={() => scrollToSection("addevent")}
-                    className="h-20 px-10 bg-white text-black font-black uppercase tracking-[0.4em] text-[11px] rounded-full hover:bg-[#E11D48] hover:text-white transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)] group"
-                  >
-                    <Plus className="w-5 h-5 mr-4 group-hover:rotate-90 transition-transform" /> Initialize Event
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => scrollToSection("events")}
-                    className="h-20 px-10 bg-transparent border-white/20 text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-full hover:bg-white hover:text-black transition-all"
-                  >
-                    <Calendar className="w-5 h-5 mr-4" /> Global Catalog
-                  </Button>
-                </div>
-              </motion.div>
-            </div>
+            </AnimatePresence>
           </div>
-
-          {/* Slide Controls */}
-          <div className="absolute bottom-20 left-10 flex gap-4">
-             <button onClick={prevSlide} className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><ArrowLeft className="w-5 h-5" /></button>
-             <button onClick={nextSlide} className="w-12 h-12 border border-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><ArrowRight className="w-5 h-5" /></button>
-          </div>
-        </div>
-
-        {/* CORE OPERATIONAL MODULES */}
-        <div className="relative z-10 space-y-32 pb-40 px-10">
-          <section id="events" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Global Catalog</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Master Manifest</span>
-             </div>
-             <ViewEvents />
-          </section>
-
-          <section id="groupbyevent" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Intelligence Grids</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Data Clusters</span>
-             </div>
-             <GroupedByEvents />
-          </section>
-
-          <section id="adminevents" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Nexus Operations</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Authorized Transmissions</span>
-             </div>
-             <AdminEvents />
-          </section>
-
-          <section id="addevent" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Production Forge</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Manifest Initialization</span>
-             </div>
-             <AddEvent />
-          </section>
-
-          <section id="addstadium" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Sector Expansion</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Physical Node Config</span>
-             </div>
-             <AddStadiumForm />
-          </section>
-
-          <section id="viewstadiums" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Arena Assets</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">Node Monitoring</span>
-             </div>
-             <ViewStadiums />
-          </section>
-
-          <section id="feedback" className="scroll-mt-32">
-             <div className="flex items-center gap-10 mb-16">
-                <h2 className="text-4xl font-black text-white uppercase tracking-tighter">Neural Feedback</h2>
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[10px] font-black text-gray-700 uppercase tracking-widest">User Sentiment</span>
-             </div>
-             <UserFeedback />
-          </section>
-        </div>
+        </main>
 
         {/* NEXUS FOOTER */}
         <footer className="relative bg-[#050505] border-t border-white/10 text-white overflow-hidden py-32 px-10">
@@ -485,7 +476,7 @@ export const AdminDashboard = () => {
             </div>
           </div>
         </footer>
-      </main>
+      </div>
 
       <Outlet />
     </div>

@@ -137,7 +137,7 @@ export const ContactUs = () => {
                     <input
                       {...register("name", { required: true })}
                       placeholder="ENTER FULL NAME"
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-800 outline-none transition-all"
+                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-500 outline-none transition-all"
                     />
                   </div>
                </div>
@@ -148,7 +148,7 @@ export const ContactUs = () => {
                       {...register("email", { required: true })}
                       type="email"
                       placeholder="EMAIL@DOMAIN.COM"
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-800 outline-none transition-all"
+                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-500 outline-none transition-all"
                     />
                   </div>
                </div>
@@ -161,7 +161,7 @@ export const ContactUs = () => {
                     {...register("message", { required: true })}
                     placeholder="DESCRIBE YOUR INFRASTRUCTURE QUERY..."
                     rows={6}
-                    className="w-full bg-white/5 border border-white/5 rounded-[2rem] px-8 py-6 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-800 outline-none resize-none transition-all"
+                    className="w-full bg-white/5 border border-white/5 rounded-[2rem] px-8 py-6 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-500 outline-none resize-none transition-all"
                   />
                </div>
             </div>

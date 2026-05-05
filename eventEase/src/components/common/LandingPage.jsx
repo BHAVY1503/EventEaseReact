@@ -133,22 +133,23 @@ export const LandingPage = () => {
       {/* Cinematic Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Dynamic Background */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 overflow-hidden">
           {images.map((img, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 1.1 }}
               animate={{ 
-                opacity: index === currentSlide ? 1 : 0,
+                opacity: index === currentSlide ? 0.3 : 0,
                 scale: index === currentSlide ? 1 : 1.1 
               }}
               transition={{ duration: 2, ease: "easeOut" }}
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${img})` }}
             >
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
             </motion.div>
           ))}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         </div>
 

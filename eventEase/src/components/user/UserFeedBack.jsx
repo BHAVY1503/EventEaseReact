@@ -112,7 +112,7 @@ export const UserFeedback = () => {
                           value={form.userName}
                           onChange={(e) => setForm({ ...form, userName: e.target.value })}
                           required
-                          className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-800 outline-none"
+                          className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-500 outline-none"
                        />
                        <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/10 group-focus-within:bg-[#E11D48] transition-colors" />
                     </div>
@@ -123,7 +123,7 @@ export const UserFeedback = () => {
                           placeholder="AVATAR LINK"
                           value={form.profileImage}
                           onChange={(e) => setForm({ ...form, profileImage: e.target.value })}
-                          className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-800 outline-none"
+                          className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-500 outline-none"
                        />
                        <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/10 group-focus-within:bg-[#E11D48] transition-colors" />
                     </div>
@@ -137,7 +137,7 @@ export const UserFeedback = () => {
                        onChange={(e) => setForm({ ...form, message: e.target.value })}
                        required
                        rows={4}
-                       className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-800 outline-none resize-none"
+                       className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-500 outline-none resize-none"
                     />
                     <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/10 group-focus-within:bg-[#E11D48] transition-colors" />
                  </div>

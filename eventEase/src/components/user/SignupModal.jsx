@@ -78,7 +78,7 @@ export const SignUpModal = ({ onClose }) => {
                            {...register("fullName", { required: "Name required" })}
                            type="text"
                            placeholder="FULL NAME"
-                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-800 outline-none transition-colors"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
                         />
                         {errors.fullName && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.fullName.message}</p>}
                      </div>
@@ -89,7 +89,7 @@ export const SignUpModal = ({ onClose }) => {
                            {...register("email", { required: "Email required" })}
                            type="email"
                            placeholder="EMAIL@DOMAIN.COM"
-                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-800 outline-none transition-colors"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
                         />
                         {errors.email && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.email.message}</p>}
                      </div>
@@ -100,7 +100,7 @@ export const SignUpModal = ({ onClose }) => {
                            {...register("password", { required: "Key required", minLength: { value: 6, message: "Min 6 chars" } })}
                            type="password"
                            placeholder="••••••••"
-                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-800 outline-none transition-colors"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
                         />
                         {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.password.message}</p>}
                      </div>
@@ -111,7 +111,7 @@ export const SignUpModal = ({ onClose }) => {
                            {...register("phoneNumber", { required: "Phone required" })}
                            type="tel"
                            placeholder="PHONE NUMBER"
-                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-800 outline-none transition-colors"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
                         />
                         {errors.phoneNumber && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.phoneNumber.message}</p>}
                      </div>

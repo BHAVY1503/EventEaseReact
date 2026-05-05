@@ -313,12 +313,15 @@ export const OrganizerDashboard = () => {
                         key={i}
                         className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: i === currentSlide ? 0.5 : 0 }}
+                        animate={{ opacity: i === currentSlide ? 0.3 : 0 }}
                         style={{
-                          backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${img})`,
+                          backgroundImage: `url(${img})`,
                         }}
-                      />
+                      >
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+                      </motion.div>
                     ))}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     
                     <div className="relative z-10 w-full px-12 md:px-20 max-w-[1600px] mx-auto">

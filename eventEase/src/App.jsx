@@ -94,10 +94,13 @@ function App() {
 				<Route element={<PrivateRoute />}>
 					{/* Admin Routes */}
 					<Route path='/admin' element={<AdminDashboard />}>
+						<Route path='allevents' element={<ViewEvents />} />
 						<Route path='groupedbyevent' element={<GroupedByEvents />} />
 						<Route path='addstadium' element={<AddStadiumForm />} />
 						<Route path='stadiums' element={<ViewStadiums />} />
 						<Route path='adminevents' element={<AdminEvents />} />
+						<Route path='addevent' element={<AddEvent />} />
+						<Route path='feedback' element={<UserFeedback />} />
 					</Route>
 					<Route path='/admin/editstadium/:id' element={<UpdateStadium />} />
 					<Route path='/alleventsticket' element={<AllEventBookings />} />
