@@ -1,477 +1,134 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+   Dialog,
+   DialogContent,
 } from "@/components/ui/dialog";
-// redux
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "@/features/auth/authSlice";
+import { LogIn, X, Ticket, ShieldCheck, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-
-
-/**
- * SignInModal
- * Props:
- *  - open (boolean) optional
- *  - onClose() optional
- *  - onLoginSuccess(token, userData) optional -> parent should store token/id/isVerified and continue pending flow
- *  - pendingPayment optional (not required here, parent handles it)
- */
 export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(open);
-  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
-  const dispatch = useDispatch();
-  const { isLoading, error, user } = useSelector((state) => state.auth);
+   const { register, handleSubmit, formState: { errors } } = useForm();
+   const navigate = useNavigate();
+   const [isOpen, setIsOpen] = useState(open);
+   const dispatch = useDispatch();
+   const { isLoading, error } = useSelector((state) => state.auth);
 
-  const validationSchema = {
-    emailValidator: {
-      required: {
-        value: true,
-        message: "Email is required*"
+   const onSubmit = async (formData) => {
+      const result = await dispatch(loginUser(formData));
+      if (loginUser.fulfilled.match(result)) {
+         const { token, data } = result.payload;
+         if (onLoginSuccess) {
+            onLoginSuccess(token, data);
+         }
+         setIsOpen(false);
+         onClose?.();
       }
-    },
-    passwordValidator: {
-      required: {
-        value: true,
-        message: "Password is required"
-      },
-      minLength: { 
-        value: 6, 
-        message: "Minimum 6 characters required" 
-      }
-    }
-  };
+   };
 
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
+   return (
+      <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
+         <DialogContent className="max-w-4xl bg-black border border-white/5 p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] z-[1000] rounded-[2rem] max-h-[85vh]">
+            <div className="grid grid-cols-1 md:grid-cols-12 h-full max-h-[85vh]">
+               {/* Visual Side (40%) */}
+               <div className="hidden md:flex md:col-span-5 relative bg-[#050505] p-10 lg:p-12 flex-col justify-between border-r border-white/5 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#E11D48]/5 blur-[100px] -mr-32 -mt-32" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 blur-[100px] -ml-32 -mb-32" />
 
-  useEffect(() => {
-    const loadGoogleSignIn = () => {
-      const googleDiv = document.getElementById("googleSignInDiv");
-      if (window.google && googleDiv) {
-        try {
-          window.google.accounts.id.initialize({
-            client_id: "342037145091-qvhlig4d6tn8p35ho40kc8c468mpnqug.apps.googleusercontent.com",
-            callback: handleGoogleResponse,
-            auto_select: false,
-          });
+                  <div className="relative z-10">
+                     <div className="flex items-center gap-4 mb-12">
+                        <div className="w-10 h-10 bg-[#E11D48] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.3)]">
+                           <Ticket className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-[0.5em] text-white">EventEase</span>
+                     </div>
 
-          window.google.accounts.id.renderButton(
-            googleDiv,
-            {
-              type: "standard",
-              theme: "filled_black",
-              size: "large",
-              text: "signin_with",
-              shape: "rectangular",
-              width: googleDiv.offsetWidth,
-            }
-          );
-          setIsGoogleLoaded(true);
-        } catch (error) {
-          console.error("Error initializing Google Sign-In:", error);
-        }
-      } else {
-        const t = setTimeout(loadGoogleSignIn, 500);
-        return () => clearTimeout(t);
-      }
-    };
+                     <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-[0.85] mb-8">
+                        ACCESS THE<br />REVOLUTION
+                     </h2>
+                     <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] leading-relaxed max-w-[240px]">
+                        Enter your credentials to unlock exclusive event management and booking protocols.
+                     </p>
+                  </div>
 
-    loadGoogleSignIn();
+                  <div className="relative z-10 flex items-center gap-6">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-gray-700 uppercase tracking-widest">
+                        <ShieldCheck className="h-4 w-4 text-[#E11D48]" /> Encrypted Access
+                     </div>
+                  </div>
+               </div>
 
-    return () => {
-      if (window.google?.accounts?.id) {
-        try {
-          window.google.accounts.id.cancel();
-        } catch (err) {
-          // ignore
-        }
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+               {/* Form Side (60%) */}
+               <div className="md:col-span-7 p-10 md:p-12 bg-black flex flex-col overflow-y-auto no-scrollbar">
+                  <div className="flex justify-between items-center mb-12">
+                     <div>
+                        <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-2 text-glow">Access Portal</h3>
+                        <div className="h-1 w-12 bg-[#E11D48]" />
+                     </div>
+                     <button onClick={() => { setIsOpen(false); onClose?.(); }} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-[#E11D48] transition-all">
+                        <X className="w-5 h-5" />
+                     </button>
+                  </div>
 
-  const handleGoogleResponse = async (response) => {
-    try {
-      const res = await axios.post("/user/googlelogin", {
-        token: response.credential,
-      });
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+                     <div className="relative group">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Transmission ID</p>
+                        <input
+                           {...register("email", { required: "Identity required" })}
+                           type="email"
+                           placeholder="EMAIL@DOMAIN.COM"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
+                        />
+                        {errors.email && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.email.message}</p>}
+                     </div>
 
-      const { token, data } = res.data;
+                     <div className="relative group">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Access Key</p>
+                        <input
+                           {...register("password", { required: "Key required" })}
+                           type="password"
+                           placeholder="••••••••"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
+                        />
+                        {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.password.message}</p>}
+                     </div>
 
-      // Let parent handle storing token/isVerified and redirect/pending flows
-      if (onLoginSuccess) {
-        onLoginSuccess(token, data);
-      } else {
-        // Fallback storage if parent didn't provide a handler
-        localStorage.setItem("userId", data._id);
-        localStorage.setItem("role", data.roleId?.name || "User");
-        localStorage.setItem("token", token);
-        localStorage.setItem("isVerified", data.isVerified ? "true" : "false");
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        if (data.roleId?.name === "Admin") navigate("/admin");
-        else navigate("/user");
-      }
+                     {error && (
+                        <div className="p-4 bg-red-500/10 border border-red-500/20 text-[#E11D48] text-[8px] font-black uppercase tracking-widest text-center">
+                           {typeof error === 'string' ? error : "AUTHENTICATION FAILED"}
+                        </div>
+                     )}
 
-      // Close modal
-      setIsOpen(false);
-      onClose?.();
-    } catch (error) {
-      console.error("Google login failed:", error);
-      alert(error.response?.data?.message || "Google login failed. Please try again.");
-    }
-  };
+                     <div className="space-y-8 pt-8">
+                        <Button
+                           type="submit"
+                           disabled={isLoading}
+                           className="w-full h-16 bg-[#E11D48] hover:bg-red-700 text-white rounded-full text-xs font-black tracking-[0.4em] uppercase transition-all duration-300 shadow-[0_0_30px_rgba(225,29,72,0.2)] hover:shadow-[0_0_40px_rgba(225,29,72,0.4)] transform hover:scale-[1.01]"
+                        >
+                           {isLoading ? "AUTHENTICATING..." : "INITIATE LOGIN"}
+                        </Button>
 
-// using redux
-  const onSubmit = async (formData) => {
-  const result = await dispatch(loginUser(formData));
-
-  if (loginUser.fulfilled.match(result)) {
-    const token = result.payload.token;
-    const userData = result.payload.data;
-    const role = userData.roleId?.name;
-    
-    // Store auth data
-    localStorage.setItem("token", token);
-    localStorage.setItem("userId", userData._id);
-    localStorage.setItem("role", role || "User");
-    localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    
-    // Call parent success callback if provided
-    if (onLoginSuccess) {
-      onLoginSuccess(token, userData);
-    } else {
-      // Default navigation
-      if (role === "Admin") navigate("/admin");
-      else navigate("/user");
-    }
-
-    setIsOpen(false);
-    onClose?.();
-  }
-};
-
-  // const onSubmit = async (formData) => {
-  //   try {
-  //     const res = await axios.post("/user/login", formData);
-  //     const token = res.data.token;
-  //     const userData = res.data.data;
-
-  //     // Let parent control post-login behavior
-  //     if (onLoginSuccess) {
-  //       onLoginSuccess(token, userData);
-  //     } else {
-  //       // fallback: local storage + redirect
-  //       localStorage.setItem("userId", userData._id);
-  //       localStorage.setItem("role", userData.roleId?.name || "User");
-  //       localStorage.setItem("token", token);
-  //       localStorage.setItem("isVerified", userData.isVerified ? "true" : "false");
-  //       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  //       if (userData.roleId?.name === "Admin") navigate("/admin");
-  //       else navigate("/user");
-  //     }
-
-  //     setIsOpen(false);
-  //     onClose?.();
-  //   } catch (err) {
-  //     console.error("Login Error:", err);
-  //     alert(err.response?.data?.message || "Login failed. Please try again.");
-  //   }
-  // };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
-      <DialogContent className="sm:max-w-[425px] bg-black text-white p-6 rounded-lg shadow-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Sign In</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Email</label>
-            <Input
-              type="email"
-              className="bg-transparent border-gray-600"
-              {...register("email", validationSchema.emailValidator)}
-            />
-            {errors.email && (
-              <span className="text-sm text-red-500">{errors.email.message}</span>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Password</label>
-            <Input
-              type="password"
-              className="bg-transparent border-gray-600"
-              {...register("password", validationSchema.passwordValidator)}
-            />
-            {errors.password && (
-              <span className="text-sm text-red-500">{errors.password.message}</span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <Button type="submit" className="w-full bg-white text-black hover:bg-gray-900">
-              Sign In
-            </Button>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-600"></span>
+                        <div className="space-y-4">
+                           <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                              <Link to="/signup" className="hover:text-[#E11D48] transition-colors">Create Identity</Link>
+                              <Link to="/forgot-password" title="protocol-forgot" className="hover:text-[#E11D48] transition-colors">Key Recovery</Link>
+                           </div>
+                           <div className="pt-4 border-t border-white/5 flex justify-center text-[10px] font-bold uppercase tracking-[0.2em] text-gray-700">
+                              <Link to="/adminsignin" className="hover:text-[#E11D48] transition-colors">Admin Access Portal</Link>
+                           </div>
+                        </div>
+                     </div>
+                  </form>
+               </div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-black px-2 text-gray-500">OR</span>
-            </div>
-          </div>
-
-          <div className="flex justify-center items-center min-h-[48px] my-4">
-            <div
-              id="googleSignInDiv"
-              className="w-full max-w-[300px] mx-auto"
-              style={{ minHeight: "48px" }}
-            />
-          </div>
-
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-500">
-              Not registered yet?
-              <Link to="/signup" className="ml-1 text-blue-600 hover:underline">
-                Sign Up
-              </Link>
-            </p>
-            <Link to="/adminsignin" className="text-sm text-gray-500 hover:underline">
-              For Admin
-            </Link>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          </div>
-        </form>
-      </DialogContent>
-
-    </Dialog>
-  );
+         </DialogContent>
+      </Dialog>
+   );
 };
 
 export default SignInModal;
-
-
-
-// import { useEffect, useState } from 'react'
-// import axios from 'axios'
-// import { jwtDecode } from "jwt-decode"
-// import { useForm } from 'react-hook-form'
-// import { Link, useNavigate } from 'react-router-dom'
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-// } from "@/components/ui/dialog"
-
-// export const SignInModal = () => {
-//   const { register, handleSubmit, formState: { errors } } = useForm()
-//   const navigate = useNavigate()
-//   const [isOpen, setIsOpen] = useState(true)
-//   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false)
-
-//   const validationSchema = {
-//     emailValidator: {
-//       required: {
-//         value: true,
-//         message: "Email is required*"
-//       }
-//     },
-//     passwordValidator: {
-//       required: {
-//         value: true,
-//         message: "Password is required"
-//       },
-//       minLength: { 
-//         value: 6, 
-//         message: "Minimum 6 characters required" 
-//       }
-//     }
-//   }
-
-//   useEffect(() => {
-//     const loadGoogleSignIn = () => {
-//       const googleDiv = document.getElementById("googleSignInDiv");
-//       if (window.google && googleDiv) {
-//         try {
-//           window.google.accounts.id.initialize({
-//             client_id: "342037145091-qvhlig4d6tn8p35ho40kc8c468mpnqug.apps.googleusercontent.com",
-//             callback: handleGoogleResponse,
-//             auto_select: false,
-//           });
-
-//           window.google.accounts.id.renderButton(
-//             googleDiv,
-//             {
-//               type: "standard",
-//               theme: "filled_black",
-//               size: "large",
-//               text: "signin_with",
-//               shape: "rectangular",
-//               width: googleDiv.offsetWidth,
-//             }
-//           );
-//           setIsGoogleLoaded(true);
-//         } catch (error) {
-//           console.error("Error initializing Google Sign-In:", error);
-//         }
-//       } else {
-//         setTimeout(loadGoogleSignIn, 500); // Increased timeout
-//       }
-//     };
-
-//     // Initial load
-//     loadGoogleSignIn();
-
-//     // Cleanup
-//     return () => {
-//       if (window.google) {
-//         try {
-//           window.google.accounts.id.cancel();
-//         } catch (error) {
-//           console.error("Error cleaning up Google Sign-In:", error);
-//         }
-//       }
-//     };
-//   }, []);
-
-//   const handleGoogleResponse = async (response) => {
-//     try {
-//       const res = await axios.post("/user/googlelogin", {
-//         token: response.credential,
-//       });
-
-//       const { token, data } = res.data;
-
-//       localStorage.setItem("userId", data._id);
-//       localStorage.setItem("role", data.roleId?.name || "User");
-//       localStorage.setItem("token", token);
-//       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-//       if (data.roleId?.name === "Admin") {
-//         navigate("/admin");
-//       } else {
-//         navigate("/user");
-//       }
-//     } catch (error) {
-//       console.error("Google login failed:", error);
-//       alert(error.response?.data?.message || "Google login failed. Please try again.");
-//     }
-//   };
-
-//   const onSubmit = async (data) => {
-//     try {
-//       const res = await axios.post("/user/login", data);
-//       const token = res.data.token;
-  
-//       if (res.status === 200) {
-//         localStorage.setItem("userId", res.data.data._id);
-//         localStorage.setItem("role", res.data.data.roleId.name);
-//         localStorage.setItem("token", token)
-//         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-//         if (res.data.data.roleId.name === "User") {
-//           navigate("/user");
-//         } else if (res.data.data.roleId.name === "Admin") {
-//           navigate("/admin");
-//         }
-//       }
-//     } catch (err) {
-//       console.error("Login Error:", err);
-//       alert(err.response?.data?.message || "Login failed. Please try again.");
-//     }
-//   };
-
-//   return (
-//     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-//       <DialogContent className="sm:max-w-[425px] bg-black text-white p-6 rounded-lg shadow-lg">
-//         <DialogHeader>
-//           <DialogTitle className="text-2xl font-bold text-center">Sign In</DialogTitle>
-//         </DialogHeader>
-        
-//         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-//           <div className="space-y-2">
-//             <label className="text-sm font-medium">Email</label>
-//             <Input
-//               type="email"
-//               className="bg-transparent border-gray-600"
-//               {...register("email", validationSchema.emailValidator)}
-//             />
-//             {errors.email && (
-//               <span className="text-sm text-red-500">{errors.email.message}</span>
-//             )}
-//           </div>
-
-//           <div className="space-y-2">
-//             <label className="text-sm font-medium">Password</label>
-//             <Input
-//               type="password"
-//               className="bg-transparent border-gray-600"
-//               {...register("password", validationSchema.passwordValidator)}
-//             />
-//             {errors.password && (
-//               <span className="text-sm text-red-500">{errors.password.message}</span>
-//             )}
-//           </div>
-
-//           <div className="flex flex-col gap-4">
-//             <Button type="submit" className="w-full bg-white text-black hover:bg-gray-900">
-//               Sign In
-//             </Button>
-//           </div>
-
-//           <div className="relative">
-//             <div className="absolute inset-0 flex items-center">
-//               <span className="w-full border-t border-gray-600"></span>
-//             </div>
-//             <div className="relative flex justify-center text-sm">
-//               <span className="bg-black px-2 text-gray-500">OR</span>
-//             </div>
-//           </div>
-
-//           <div className="flex justify-center items-center min-h-[48px] my-4">
-//             <div 
-//               id="googleSignInDiv"
-//               className="w-full max-w-[300px] mx-auto"
-//               style={{ minHeight: '48px' }}
-//             />
-//           </div>
-
-//           <div className="text-center space-y-2">
-//             <p className="text-sm text-gray-500">
-//               Not registered yet? 
-//               <Link to="/signup" className="ml-1 text-blue-600 hover:underline">
-//                 Sign Up
-//               </Link>
-//             </p>
-//             <Link to="/adminsignin" className="text-sm text-gray-500 hover:underline">
-//               For Admin
-//             </Link>
-//           </div>
-//         </form>
-//       </DialogContent>
-//     </Dialog>
-//   )
-// }
-
-
-

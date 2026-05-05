@@ -60,18 +60,11 @@ export const SeatSelectionPage = () => {
       setSelectedSeats([]);
       setBookedSeatLabels((prev) => [...prev, ...selectedSeats]);
       
-      // ✅ Redirect after successful booking (choose one):
+      // Redirect after successful booking based on role
+      const userRole = localStorage.getItem("role");
+      const targetPath = userRole === "Organizer" ? "/bookedtickets" : "/mytickets";
       
-      // Option 1: Back to events list
-      setTimeout(() => navigate('/mytickets'), 1500);
-      
-      // Option 2: To a confirmation page (if you have one)
-      // setTimeout(() => navigate('/booking-confirmation', { 
-      //   state: { bookingId: res.data.bookingId, eventName: event.eventName } 
-      // }), 1500);
-      
-      // Option 3: To user's bookings page
-      // setTimeout(() => navigate('/my-bookings'), 1500);
+      setTimeout(() => navigate(targetPath), 1500);
       
     } catch (err) {
       console.error("Booking error", err.response?.data || err.message);

@@ -1,265 +1,146 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+   Dialog,
+   DialogContent,
 } from "@/components/ui/dialog"
-//redux
 import { useDispatch, useSelector } from 'react-redux'
 import { signupUser } from '@/features/auth/authSlice'
+import { UserPlus, X, Ticket, ShieldCheck, ArrowRight } from "lucide-react"
 
 export const SignUpModal = ({ onClose }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm()
-  const navigate = useNavigate()
-  const [isOpen, setIsOpen] = useState(true)
-  const dispatch = useDispatch()
-  const { isLoading, error } = useSelector((state) => state.auth);
+   const { register, handleSubmit, formState: { errors } } = useForm()
+   const navigate = useNavigate()
+   const [isOpen, setIsOpen] = useState(true)
+   const dispatch = useDispatch()
+   const { isLoading, error } = useSelector((state) => state.auth);
 
-  const validationSchema = {
-    emailValidator: {
-      required: {
-        value: true,
-        message: "Email is required*"
+   const onSubmit = async (data) => {
+      const result = await dispatch(signupUser(data));
+      if (signupUser.fulfilled.match(result)) {
+         navigate("/signin");
+         setIsOpen(false);
+         onClose?.();
       }
-    },
-    fNameValidator: {
-      required: {
-        value: true,
-        message: "Full name is required*"
-      }
-    },
-    passwordValidator: {
-      required: {
-        value: true,
-        message: "Password is required*"
-      },
-      minLength: { 
-        value: 6, 
-        message: "Minimum 6 characters required" 
-      }
-    },
-    phoneNoValidator: {
-      required: {
-        value: true,
-        message: "Phone number is required*"
-      }
-    }
-  }
+   };
 
-  //redux
- const onSubmit = async (data) => {
-  const result = await dispatch(signupUser(data));
+   return (
+      <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
+         <DialogContent className="max-w-4xl bg-black border border-white/5 p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] z-[1000] rounded-[2rem] max-h-[85vh]">
+            <div className="grid grid-cols-1 md:grid-cols-12 h-full max-h-[85vh]">
+               {/* Visual Side (40%) */}
+               <div className="hidden md:flex md:col-span-5 relative bg-[#050505] p-10 lg:p-12 flex-col justify-between border-r border-white/5 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#E11D48]/5 blur-[100px] -mr-32 -mt-32" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 blur-[100px] -ml-32 -mb-32" />
 
-  if (signupUser.fulfilled.match(result)) {
-    navigate("/signin");
-  }
-};
+                  <div className="relative z-10">
+                     <div className="flex items-center gap-4 mb-12">
+                        <div className="w-10 h-10 bg-[#E11D48] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.3)]">
+                           <Ticket className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-[0.5em] text-white">EventEase</span>
+                     </div>
 
-  // const onSubmit = async (data) => {
-  //   try {
-  //     const res = await axios.post("/user", data);
+                     <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-[0.85] mb-8">
+                        CREATE YOUR<br />IDENTITY
+                     </h2>
+                     <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] leading-relaxed max-w-[240px]">
+                        Join the global network of elite event participants. Secure your profile today.
+                     </p>
+                  </div>
 
-  //     if (res.status === 201) {
-  //       navigate("/signin");
-  //     }
-  //   } catch (err) {
-  //     console.error("Signup error:", err);
-  //     alert(err.response?.data?.message || "Signup failed. Please try again.");
-  //   }
-  // };
+                  <div className="relative z-10 flex items-center gap-6">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-gray-700 uppercase tracking-widest">
+                        <ShieldCheck className="h-4 w-4 text-[#E11D48]" /> Secure Protocol
+                     </div>
+                  </div>
+               </div>
 
-  return (
-    <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
-      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white p-6 rounded-xl shadow-2xl border border-gray-800">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Sign Up</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Full Name</label>
-            <Input
-              type="text"
-              placeholder="Enter your full name.."
-              className="bg-transparent border-gray-600"
-              {...register("fullName", validationSchema.fNameValidator)}
-            />
-            {errors.fullName && (
-              <span className="text-sm text-red-500">{errors.fullName.message}</span>
-            )}
-          </div>
+               {/* Form Side (60%) */}
+               <div className="md:col-span-7 p-10 md:p-12 bg-black flex flex-col overflow-y-auto no-scrollbar">
+                  <div className="flex justify-between items-center mb-12">
+                     <div>
+                        <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-2 text-glow">User Registration</h3>
+                        <div className="h-1 w-12 bg-[#E11D48]" />
+                     </div>
+                     <button onClick={() => { setIsOpen(false); onClose?.(); }} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-[#E11D48] transition-all">
+                        <X className="w-5 h-5" />
+                     </button>
+                  </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Email</label>
-            <Input
-              type="email"
-              placeholder="Enetr your email.."
-              className="bg-transparent border-gray-600"
-              {...register("email", validationSchema.emailValidator)}
-            />
-            {errors.email && (
-              <span className="text-sm text-red-500">{errors.email.message}</span>
-            )}
-          </div>
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+                     <div className="relative group">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Subject Name</p>
+                        <input
+                           {...register("fullName", { required: "Name required" })}
+                           type="text"
+                           placeholder="FULL NAME"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
+                        />
+                        {errors.fullName && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.fullName.message}</p>}
+                     </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Password</label>
-            <Input
-              type="password"
-              placeholder="Enter your password.."
-              className="bg-transparent border-gray-600"
-              {...register("password", validationSchema.passwordValidator)}
-            />
-            {errors.password && (
-              <span className="text-sm text-red-500">{errors.password.message}</span>
-            )}
-          </div>
+                     <div className="relative group">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Transmission ID</p>
+                        <input
+                           {...register("email", { required: "Email required" })}
+                           type="email"
+                           placeholder="EMAIL@DOMAIN.COM"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
+                        />
+                        {errors.email && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.email.message}</p>}
+                     </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Phone Number</label>
-            <Input
-              type="tel"
-              placeholder="Enter your phone number.."
-              className="bg-transparent border-gray-600"
-              {...register("phoneNumber", validationSchema.phoneNoValidator)}
-            />
-            {errors.phoneNumber && (
-              <span className="text-sm text-red-500">{errors.phoneNumber.message}</span>
-            )}
-          </div>
+                     <div className="relative group">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Access Key</p>
+                        <input
+                           {...register("password", { required: "Key required", minLength: { value: 6, message: "Min 6 chars" } })}
+                           type="password"
+                           placeholder="••••••••"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
+                        />
+                        {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.password.message}</p>}
+                     </div>
 
-          <div className="flex flex-col gap-4">
-            <Button type="submit" className="w-full bg-white text-black hover:bg-gray-800">
-              Sign Up
-            </Button>
-            <Link to="/">
-              <Button variant="outline" className="w-full bg-white text-black  border-gray-600 hover:bg-black-800">
-                Cancel
-              </Button>
-            </Link>
-          </div>
+                     <div className="relative group">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Voice Link</p>
+                        <input
+                           {...register("phoneNumber", { required: "Phone required" })}
+                           type="tel"
+                           placeholder="PHONE NUMBER"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] uppercase focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
+                        />
+                        {errors.phoneNumber && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.phoneNumber.message}</p>}
+                     </div>
 
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-500">
-              Already have an account?
-              <Link to="/signin" className="ml-1 text-blue-600 hover:underline">
-                Sign In
-              </Link>
-            </p>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+                     {error && (
+                        <div className="p-4 bg-red-500/10 border border-red-500/20 text-[#E11D48] text-[8px] font-black uppercase tracking-widest text-center">
+                           {typeof error === 'string' ? error : "REGISTRATION FAILED"}
+                        </div>
+                     )}
 
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
+                     <div className="space-y-8 pt-8">
+                        <Button
+                           type="submit"
+                           disabled={isLoading}
+                           className="w-full h-16 bg-[#E11D48] hover:bg-red-700 text-white rounded-full text-xs font-black tracking-[0.4em] uppercase transition-all duration-300 shadow-[0_0_30px_rgba(225,29,72,0.2)] hover:shadow-[0_0_40px_rgba(225,29,72,0.4)] transform hover:scale-[1.01]"
+                        >
+                           {isLoading ? "TRANSMITTING..." : "INITIATE REGISTRATION"}
+                        </Button>
+
+                        <p className="text-center text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                           Existing Identity? <Link to="/signin" className="text-[#E11D48] hover:underline ml-2">Access Portal</Link>
+                        </p>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </DialogContent>
+      </Dialog>
+   );
 }
 
-// import React from 'react';
-// import axios from 'axios';
-// import "../../assets/SignUpModel.css"
-// import { Link, useNavigate } from 'react-router-dom';
-// import { useForm } from 'react-hook-form'
-
-// export const SignUpModal = ({ onClose }) => {
-  
-//     const {register, handleSubmit, formState:{errors}} = useForm()
-//     console.log(errors)
-//     const navigate = useNavigate();
-
-//    const validationSchema={
-//     emailValidator:{
-//         required:{
-//             value:true,
-//             message:"email was required"
-//         }
-//     },
-//     fNameValidator:{
-//         required:{
-//             value:true,
-//             message:"fullname was required*"
-//         }
-//     },
-//     passwordValidator:{
-//         required:{
-//             value:true,
-//             message:"password was required"
-//         }
-//     },
-//     phoneNoValidator:{
-//       required:{
-//         value:true,
-//         message:"mobile number is required.."
-//       }
-//     }
-
-//    }
-//    const submitHandler = async (data) => {
-//   try {
-//     console.log(data);
-//     data.roleId = "68480a087e2eb1da1f656aec";
-//     const res = await axios.post("/user", data);
-//     console.log(res);
-//     console.log(res.data);
-
-//     if (res.status === 201) {
-//       alert("Signup Successfully");
-//       navigate("/signin");
-//     } else {
-//       alert("User not created");
-//     }
-//   } catch (err) {
-//     console.error("Signup error:", err);
-//     alert("Signup failed: " + (err.response?.data?.message || err.message));
-//   }
-// };
-
-   
-    
-//   return (
-//     <div className="modal-overlay" id="#signuphd">
-//       <div className="modal-content bg-white p-4 rounded shadow-lg">
-//         <h2 className="mb-3" >Sign Up</h2>
-//         <form onSubmit={handleSubmit(submitHandler)}>
-//             <div className="mb-2">
-//             <label>Full Name:</label>
-//             <input type="text" className="form-control" id="fullName" {...register("fullName", validationSchema.fNameValidator)} />
-//              <small style={{color:'red'}}>{errors.fullName?.message}</small>
-//           </div>
-//           <div className="mb-2">
-//             <label>Email:</label>
-//             <input type="email" className="form-control" id='email' {...register("email", validationSchema.emailValidator)} />
-//              <small style={{color:'red'}}>{errors.email?.message}</small>
-
-//           </div>
-//           <div className="mb-2">
-//             <label>Password:</label>
-//             <input type="password" className="form-control" id='password' {...register("password", validationSchema.passwordValidator)} />
-//              <small style={{color:'red'}}>{errors.password?.message}</small>
-//          </div>
-//           <div className="mb-2">
-//             <label>PhoneNo:</label>
-//             <input type="number" className="form-control" id='phoneNumber' {...register("phoneNumber", validationSchema.phoneNoValidator)} />
-//              <small style={{color:'red'}}>{errors.phoneNumber?.message}</small>
-//          </div>
-//           {/* <div className="mb-3">
-//             <label>Age:</label>
-//             <input type="password" className="form-control" />
-//           </div> */}
-//           <button type="submit" className="btn btn-primary">Sign Up</button>
-//            <Link to="/" className="btn btn-secondary ms-2">Cancel</Link>
-
-//           <br/>
-//         </form>
-//       <small>if,already SignUp?</small><a href='/signin'>SignIn</a>
-
-//       </div>
-//     </div>
-//   );
-// };
+export default SignUpModal;

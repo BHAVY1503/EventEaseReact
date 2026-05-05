@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMyEvents, deleteEvent } from '../../features/events/eventsSlice';
 import { useToast } from '../../hooks/use-toast';
@@ -47,16 +48,26 @@ import {
   XCircle,
   Mail,
   Phone,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  Zap,
+  LayoutGrid,
+  History,
+  ShieldCheck,
+  Globe,
+  Settings,
+  Activity
 } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export const ViewMyEvent = () => {
   const dispatch = useAppDispatch();
   const { list: events, status, error } = useAppSelector((s) => s.events);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [bookingQuantity, setBookingQuantity] = useState({});
   const [bookedTickets, setBookedTickets] = useState({});
-  const [organizerId, setOrganizerId] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
@@ -66,78 +77,55 @@ export const ViewMyEvent = () => {
   const handleDelete = async (eventId) => {
     try {
       await dispatch(deleteEvent(eventId)).unwrap();
-      toast({ title: 'Event deleted', description: 'Event removed successfully', status: 'success' });
+      toast({ title: 'Event Terminated', description: 'Operational node removed successfully', status: 'success' });
     } catch (err) {
       console.error('Error deleting event', err);
-      toast({ title: 'Delete failed', description: err || 'Failed to delete event', status: 'error' });
+      toast({ title: 'Termination Failed', description: err || 'Failed to remove node', status: 'error' });
     }
   };
 
   const handleBookSeat = async (eventId, stateId, cityId) => {
     const quantity = bookingQuantity[eventId] || 1;
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      toast({ title: 'Auth Required', description: 'Please login to synchronize bookings', status: 'error' });
+      navigate('/signin');
+      return;
+    }
+
     try {
       const res = await axios.post(
         `/event/bookseat/${eventId}`,
         { stateId, cityId, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Seat(s) booked successfully!");
+      
+      toast({ title: 'Synchronized', description: res.data?.message || "Seats locked successfully", status: 'success' });
       setBookedTickets((prev) => ({ ...prev, [eventId]: res.data.data.ticket }));
-      getAllEvents();
+      
+      setTimeout(() => {
+        navigate('/organizer/bookedtickets');
+        dispatch(fetchMyEvents());
+      }, 1500);
     } catch (err) {
-      alert(err?.response?.data?.message || "Booking failed");
-      console.error("Booking error:", err);
+      toast({ title: 'Protocol Error', description: err?.response?.data?.message || "Booking failed", status: 'error' });
     }
   };
 
-  const handleContactUs = () => {
-    window.location.href = '/organizer#contactus';
-  };
-
-  // Get event status
   const getEventStatus = (event) => {
     const now = new Date();
     const startDate = new Date(event.startDate);
     const endDate = new Date(event.endDate);
 
-    if (endDate < now) {
-      return 'completed';
-    }
-    if (startDate <= now && endDate >= now) {
-      return 'ongoing';
-    }
+    if (endDate < now) return 'completed';
+    if (startDate <= now && endDate >= now) return 'ongoing';
     return 'upcoming';
   };
 
-  // Filter events by status
-  const filterEventsByStatus = (status) => {
-    if (status === 'all') return events;
-    return events.filter(event => event.approvalStatus === status);
-  };
-
-  const approvedEvents = filterEventsByStatus('Approved');
-  const pendingEvents = filterEventsByStatus('Pending');
-  const rejectedEvents = filterEventsByStatus('Rejected');
-
-  // Categorize events by time status
-  const categorizeEventsByTime = (eventList) => {
-    const completed = [];
-    const ongoing = [];
-    const upcoming = [];
-
-    eventList.forEach(event => {
-      const status = getEventStatus(event);
-      if (status === 'completed') {
-        completed.push(event);
-      } else if (status === 'ongoing') {
-        ongoing.push(event);
-      } else {
-        upcoming.push(event);
-      }
-    });
-
-    return { completed, ongoing, upcoming };
-  };
+  const approvedEvents = events.filter(e => e.approvalStatus === 'Approved');
+  const pendingEvents = events.filter(e => e.approvalStatus === 'Pending');
+  const rejectedEvents = events.filter(e => e.approvalStatus === 'Rejected');
 
   const getDisplayEvents = () => {
     switch(activeTab) {
@@ -148,27 +136,30 @@ export const ViewMyEvent = () => {
     }
   };
 
+  const categorizeEventsByTime = (eventList) => {
+    const completed = [];
+    const active = []; // ongoing + upcoming
+
+    eventList.forEach(event => {
+      const status = getEventStatus(event);
+      if (status === 'completed') completed.push(event);
+      else active.push(event);
+    });
+
+    return { completed, active };
+  };
+
   const LoadingSkeleton = () => (
-    <div className="space-y-12">
-      {[1, 2].map((section) => (
-        <div key={section}>
-          <Skeleton className="h-8 w-48 mb-6" />
-          <div className="flex space-x-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="w-80">
-                <Skeleton className="h-48 w-full rounded-t-lg" />
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-full mb-1" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-2/3 mb-2" />
-                </CardContent>
-              </Card>
-            ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[1, 2, 3].map((i) => (
+        <Card key={i} className="bg-white/5 border-white/5 rounded-[2.5rem] overflow-hidden">
+          <Skeleton className="h-48 w-full bg-white/5" />
+          <div className="p-8 space-y-4">
+             <Skeleton className="h-6 w-3/4 bg-white/5" />
+             <Skeleton className="h-4 w-full bg-white/5" />
+             <Skeleton className="h-4 w-2/3 bg-white/5" />
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );
@@ -180,822 +171,229 @@ export const ViewMyEvent = () => {
     const isRejected = event.approvalStatus === 'Rejected';
 
     return (
-      <Card className={`group cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-gray-950 text-gray-900 dark:text-gray-100 h-full flex flex-col ${dimmed ? 'opacity-60 filter grayscale' : ''}`}>
-        <div className="relative overflow-hidden">
-          <img
-            src={event.eventImgUrl}
-            alt={event.eventName}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-          {eventStatus === 'completed' && (
-            <Badge className="absolute top-2 right-2 bg-green-500">
-              <CheckCircle className="w-3 h-3 mr-1" />
-              Completed
-            </Badge>
-          )}
-          {eventStatus === 'ongoing' && (
-            <Badge className="absolute top-2 right-2 bg-blue-500">
-              <Clock className="w-3 h-3 mr-1" />
-              Ongoing
-            </Badge>
-          )}
-          {eventStatus === 'upcoming' && (
-            <>
-              {event.approvalStatus === "Pending" && (
-                <Badge className="absolute top-2 right-2 bg-yellow-400 text-gray-900">
-                  <Clock className="w-3 h-3 mr-1" />
-                  Pending
-                </Badge>
-              )}
-              {event.approvalStatus === "Approved" && (
-                <Badge className="absolute top-2 right-2 bg-green-500">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  Approved
-                </Badge>
-              )}
-              {event.approvalStatus === "Rejected" && (
-                <Badge className="absolute top-2 right-2 bg-red-500">
-                  <XCircle className="w-3 h-3 mr-1" />
-                  Rejected
-                </Badge>
-              )}
-            </>
-          )}
-        </div>
-
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl">{event.eventName}</CardTitle>
-          <CardDescription className="flex gap-2">
-            <Badge variant="outline">{event.eventType}</Badge>
-            <Badge variant="secondary">{event.eventCategory}</Badge>
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="flex-grow space-y-3">
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-            <Calendar className="w-4 h-4 mr-2" />
-            <span>{new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</span>
+      <motion.div
+        layout
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+      >
+        <Card className={cn(
+          "group relative bg-white/5 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-3xl hover:border-[#E11D48]/40 transition-all duration-700 shadow-2xl h-full flex flex-col",
+          dimmed && "opacity-40 grayscale hover:grayscale-0 hover:opacity-100"
+        )}>
+          {/* Status Badge */}
+          <div className="absolute top-4 right-4 z-20">
+             {eventStatus === 'completed' ? (
+               <Badge className="bg-green-500/20 text-green-500 border-green-500/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+                  TERMINATED
+               </Badge>
+             ) : eventStatus === 'ongoing' ? (
+               <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest animate-pulse">
+                  LIVE
+               </Badge>
+             ) : (
+               <div className="flex flex-col gap-1.5 items-end">
+                  {event.approvalStatus === "Pending" && (
+                    <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+                       PENDING
+                    </Badge>
+                  )}
+                  {event.approvalStatus === "Approved" && (
+                    <Badge className="bg-[#E11D48]/20 text-[#E11D48] border-[#E11D48]/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+                       AUTHORIZED
+                    </Badge>
+                  )}
+                  {event.approvalStatus === "Rejected" && (
+                    <Badge className="bg-red-500/20 text-red-500 border-red-500/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+                       DENIED
+                    </Badge>
+                  )}
+               </div>
+             )}
           </div>
 
-          {event.eventCategory === "Outdoor" && (
-            <>
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                <MapPin className="w-4 h-4 mr-2" />
-                <span>{event.stateId?.Name}, {event.cityId?.name}</span>
-              </div>
-              <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                <Ticket className="w-4 h-4 mr-2" />
-                <span>₹{event.ticketRate}</span>
-              </div>
-            </>
-          )}
-          {event.eventCategory === "Indoor" && event.stadiumId?.location?.address && (
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-              <MapPin className="w-4 h-4 mr-2" />
-              <span>{event.stadiumId.location.address}</span>
+          <div className="relative h-44 overflow-hidden">
+            <img
+              src={event.eventImgUrl}
+              alt={event.eventName}
+              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            
+            <div className="absolute bottom-4 left-6 flex flex-col gap-1">
+               <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48] mb-0.5">{event.eventCategory}</span>
+               <h3 className="text-lg font-black uppercase tracking-tighter text-white leading-none">{event.eventName}</h3>
             </div>
-          )}
-          {event.eventCategory === "ZoomMeeting" && event.zoomUrl && (
-            <div className="flex items-center text-sm">
-              <ExternalLink className="w-4 h-4 mr-2" />
-              <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
-                Join Zoom Meeting
-              </a>
+          </div>
+
+          <CardContent className="p-6 flex-grow space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+               <div className="flex flex-col gap-0.5">
+                  <span className="text-[7px] font-black uppercase tracking-widest text-gray-500">Timeline</span>
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold text-gray-300">
+                     <Calendar className="w-3 h-3 text-[#E11D48]" />
+                     {new Date(event.startDate).toLocaleDateString()}
+                  </div>
+               </div>
+               <div className="flex flex-col gap-0.5">
+                  <span className="text-[7px] font-black uppercase tracking-widest text-gray-500">Capacity</span>
+                  <div className="flex items-center gap-1.5 text-[9px] font-bold text-gray-300">
+                     <Users className="w-3 h-3 text-blue-500" />
+                     {availableSeats} REMAINING
+                  </div>
+               </div>
             </div>
-          )}
-          {event.latitude && event.longitude && (
-            <div className="flex items-center">
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm" className="text-xs">
-                  <MapPin className="w-3 h-3 mr-1" />
-                  Get Directions
+
+            <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 bg-white/5 p-3 rounded-xl border border-white/5">
+               <MapPin className="w-3.5 h-3.5 text-[#E11D48] flex-shrink-0" />
+               <span className="uppercase tracking-widest truncate">
+                  {event.eventCategory === "Indoor" 
+                    ? event.stadiumId?.location?.address || "Venure Pending"
+                    : `${event.stateId?.Name}, ${event.cityId?.name}`}
+               </span>
+            </div>
+
+            {isRejected && (
+              <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
+                 <p className="text-[8px] font-black uppercase tracking-widest text-red-500 mb-1">Logs</p>
+                 <p className="text-[9px] text-gray-400 font-bold leading-tight">{event.rejectionReason || "No details."}</p>
+              </div>
+            )}
+          </CardContent>
+
+          <CardFooter className="p-6 pt-0 flex gap-2 mt-auto">
+            <Button 
+              variant="outline" 
+              className="flex-1 h-10 bg-white/5 border-white/5 text-white font-black uppercase tracking-widest text-[8px] rounded-lg hover:bg-white/10 transition-all"
+              onClick={() => navigate(`/organizer/updateevent/${event._id}`)}
+            >
+              <Edit className="w-3 h-3 mr-2" /> EDIT
+            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="w-12 h-12 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition-all p-0">
+                  <Trash2 className="w-4 h-4" />
                 </Button>
-              </a>
-            </div>
-          )}
-
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-            <Users className="w-4 h-4 mr-2" />
-            <span>{availableSeats} seats available</span>
-          </div>
-
-          {eventStatus !== 'completed' && event.eventType === "Indoor" && (
-            <div className="space-y-2 pt-2">
-              <Input
-                type="number"
-                min="1"
-                max={availableSeats}
-                placeholder="Number of seats"
-                value={bookingQuantity[event._id] || 1}
-                onChange={(e) =>
-                  setBookingQuantity((prev) => ({
-                    ...prev,
-                    [event._id]: parseInt(e.target.value),
-                  }))
-                }
-              />
-              <Button
-                className="w-full"
-                disabled={availableSeats <= 0 || !event.isApproved}
-                onClick={() =>
-                  handleBookSeat(event._id, event.stateId?._id, event.cityId?._id)
-                }
-              >
-                <Ticket className="w-4 h-4 mr-2" />
-                Book Seats
-              </Button>
-            </div>
-          )}
-
-          {booked && (
-            <Alert className="mt-4 border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20">
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <AlertDescription className="text-green-800 dark:text-green-200">
-                <div className="space-y-1">
-                  <div><strong>Ticket Booked!</strong></div>
-                  <div>Quantity: {booked.quantity}</div>
-                  <div>Ticket ID: {booked._id}</div>
-                  {booked.selectedSeats?.length > 0 && (
-                    <div>Seats: {booked.selectedSeats.join(', ')}</div>
-                  )}
-                </div>
-              </AlertDescription>
-            </Alert>
-          )}
-          
-          {isRejected && (
-            <Alert className="border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20">
-              <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-              <AlertDescription className="text-red-800 dark:text-red-200">
-                <div className="space-y-2">
-                  <div><strong>Event Rejected</strong></div>
-                  {event.rejectionReason ? (
-                    <div className="text-sm">Reason: {event.rejectionReason}</div>
-                  ) : (
-                    <div className="text-sm italic text-gray-500 dark:text-gray-400">No reason provided by admin.</div>
-                  )}
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="w-full mt-2 border-red-300 text-red-700 hover:bg-red-100 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/30"
-                    onClick={handleContactUs}
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-black border border-white/5 rounded-[2rem] p-10 backdrop-blur-3xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-2xl font-black uppercase tracking-tighter text-white mb-4">Confirm Termination</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-500 font-bold uppercase tracking-widest text-xs leading-relaxed">
+                    This action will permanently remove <span className="text-[#E11D48]">"{event.eventName}"</span> from the production infrastructure. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="mt-8 gap-4">
+                  <AlertDialogCancel className="h-14 px-8 bg-white/5 border-white/5 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl">Abort</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDelete(event._id)}
+                    className="h-14 px-8 bg-[#E11D48] text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-red-600 transition-all"
                   >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Contact Support
-                  </Button>
-                </div>
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-
-        <CardFooter className="flex gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1"
-            onClick={() => window.location.href = `/updateevent/${event._id}`}
-          >
-            <Edit className="w-4 h-4 mr-1" />
-            Edit
-          </Button>
-          
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" className="flex-1">
-                <Trash2 className="w-4 h-4 mr-1" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="dark:bg-gray-900">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="dark:text-gray-100">Delete Event</AlertDialogTitle>
-                <AlertDialogDescription className="dark:text-gray-300">
-                  Are you sure you want to delete "{event.eventName}"? This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="dark:bg-gray-800 dark:text-gray-100">Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleDelete(event._id)}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  Delete Event
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </CardFooter>
-      </Card>
+                    Confirm Termination
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardFooter>
+        </Card>
+      </motion.div>
     );
   };
 
   const displayEvents = getDisplayEvents();
-  const { completed, ongoing, upcoming } = categorizeEventsByTime(displayEvents);
-  const activeEvents = [...ongoing, ...upcoming];
+  const { completed, active } = categorizeEventsByTime(displayEvents);
 
   return (
-    <div className="min-h-screen w-full mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            My Events
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto dark:text-gray-300">
-            Manage and track all the events you've created. View bookings, update details, or create new events.
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="mb-8 flex flex-wrap gap-2 justify-center">
-          <Button
-            variant={activeTab === 'all' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('all')}
-            className="min-w-[120px]"
-          >
-            All Events ({events.length})
-          </Button>
-          <Button
-            variant={activeTab === 'approved' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('approved')}
-            className="min-w-[120px]"
-          >
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Approved ({approvedEvents.length})
-          </Button>
-          <Button
-            variant={activeTab === 'pending' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('pending')}
-            className="min-w-[120px]"
-          >
-            <Clock className="w-4 h-4 mr-2" />
-            Pending ({pendingEvents.length})
-          </Button>
-          <Button
-            variant={activeTab === 'rejected' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('rejected')}
-            className="min-w-[120px]"
-          >
-            <XCircle className="w-4 h-4 mr-2" />
-            Rejected ({rejectedEvents.length})
-          </Button>
-        </div>
-
-        {status === 'loading' ? (
-          <LoadingSkeleton />
-        ) : displayEvents.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="mx-auto w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
-              <Calendar className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+    <div className="w-full space-y-12 pb-20">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16">
+         <div>
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-8">
+               <Sparkles className="h-4 w-4 text-[#E11D48]" />
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Archival Manifest v2.4</span>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No {activeTab !== 'all' ? activeTab : ''} events found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {activeTab === 'all' 
-                ? "You haven't created any events yet. Get started by adding your first event!"
-                : `You don't have any ${activeTab} events at the moment.`
-              }
-            </p>
-            {activeTab === 'all' && (
-              <Button onClick={() => window.location.href = "/organizer/addevent"}>
-                <Calendar className="w-4 h-4 mr-2" />
-                Create Your First Event
+            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
+               MY <span className="text-[#E11D48]">ARCHIVE</span>
+            </h1>
+         </div>
+         <div className="flex gap-4">
+            {[
+              { id: 'all', label: 'ALL NODES', icon: LayoutGrid },
+              { id: 'approved', label: 'AUTHORIZED', icon: ShieldCheck },
+              { id: 'pending', label: 'SYNCING', icon: Clock },
+              { id: 'rejected', label: 'DENIED', icon: XCircle },
+            ].map(tab => (
+              <Button
+                key={tab.id}
+                variant="ghost"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "h-12 px-6 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                  activeTab === tab.id 
+                    ? "bg-[#E11D48] text-white shadow-[0_0_20px_rgba(225,29,72,0.3)]" 
+                    : "bg-white/5 text-gray-500 hover:bg-white/10"
+                )}
+              >
+                <tab.icon className={cn("w-3.5 h-3.5 mr-2", activeTab === tab.id ? "text-white" : "text-gray-600")} />
+                {tab.label}
               </Button>
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Active Events (Ongoing + Upcoming) */}
-            {activeEvents.length > 0 && (
-              <section className="mb-12">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Active Events ({activeEvents.length})
-                  </h2>
-                  <Button variant="link" className="text-blue-600 dark:text-blue-400">
-                    See All <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
-
-                <Carousel opts={{ align: "start", loop: activeEvents.length > 3 }} className="w-full">
-                  <CarouselContent className="-ml-4">
-                    {activeEvents.map((event) => (
-                      <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
-                        <EventCard event={event} />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  {activeEvents.length > 3 && (
-                    <>
-                      <CarouselPrevious className="hidden md:flex" />
-                      <CarouselNext className="hidden md:flex" />
-                    </>
-                  )}
-                </Carousel>
-              </section>
-            )}
-
-            {/* Completed Events */}
-            {completed.length > 0 && (
-              <section className="mt-12">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Completed Events ({completed.length})
-                  </h2>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{completed.length} items</div>
-                </div>
-
-                <Carousel opts={{ align: "start", loop: completed.length > 3 }} className="w-full">
-                  <CarouselContent className="-ml-4">
-                    {completed.map((event) => (
-                      <CarouselItem key={event._id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
-                        <EventCard event={event} dimmed />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  {completed.length > 3 && (
-                    <>
-                      <CarouselPrevious className="hidden md:flex" />
-                      <CarouselNext className="hidden md:flex" />
-                    </>
-                  )}
-                </Carousel>
-              </section>
-            )}
-          </>
-        )}
+            ))}
+         </div>
       </div>
+
+      {status === 'loading' ? (
+        <LoadingSkeleton />
+      ) : displayEvents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-40 bg-white/5 border border-white/5 rounded-[3rem] backdrop-blur-3xl">
+           <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-10 border border-white/10 group">
+              <Globe className="w-12 h-12 text-gray-700 group-hover:text-[#E11D48] transition-colors duration-500" />
+           </div>
+           <h3 className="text-3xl font-black uppercase tracking-tighter text-white mb-4">No Nodes Detected</h3>
+           <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mb-10">Initialize your first production to start tracking.</p>
+           <Button 
+             className="h-16 px-12 bg-white text-black font-black uppercase tracking-widest text-[11px] rounded-full hover:bg-[#E11D48] hover:text-white transition-all shadow-2xl"
+             onClick={() => navigate("/organizer/addevent")}
+           >
+              INITIALIZE PRODUCTION
+           </Button>
+        </div>
+      ) : (
+        <div className="space-y-24">
+          {/* Active Production Section */}
+          {active.length > 0 && (
+            <div className="space-y-10">
+               <div className="flex items-center gap-6">
+                  <div className="w-1.5 h-10 bg-[#E11D48]" />
+                  <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Active Infrastructure</h2>
+               </div>
+               
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <AnimatePresence>
+                    {active.map((event) => (
+                      <EventCard key={event._id} event={event} />
+                    ))}
+                  </AnimatePresence>
+               </div>
+            </div>
+          )}
+
+          {/* Completed Nodes Section */}
+          {completed.length > 0 && (
+            <div className="space-y-10 opacity-80 hover:opacity-100 transition-opacity duration-700">
+               <div className="flex items-center gap-6">
+                  <div className="w-1.5 h-10 bg-gray-700" />
+                  <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Historical Nodes</h2>
+               </div>
+               
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {completed.map((event) => (
+                    <EventCard key={event._id} event={event} dimmed />
+                  ))}
+               </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
-
-
-// import axios from 'axios';
-// import React, { useEffect, useState } from 'react';
-// import { 
-//   Card, 
-//   CardContent, 
-//   CardDescription, 
-//   CardFooter, 
-//   CardHeader, 
-//   CardTitle 
-// } from '@/components/ui/card';
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Badge } from '@/components/ui/badge';
-// import { Alert, AlertDescription } from '@/components/ui/alert';
-// import { 
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-//   AlertDialogTrigger,
-// } from '@/components/ui/alert-dialog';
-// import { Skeleton } from '@/components/ui/skeleton';
-// import { 
-//   Calendar,
-//   MapPin,
-//   Users,
-//   ExternalLink,
-//   Edit,
-//   Trash2,
-//   Ticket,
-//   CheckCircle,
-//   Clock,
-//   XCircle,
-//   Mail,
-//   Phone
-// } from 'lucide-react';
-
-// export const ViewMyEvent = () => {
-//   const [events, setEvents] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [bookingQuantity, setBookingQuantity] = useState({});
-//   const [bookedTickets, setBookedTickets] = useState({});
-//   const [organizerId, setOrganizerId] = useState(null);
-//   const [activeTab, setActiveTab] = useState('all');
-
-//   const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-
-//   const getOrganizerId = async () => {
-//     try {
-//       const res = await axios.get("/organizer/organizer/self", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setOrganizerId(res.data.data._id);
-//     } catch (err) {
-//       console.error("Failed to fetch organizer ID", err);
-//       setLoading(false);
-//     }
-//   };
-
-//   const getAllEvents = async () => {
-//     try {
-//       const res = await axios.get(`/event/geteventbyorganizerid`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setEvents(res.data.data);
-//     } catch (error) {
-//       console.error("Error fetching events:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (token) getOrganizerId();
-//     else setLoading(false);
-//   }, []);
-
-//   useEffect(() => {
-//     if (organizerId) getAllEvents();
-//   }, [organizerId]);
-
-//   const handleDelete = async (eventId) => {
-//     try {
-//       await axios.delete(`/event/deleteevent/${eventId}`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       getAllEvents();
-//     } catch (err) {
-//       console.error("Error deleting event", err);
-//       alert("Failed to delete event");
-//     }
-//   };
-
-//   const handleBookSeat = async (eventId, stateId, cityId) => {
-//     const quantity = bookingQuantity[eventId] || 1;
-//     try {
-//       const res = await axios.post(
-//         `/event/bookseat/${eventId}`,
-//         { stateId, cityId, quantity },
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       alert("Seat(s) booked successfully!");
-//       setBookedTickets((prev) => ({ ...prev, [eventId]: res.data.data.ticket }));
-//       getAllEvents();
-//     } catch (err) {
-//       alert(err?.response?.data?.message || "Booking failed");
-//       console.error("Booking error:", err);
-//     }
-//   };
-
-//   const handleContactUs = () => {
-//     window.location.href = '/organizer#contactus';
-//   };
-
-//   // Filter events by status
-//   const filterEventsByStatus = (status) => {
-//     if (status === 'all') return events;
-//     return events.filter(event => event.approvalStatus === status);
-//   };
-
-//   const approvedEvents = filterEventsByStatus('Approved');
-//   const pendingEvents = filterEventsByStatus('Pending');
-//   const rejectedEvents = filterEventsByStatus('Rejected');
-
-//   const getDisplayEvents = () => {
-//     switch(activeTab) {
-//       case 'approved': return approvedEvents;
-//       case 'pending': return pendingEvents;
-//       case 'rejected': return rejectedEvents;
-//       default: return events;
-//     }
-//   };
-
-//   const LoadingSkeleton = () => (
-//     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//       {[1, 2, 3].map((i) => (
-//         <Card key={i} className="h-full">
-//           <CardHeader>
-//             <Skeleton className="h-48 w-full rounded-lg" />
-//           </CardHeader>
-//           <CardContent>
-//             <Skeleton className="h-6 w-3/4 mb-2" />
-//             <Skeleton className="h-4 w-full mb-1" />
-//             <Skeleton className="h-4 w-full mb-1" />
-//             <Skeleton className="h-4 w-2/3" />
-//           </CardContent>
-//         </Card>
-//       ))}
-//     </div>
-//   );
-
-//   const EventCard = ({ event }) => {
-//     const availableSeats = event.numberOfSeats - (event.bookedSeats || 0);
-//     const booked = bookedTickets[event._id];
-//     const eventEnded = new Date(event.endDate) < new Date();
-//     const isRejected = event.approvalStatus === 'Rejected';
-
-//     return (
-//       <Card className="group cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/50 overflow-hidden dark:bg-gray-950 text-gray-900 dark:text-gray-100 h-120 flex flex-col">
-//         <div className="relative overflow-hidden">
-//           <img
-//             src={event.eventImgUrl}
-//             alt={event.eventName}
-//             className="w-full h-48 object-cover rounded-t-lg"
-//           />
-//           {eventEnded && (
-//             <Badge className="absolute top-2 right-2 bg-green-500">
-//               <CheckCircle className="w-3 h-3 mr-1" />
-//               Completed
-//             </Badge>
-//           )}
-//           {!eventEnded && (
-//             <>
-//               {event.approvalStatus === "Pending" && (
-//                 <Badge className="absolute top-2 right-2 bg-yellow-400 text-gray-900">
-//                   <Clock className="w-3 h-3 mr-1" />
-//                   Pending
-//                 </Badge>
-//               )}
-//               {event.approvalStatus === "Approved" && (
-//                 <Badge className="absolute top-2 right-2 bg-green-500">
-//                   <CheckCircle className="w-3 h-3 mr-1" />
-//                   Approved
-//                 </Badge>
-//               )}
-//               {event.approvalStatus === "Rejected" && (
-//                 <Badge className="absolute top-2 right-2 bg-red-500">
-//                   <XCircle className="w-3 h-3 mr-1" />
-//                   Rejected
-//                 </Badge>
-//               )}
-//             </>
-//           )}
-//         </div>
-
-//         <CardHeader className="pb-4">
-//           <CardTitle className="text-xl">{event.eventName}</CardTitle>
-//           <CardDescription className="flex gap-2">
-//             <Badge variant="outline">{event.eventType}</Badge>
-//             <Badge variant="secondary">{event.eventCategory}</Badge>
-//           </CardDescription>
-//         </CardHeader>
-
-//         <CardContent className="flex-grow space-y-3">
-//           <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-//             <Calendar className="w-4 h-4 mr-2" />
-//             <span>{new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</span>
-//           </div>
-
-//           {event.eventCategory === "Outdoor" && (
-//             <>
-//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-//                 <MapPin className="w-4 h-4 mr-2" />
-//                 <span>{event.stateId?.Name}, {event.cityId?.name}</span>
-//               </div>
-//               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-//                 <Ticket className="w-4 h-4 mr-2" />
-//                 <span>₹{event.ticketRate}</span>
-//               </div>
-//             </>
-//           )}
-//           {event.eventCategory === "Indoor" && event.stadiumId?.location?.address && (
-//             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-//               <MapPin className="w-4 h-4 mr-2" />
-//               <span>{event.stadiumId.location.address}</span>
-//             </div>
-//           )}
-//           {event.eventCategory === "ZoomMeeting" && event.zoomUrl && (
-//             <div className="flex items-center text-sm">
-//               <ExternalLink className="w-4 h-4 mr-2" />
-//               <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
-//                 Join Zoom Meeting
-//               </a>
-//             </div>
-//           )}
-//           {event.latitude && event.longitude && (
-//             <div className="flex items-center">
-//               <a href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`} target="_blank" rel="noopener noreferrer">
-//                 <Button variant="outline" size="sm" className="text-xs">
-//                   <MapPin className="w-3 h-3 mr-1" />
-//                   Get Directions
-//                 </Button>
-//               </a>
-//             </div>
-//           )}
-
-//           <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-//             <Users className="w-4 h-4 mr-2" />
-//             <span>{availableSeats} seats available</span>
-//           </div>
-
-//           {!eventEnded && event.eventType === "Indoor" && (
-//             <div className="space-y-2 pt-2">
-//               <Input
-//                 type="number"
-//                 min="1"
-//                 max={availableSeats}
-//                 placeholder="Number of seats"
-//                 value={bookingQuantity[event._id] || 1}
-//                 onChange={(e) =>
-//                   setBookingQuantity((prev) => ({
-//                     ...prev,
-//                     [event._id]: parseInt(e.target.value),
-//                   }))
-//                 }
-//               />
-//               <Button
-//                 className="w-full"
-//                 disabled={availableSeats <= 0 || !event.isApproved}
-//                 onClick={() =>
-//                   handleBookSeat(event._id, event.stateId?._id, event.cityId?._id)
-//                 }
-//               >
-//                 <Ticket className="w-4 h-4 mr-2" />
-//                 Book Seats
-//               </Button>
-//             </div>
-//           )}
-
-//           {booked && (
-//             <Alert className="mt-4 border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20">
-//               <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-//               <AlertDescription className="text-green-800 dark:text-green-200">
-//                 <div className="space-y-1">
-//                   <div><strong>Ticket Booked!</strong></div>
-//                   <div>Quantity: {booked.quantity}</div>
-//                   <div>Ticket ID: {booked._id}</div>
-//                   {booked.selectedSeats?.length > 0 && (
-//                     <div>Seats: {booked.selectedSeats.join(', ')}</div>
-//                   )}
-//                 </div>
-//               </AlertDescription>
-//             </Alert>
-//           )}
-          
-//           {isRejected && (
-//             <Alert className="border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20">
-//               <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-//               <AlertDescription className="text-red-800 dark:text-red-200">
-//                 <div className="space-y-2">
-//                   <div><strong>Event Rejected</strong></div>
-//                   {event.rejectionReason ? (
-//                     <div className="text-sm">Reason: {event.rejectionReason}</div>
-//                   ) : (
-//                     <div className="text-sm italic text-gray-500 dark:text-gray-400">No reason provided by admin.</div>
-//                   )}
-//                   <Button 
-//                     size="sm" 
-//                     variant="outline" 
-//                     className="w-full mt-2 border-red-300 text-red-700 hover:bg-red-100 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/30"
-//                     onClick={handleContactUs}
-//                   >
-//                     <Mail className="w-4 h-4 mr-2" />
-//                     Contact Support
-//                   </Button>
-//                 </div>
-//               </AlertDescription>
-//             </Alert>
-//           )}
-//         </CardContent>
-
-//         <CardFooter className="flex gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
-//           <Button 
-//             variant="outline" 
-//             size="sm" 
-//             className="flex-1"
-//             onClick={() => window.location.href = `/updateevent/${event._id}`}
-//           >
-//             <Edit className="w-4 h-4 mr-1" />
-//             Edit
-//           </Button>
-          
-//           <AlertDialog>
-//             <AlertDialogTrigger asChild>
-//               <Button variant="destructive" size="sm" className="flex-1">
-//                 <Trash2 className="w-4 h-4 mr-1" />
-//                 Delete
-//               </Button>
-//             </AlertDialogTrigger>
-//             <AlertDialogContent className="dark:bg-gray-900">
-//               <AlertDialogHeader>
-//                 <AlertDialogTitle className="dark:text-gray-100">Delete Event</AlertDialogTitle>
-//                 <AlertDialogDescription className="dark:text-gray-300">
-//                   Are you sure you want to delete "{event.eventName}"? This action cannot be undone.
-//                 </AlertDialogDescription>
-//               </AlertDialogHeader>
-//               <AlertDialogFooter>
-//                 <AlertDialogCancel className="dark:bg-gray-800 dark:text-gray-100">Cancel</AlertDialogCancel>
-//                 <AlertDialogAction
-//                   onClick={() => handleDelete(event._id)}
-//                   className="bg-red-600 hover:bg-red-700"
-//                 >
-//                   Delete Event
-//                 </AlertDialogAction>
-//               </AlertDialogFooter>
-//             </AlertDialogContent>
-//           </AlertDialog>
-//         </CardFooter>
-//       </Card>
-//     );
-//   };
-
-//   const displayEvents = getDisplayEvents();
-
-//   return (
-//     // FIXED: Changed from h-screen w-screen to min-h-screen w-full
-//     <div className="min-h-screen w-full mx-auto px-4 py-16 space-y-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-//       <div className="max-w-7xl mx-auto">
-//         <div className="text-center mb-12">
-//           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-//             My Events
-//           </h1>
-//           <p className="text-lg text-gray-600 max-w-2xl mx-auto dark:text-gray-300">
-//             Manage and track all the events you've created. View bookings, update details, or create new events.
-//           </p>
-//         </div>
-
-//         {/* Tabs */}
-//         <div className="mb-8 flex flex-wrap gap-2 justify-center">
-//           <Button
-//             variant={activeTab === 'all' ? 'default' : 'outline'}
-//             onClick={() => setActiveTab('all')}
-//             className="min-w-[120px]"
-//           >
-//             All Events ({events.length})
-//           </Button>
-//           <Button
-//             variant={activeTab === 'approved' ? 'default' : 'outline'}
-//             onClick={() => setActiveTab('approved')}
-//             className="min-w-[120px]"
-//           >
-//             <CheckCircle className="w-4 h-4 mr-2" />
-//             Approved ({approvedEvents.length})
-//           </Button>
-//           <Button
-//             variant={activeTab === 'pending' ? 'default' : 'outline'}
-//             onClick={() => setActiveTab('pending')}
-//             className="min-w-[120px]"
-//           >
-//             <Clock className="w-4 h-4 mr-2" />
-//             Pending ({pendingEvents.length})
-//           </Button>
-//           <Button
-//             variant={activeTab === 'rejected' ? 'default' : 'outline'}
-//             onClick={() => setActiveTab('rejected')}
-//             className="min-w-[120px]"
-//           >
-//             <XCircle className="w-4 h-4 mr-2" />
-//             Rejected ({rejectedEvents.length})
-//           </Button>
-//         </div>
-
-//         {/* <div className="bg-gray-900 rounded-xl shadow-sm border p-8 dark:bg-gray-800 dark:border-gray-700"> */}
-//           {loading ? (
-//             <LoadingSkeleton />
-//           ) : displayEvents.length === 0 ? (
-//             <div className="text-center py-16">
-//               <div className="mx-auto w-24 h-24 bg-gray-700 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
-//                 <Calendar className="w-12 h-12 text-gray-400 dark:text-gray-500" />
-//               </div>
-//               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-//                 No {activeTab !== 'all' ? activeTab : ''} events found
-//               </h3>
-//               <p className="text-gray-600 dark:text-gray-400 mb-6">
-//                 {activeTab === 'all' 
-//                   ? "You haven't created any events yet. Get started by adding your first event!"
-//                   : `You don't have any ${activeTab} events at the moment.`
-//                 }
-//               </p>
-//               {activeTab === 'all' && (
-//                 <Button onClick={() => window.location.href = "/organizer/addevent"}>
-//                   <Calendar className="w-4 h-4 mr-2" />
-//                   Create Your First Event
-//                 </Button>
-//               )}
-//             </div>
-//           ) : (
-//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//               {displayEvents.map((event) => (
-//                 <EventCard key={event._id} event={event} />
-//               ))}
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     // </div>
-//   );
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
