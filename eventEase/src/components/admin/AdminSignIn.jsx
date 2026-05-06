@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { adminLogin, googleLogin } from "../../features/auth/authSlice";
-import { ShieldCheck, Lock, X } from "lucide-react";
+import { ShieldCheck, Lock, X, Eye, EyeOff } from "lucide-react";
 
 export const AdminSignIn = ({ onClose }) => {
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -18,6 +18,7 @@ export const AdminSignIn = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((s) => s.auth);
   const [isOpen, setIsOpen] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
 
   const validationSchema = {
     emailValidator: {
@@ -176,16 +177,25 @@ export const AdminSignIn = ({ onClose }) => {
                     {errors.email && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.email.message}</p>}
                  </div>
 
-                 <div className="relative group">
-                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Override Key</p>
-                    <input
-                       {...register("password", validationSchema.passwordValidator)}
-                       type="password"
-                       placeholder="••••••••"
-                       className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-white placeholder:text-gray-500 outline-none transition-colors"
-                    />
-                    {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.password.message}</p>}
-                 </div>
+                  <div className="relative group">
+                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Override Key</p>
+                     <div className="relative">
+                        <input
+                           {...register("password", validationSchema.passwordValidator)}
+                           type={showPassword ? "text" : "password"}
+                           placeholder="••••••••"
+                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-white placeholder:text-gray-500 outline-none transition-colors pr-10"
+                        />
+                        <button
+                           type="button"
+                           onClick={() => setShowPassword(!showPassword)}
+                           className="absolute right-0 bottom-2 text-gray-500 hover:text-white transition-colors"
+                        >
+                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                     </div>
+                     {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-red-500 uppercase tracking-widest">{errors.password.message}</p>}
+                  </div>
 
                  {error && (
                     <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black uppercase tracking-widest text-center">
