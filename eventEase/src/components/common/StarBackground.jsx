@@ -16,7 +16,7 @@ const StarBackground = () => {
 
     // --- Configuration ---
     const starColor = '#E11D48'; // Primary Brand Red/Crimson
-    const bgStarCount = 1200;
+    const bgStarCount = 150;
     const heroCount = 3;
     let scrollY = window.scrollY;
     let targetScrollY = window.scrollY;
@@ -30,9 +30,9 @@ const StarBackground = () => {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
         this.z = Math.random() * 2000; // Depth for parallax
-        this.size = Math.random() * 1.2 + 0.1;
-        this.opacity = Math.random() * 0.6 + 0.1;
-        this.twinkle = Math.random() * 0.02 + 0.005;
+        this.size = Math.random() * 0.9 + 0.1;
+        this.opacity = Math.random() * 0.4 + 0.05;
+        this.twinkle = Math.random() * 0.01 + 0.002;
       }
       update(currentScrollY) {
         // Parallax: Stars further away (higher z) move slower
@@ -41,7 +41,7 @@ const StarBackground = () => {
         if (this.currentY < 0) this.currentY += height;
 
         this.opacity += this.twinkle;
-        if (this.opacity > 0.8 || this.opacity < 0.1) this.twinkle = -this.twinkle;
+        if (this.opacity > 0.5 || this.opacity < 0.05) this.twinkle = -this.twinkle;
       }
       draw() {
         ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
