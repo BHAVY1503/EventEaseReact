@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone, Clock, Send, Globe, ShieldCheck, Sparkles, Activity, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "@/lib/utils";
+import '../../styles/components/ContactUs.css';
 
 export const ContactUs = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm();
@@ -67,18 +68,18 @@ export const ContactUs = () => {
   };
 
   return (
-    <div className="w-full bg-transparent overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-px bg-white/5">
+    <div className="contact-section">
+      <div className="contact-grid">
         {/* Info Sidebar (40%) */}
-        <div className="lg:col-span-2 p-10 md:p-16 bg-black/40 backdrop-blur-3xl space-y-12 border-b lg:border-b-0 lg:border-r border-white/5">
+        <div className="info-sidebar space-y-12">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+            <div className="sidebar-badge">
                <Activity className="h-3 w-3 text-[#E11D48] animate-pulse" />
                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Support Protocol Active</span>
             </div>
-            <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] text-white">
+            <h3 className="sidebar-title">
                DIRECT<br />
-               <span className="text-[#E11D48]">COMMAND</span>
+               <span>COMMAND</span>
             </h3>
             <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-xs">
                Priority operational support for elite producers. Secure channel open 24/7 for infrastructure queries.
@@ -86,8 +87,8 @@ export const ContactUs = () => {
           </div>
 
           <div className="space-y-10">
-            <div className="flex items-start gap-6 group">
-               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#E11D48]/40 group-hover:bg-[#E11D48]/10 transition-all duration-500">
+            <div className="contact-item group">
+               <div className="contact-icon-box">
                   <Mail className="h-4 w-4 text-[#E11D48]" />
                </div>
                <div>
@@ -96,8 +97,8 @@ export const ContactUs = () => {
                </div>
             </div>
             
-            <div className="flex items-start gap-6 group">
-               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#E11D48]/40 group-hover:bg-[#E11D48]/10 transition-all duration-500">
+            <div className="contact-item group">
+               <div className="contact-icon-box">
                   <Phone className="h-4 w-4 text-[#E11D48]" />
                </div>
                <div>
@@ -106,8 +107,8 @@ export const ContactUs = () => {
                </div>
             </div>
 
-            <div className="flex items-start gap-6 group">
-               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#E11D48]/40 group-hover:bg-[#E11D48]/10 transition-all duration-500">
+            <div className="contact-item group">
+               <div className="contact-icon-box">
                   <Globe className="h-4 w-4 text-[#E11D48]" />
                </div>
                <div>
@@ -128,7 +129,7 @@ export const ContactUs = () => {
         </div>
 
         {/* Form Area (60%) */}
-        <div className="lg:col-span-3 p-10 md:p-16 bg-black/20 backdrop-blur-sm">
+        <div className="form-area">
           <form onSubmit={handleSubmit(submitHandler)} className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                <div className="space-y-3 group">
@@ -137,7 +138,7 @@ export const ContactUs = () => {
                     <input
                       {...register("name", { required: true })}
                       placeholder="ENTER FULL NAME"
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-500 outline-none transition-all"
+                      className="cinematic-input-admin"
                     />
                   </div>
                </div>
@@ -148,7 +149,7 @@ export const ContactUs = () => {
                       {...register("email", { required: true })}
                       type="email"
                       placeholder="EMAIL@DOMAIN.COM"
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-500 outline-none transition-all"
+                      className="cinematic-input-admin"
                     />
                   </div>
                </div>
@@ -161,7 +162,7 @@ export const ContactUs = () => {
                     {...register("message", { required: true })}
                     placeholder="DESCRIBE YOUR INFRASTRUCTURE QUERY..."
                     rows={6}
-                    className="w-full bg-white/5 border border-white/5 rounded-[2rem] px-8 py-6 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-1 focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50 placeholder:text-gray-500 outline-none resize-none transition-all"
+                    className="cinematic-textarea-admin"
                   />
                </div>
             </div>

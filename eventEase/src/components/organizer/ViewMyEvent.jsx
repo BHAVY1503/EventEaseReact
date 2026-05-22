@@ -60,6 +60,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import '../../styles/components/ViewMyEvent.css';
 
 export const ViewMyEvent = () => {
   const dispatch = useAppDispatch();
@@ -150,8 +151,8 @@ export const ViewMyEvent = () => {
   };
 
   const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {[1, 2, 3].map((i) => (
+    <div className="event-grid">
+      {[1, 2, 3, 4].map((i) => (
         <Card key={i} className="bg-white/5 border-white/5 rounded-[2.5rem] overflow-hidden">
           <Skeleton className="h-48 w-full bg-white/5" />
           <div className="p-8 space-y-4">
@@ -178,17 +179,17 @@ export const ViewMyEvent = () => {
         exit={{ opacity: 0, scale: 0.95 }}
       >
         <Card className={cn(
-          "group relative bg-white/5 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-3xl hover:border-[#E11D48]/40 transition-all duration-700 shadow-2xl h-full flex flex-col",
-          dimmed && "opacity-40 grayscale hover:grayscale-0 hover:opacity-100"
+          "event-card",
+          dimmed && "dimmed"
         )}>
           {/* Status Badge */}
-          <div className="absolute top-4 right-4 z-20">
+          <div className="status-badge-container">
              {eventStatus === 'completed' ? (
-               <Badge className="bg-green-500/20 text-green-500 border-green-500/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+               <Badge className="status-badge terminated">
                   TERMINATED
                </Badge>
              ) : eventStatus === 'ongoing' ? (
-               <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/20 px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest animate-pulse">
+               <Badge className="status-badge live">
                   LIVE
                </Badge>
              ) : (
@@ -212,13 +213,13 @@ export const ViewMyEvent = () => {
              )}
           </div>
 
-          <div className="relative h-44 overflow-hidden">
+          <div className="event-card-media">
             <img
               src={event.eventImgUrl}
               alt={event.eventName}
-              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              className="event-card-img"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            <div className="event-card-overlay" />
             
             <div className="absolute bottom-4 left-6 flex flex-col gap-1">
                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48] mb-0.5">{event.eventCategory}</span>
@@ -304,19 +305,19 @@ export const ViewMyEvent = () => {
   const { completed, active } = categorizeEventsByTime(displayEvents);
 
   return (
-    <div className="w-full space-y-12 pb-20">
+    <div className="archive-container">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16">
+      <div className="archive-header">
          <div>
-            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-8">
+            <div className="archive-version-badge">
                <Sparkles className="h-4 w-4 text-[#E11D48]" />
-               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Archival Manifest v2.4</span>
+               <span className="archive-version-text">Archival Manifest v2.4</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
-               MY <span className="text-[#E11D48]">ARCHIVE</span>
+            <h1 className="archive-title">
+               MY <span>ARCHIVE</span>
             </h1>
          </div>
-         <div className="flex gap-4">
+         <div className="archive-tabs">
             {[
               { id: 'all', label: 'ALL NODES', icon: LayoutGrid },
               { id: 'approved', label: 'AUTHORIZED', icon: ShieldCheck },
@@ -328,10 +329,8 @@ export const ViewMyEvent = () => {
                 variant="ghost"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "h-12 px-6 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
-                  activeTab === tab.id 
-                    ? "bg-[#E11D48] text-white shadow-[0_0_20px_rgba(225,29,72,0.3)]" 
-                    : "bg-white/5 text-gray-500 hover:bg-white/10"
+                  "archive-tab-btn",
+                  activeTab === tab.id && "active"
                 )}
               >
                 <tab.icon className={cn("w-3.5 h-3.5 mr-2", activeTab === tab.id ? "text-white" : "text-gray-600")} />
@@ -344,7 +343,7 @@ export const ViewMyEvent = () => {
       {status === 'loading' ? (
         <LoadingSkeleton />
       ) : displayEvents.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-40 bg-white/5 border border-white/5 rounded-[3rem] backdrop-blur-3xl">
+        <div className="empty-state">
            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-10 border border-white/10 group">
               <Globe className="w-12 h-12 text-gray-700 group-hover:text-[#E11D48] transition-colors duration-500" />
            </div>
@@ -367,7 +366,7 @@ export const ViewMyEvent = () => {
                   <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Active Infrastructure</h2>
                </div>
                
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+               <div className="event-grid">
                   <AnimatePresence>
                     {active.map((event) => (
                       <EventCard key={event._id} event={event} />
@@ -385,7 +384,7 @@ export const ViewMyEvent = () => {
                   <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Historical Nodes</h2>
                </div>
                
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+               <div className="event-grid">
                   {completed.map((event) => (
                     <EventCard key={event._id} event={event} dimmed />
                   ))}

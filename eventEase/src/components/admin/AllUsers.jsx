@@ -45,6 +45,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import '../../styles/components/AllUsers.css';
 
 export const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -129,22 +130,22 @@ export const AllUsers = () => {
   }
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="users-container">
       {/* HEADER SECTION */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        className="users-header"
       >
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+        <div className="users-badge">
           <Users className="h-3 w-3 text-[#E11D48] animate-pulse" />
           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Global User Directory Active</span>
         </div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
+            <h1 className="users-title">
               USER<br />
-              <span className="text-[#E11D48]">COMMAND</span>
+              <span>COMMAND</span>
             </h1>
             <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
               Surveillance and regulation of all platform entities.
@@ -164,7 +165,7 @@ export const AllUsers = () => {
       </motion.div>
 
       {/* STATS SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="stats-grid">
         {[
           { label: "Active Nodes", value: users.length, icon: Activity, color: "text-[#E11D48]" },
           { label: "Privileged Access", value: users.filter(u => u.role === 'Admin').length, icon: Shield, color: "text-blue-500" },
@@ -175,9 +176,9 @@ export const AllUsers = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-8 bg-[#0A0A0A] border border-white/5 rounded-[2.5rem] space-y-4 shadow-2xl relative overflow-hidden group"
+            className="stat-card-users group"
           >
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
+            <div className="stat-icon-bg">
                <stat.icon className="w-20 h-20 text-white" />
             </div>
             <div className="flex items-center justify-between relative z-10">
@@ -196,22 +197,22 @@ export const AllUsers = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="border border-white/5 bg-[#0A0A0A] rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-3xl"
+        className="registry-card"
       >
-        <div className="p-10 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gradient-to-r from-transparent to-white/[0.02]">
+        <div className="registry-header">
           <div className="space-y-1">
              <h3 className="text-2xl font-black uppercase tracking-tight text-white">Central Registry</h3>
              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Validated Platform Entities</p>
           </div>
           
           <div className="flex items-center gap-6 flex-1 max-w-2xl">
-            <div className="relative flex-1 group">
+            <div className="search-input-wrapper group">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
               <Input
                 placeholder="IDENTIFY BY NAME, EMAIL, OR PHONE..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-14 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-500 transition-all"
+                className="search-input"
               />
             </div>
             <Button variant="outline" className="h-14 px-8 border-white/10 bg-transparent text-gray-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-2xl hover:bg-white hover:text-black transition-all">
@@ -220,7 +221,7 @@ export const AllUsers = () => {
           </div>
         </div>
 
-        <div className="p-0 overflow-x-auto custom-scrollbar">
+        <div className="table-responsive custom-scrollbar">
           <Table>
             <TableHeader>
               <TableRow className="border-white/5 hover:bg-transparent">
@@ -239,7 +240,7 @@ export const AllUsers = () => {
                   </TableCell>
                   <TableCell className="py-6">
                     <div className="flex items-center gap-6">
-                      <Avatar className="w-12 h-12 rounded-2xl ring-2 ring-white/5">
+                      <Avatar className="user-avatar-cell ring-2 ring-white/5">
                         <AvatarFallback className="bg-gradient-to-br from-[#E11D48] to-[#991B1B] text-white font-black uppercase text-lg">
                           {user.fullName?.charAt(0) || 'U'}
                         </AvatarFallback>

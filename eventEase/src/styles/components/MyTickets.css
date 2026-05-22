@@ -1,0 +1,336 @@
+/* MyTickets.css */
+
+.my-tickets-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+  padding-bottom: 5rem;
+}
+
+.my-tickets-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* Header Section */
+.archive-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+.archive-title-box h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .archive-title-box h1 {
+    font-size: 5rem;
+  }
+}
+
+.archive-title-box h1 span {
+  color: #E11D48;
+}
+
+.archive-subtitle {
+  font-size: 0.625rem;
+  font-weight: 900;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+}
+
+/* Ticket Grid */
+.tickets-grid-premium {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .tickets-grid-premium {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tickets-grid-premium {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Ticket Card */
+.ticket-card-user {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  color: #000000;
+}
+
+.ticket-card-user:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+}
+
+.ticket-card-user.active-ticket {
+  border: 1px solid rgba(225, 29, 72, 0.2);
+}
+
+.ticket-card-user.cancelled-ticket {
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+
+/* Notches */
+.user-ticket-notch-left,
+.user-ticket-notch-right {
+  position: absolute;
+  top: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #000000;
+  border-radius: 9999px;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.user-ticket-notch-left { left: -0.75rem; }
+.user-ticket-notch-right { right: -0.75rem; }
+
+/* Content Layout */
+.ticket-card-header-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.ticket-icon-box-user {
+  width: 3rem;
+  height: 3rem;
+  background-color: rgba(225, 29, 72, 0.1);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E11D48;
+}
+
+.status-badge-user {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.status-badge-user.upcoming { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.status-badge-user.past { background-color: rgba(75, 85, 99, 0.1); color: #4b5563; }
+.status-badge-user.ongoing { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+.ticket-title-user {
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+}
+
+.ticket-date-user {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ticket-footer-user {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ticket-id-tag-user {
+  font-size: 0.625rem;
+  font-weight: 900;
+  color: #9ca3af;
+  letter-spacing: 0.1em;
+}
+
+.ticket-price-user {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #E11D48;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+/* Detail Panel Styling */
+.sheet-content-premium {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.sheet-header-premium {
+  padding: 3rem;
+  background: linear-gradient(135deg, #E11D48, #991b1b);
+  color: #ffffff;
+}
+
+.sheet-body-premium {
+  padding: 3rem;
+}
+
+.sheet-section-title {
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: #E11D48;
+  margin-bottom: 1.5rem;
+}
+
+.sheet-main-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  margin-bottom: 2rem;
+}
+
+.detail-grid-user {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  padding: 2.5rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.detail-item-user h4 {
+  font-size: 0.5rem;
+  font-weight: 900;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-item-user p {
+  font-size: 0.875rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sector-access-box {
+  background-color: #f9fafb;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  margin: 2.5rem 0;
+}
+
+.grand-total-user-box {
+  background-color: #000000;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+
+.grand-total-user-box h5 {
+  font-size: 0.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #4b5563;
+}
+
+.grand-total-user-box .price-text {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: #E11D48;
+  font-style: italic;
+}
+
+.sheet-actions-user {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.sheet-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.btn-premium-user {
+  height: 4rem;
+  border-radius: 1.25rem;
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  transition: all 0.3s ease;
+}
+
+.btn-premium-user.primary {
+  background: linear-gradient(135deg, #E11D48, #be123c);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-premium-user.secondary {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.btn-premium-user.danger {
+  background-color: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.btn-premium-user.danger:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Refund Component */
+.refund-card-premium {
+  margin-top: 1.5rem;
+  border-radius: 1.25rem;
+  border-left: 4px solid #E11D48;
+}

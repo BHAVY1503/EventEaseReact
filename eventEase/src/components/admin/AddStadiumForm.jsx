@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import '../../styles/components/AddStadiumForm.css';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -144,21 +145,21 @@ const AddStadiumForm = () => {
   };
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="add-stadium-container">
       {/* HEADER SECTION */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        className="add-stadium-header"
       >
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+        <div className="stadium-badge">
           <Activity className="h-3 w-3 text-[#E11D48] animate-pulse" />
           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Infrastructure Acquisition Protocol</span>
         </div>
         <div className="space-y-2">
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
+          <h1 className="stadium-title">
             DEPLOY<br />
-            <span className="text-[#E11D48]">STADIUM</span>
+            <span>STADIUM</span>
           </h1>
           <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
             Integrate new indoor arena modules into the global event network.
@@ -166,15 +167,15 @@ const AddStadiumForm = () => {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+      <div className="stadium-form-grid">
         {/* FORM SIDE (3/5) */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-3 space-y-8"
+          className="form-side"
         >
-          <div className="border border-white/5 bg-[#0A0A0A] rounded-[2.5rem] p-10 space-y-10 shadow-2xl backdrop-blur-3xl relative overflow-hidden">
+          <div className="cinematic-card-stadium space-y-10">
             <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
               <Building2 className="w-64 h-64 text-white" />
             </div>
@@ -194,7 +195,7 @@ const AddStadiumForm = () => {
                     <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Designation Name</p>
                     <Input
                       placeholder="ENTER STADIUM NAME"
-                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      className="cinematic-input-stadium"
                       {...register("name", { required: "Name is mandatory" })}
                     />
                     {errors.name && <p className="text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.name.message}</p>}
@@ -204,7 +205,7 @@ const AddStadiumForm = () => {
                     <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] group-focus-within:text-[#E11D48] transition-colors">Electronic Address</p>
                     <Input
                       placeholder="ENTER PHYSICAL LOCATION"
-                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      className="cinematic-input-stadium"
                       {...register("address", { required: "Address is mandatory" })}
                     />
                     {errors.address && <p className="text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.address.message}</p>}
@@ -227,7 +228,7 @@ const AddStadiumForm = () => {
                     <Input
                       type="number"
                       placeholder="E.G. 50000"
-                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      className="cinematic-input-stadium"
                       {...register("totalSeats", { required: true, min: 1 })}
                     />
                   </div>
@@ -236,14 +237,14 @@ const AddStadiumForm = () => {
                     <Input
                       type="number"
                       defaultValue={20}
-                      className="bg-white/5 border-white/10 rounded-2xl h-14 text-[11px] font-black tracking-widest uppercase focus:ring-[#E11D48]/50 focus:border-[#E11D48]/50"
+                      className="cinematic-input-stadium"
                       {...register("seatsPerZone")}
                     />
                   </div>
                 </div>
 
                 {zoneCount > 0 && (
-                  <div className="p-8 bg-white/5 rounded-[2rem] border border-white/5 space-y-6">
+                  <div className="sector-valuations space-y-6">
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Sector Valuations (₹)</p>
                       <Badge className="bg-[#E11D48] text-white font-black text-[8px] uppercase tracking-widest">{zoneCount} SECTORS</Badge>
@@ -282,7 +283,7 @@ const AddStadiumForm = () => {
                   />
                   <label 
                     htmlFor="stadium-upload"
-                    className="flex flex-col items-center justify-center gap-4 w-full h-40 bg-white/5 border-2 border-dashed border-white/10 rounded-[2rem] cursor-pointer hover:border-[#E11D48]/50 hover:bg-[#E11D48]/5 transition-all group/upload"
+                    className="upload-box group/upload"
                   >
                     <Upload className="w-8 h-8 text-gray-600 group-hover/upload:text-[#E11D48] transition-colors" />
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 group-hover/upload:text-[#E11D48]">
@@ -315,9 +316,9 @@ const AddStadiumForm = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
-          className="lg:col-span-2 space-y-8"
+          className="map-side"
         >
-          <div className="border border-white/5 bg-[#0A0A0A] rounded-[2.5rem] p-10 space-y-8 shadow-2xl h-full flex flex-col">
+          <div className="cinematic-card-stadium h-full flex flex-col">
             <div className="flex items-center gap-4 border-b border-white/5 pb-4">
               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
                 <Globe className="w-4 h-4 text-gray-400" />
@@ -325,14 +326,14 @@ const AddStadiumForm = () => {
               <h3 className="text-xl font-black uppercase tracking-tight text-white">Geospatial Link</h3>
             </div>
 
-            <div className="space-y-4 flex-1 flex flex-col">
+            <div className="space-y-4 flex-1 flex flex-col pt-8">
               <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
                 Calibrate the precise deployment coordinates. Use high-resolution positioning for grid synchronization.
               </p>
               
-              <div className="relative flex-1 min-h-[400px] rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+              <div className="map-viewport">
                 <div ref={mapContainer} className="absolute inset-0" />
-                <div className="absolute bottom-6 left-6 right-6 p-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-between">
+                <div className="coordinate-badge">
                   <div>
                     <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Global Coordinates</p>
                     <p className="text-[9px] font-black text-white">{lat.toFixed(4)}N / {lng.toFixed(4)}E</p>

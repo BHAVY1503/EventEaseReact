@@ -6,11 +6,8 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import api from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
@@ -19,13 +16,10 @@ import {
   Upload,
   Video,
   Building2,
-  DollarSign,
   Loader2,
   CheckCircle,
-  Sparkles,
   Zap,
   Globe,
-  Rocket,
   ShieldCheck,
   Activity,
   ChevronRight
@@ -36,6 +30,7 @@ import { createEvent, fetchMyEvents } from "../../features/events/eventsSlice";
 import { useToast } from "../../hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import '../../styles/components/ProductionForm.css';
 
 const mapboxCustomStyles = `
   .mapboxgl-ctrl-geocoder {
@@ -235,72 +230,51 @@ export const AddEvent = () => {
   };
 
   return (
-    <div className="w-full bg-transparent text-white selection:bg-[#E11D48]/30 py-6 md:py-10 px-0 relative overflow-hidden">
+    <div className="production-form-wrapper">
       <style>{mapboxCustomStyles}</style>
-      <div className="max-w-[1400px] mx-auto relative z-10">
-
-        <form onSubmit={handleSubmit(submitHandler)} className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
+      <div className="production-form-container">
+        <form onSubmit={handleSubmit(submitHandler)} className="form-grid-layout">
           {/* Left Column: Operational Config */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-5 xl:col-span-4 space-y-6 md:space-y-8"
-          >
-            <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 space-y-8">
-              <div className="space-y-6">
-                <div className="flex items-center gap-4 border-b border-white/5 pb-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-[#E11D48]/10 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0">
-                    <Globe className="w-5 h-5 md:w-6 md:h-6 text-[#E11D48]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter">Operational Node</h3>
-                    <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-gray-500">Configure sector parameters</p>
-                  </div>
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="form-config-panel">
+            <div className="form-config-card">
+              <div className="panel-header">
+                <div className="header-icon-box"><Globe className="w-5 h-5 text-[#E11D48]" /></div>
+                <div className="header-title-box">
+                  <h3>Operational Node</h3>
+                  <p className="header-sub-label">Configure sector parameters</p>
                 </div>
+              </div>
 
-                <div className="space-y-3">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Environment Protocol</Label>
-                  <div className="relative">
-                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <select
-                      className="w-full h-14 bg-black/40 border border-white/10 rounded-xl px-6 text-sm font-bold focus:ring-2 focus:ring-[#E11D48] focus:border-transparent outline-none transition-all appearance-none"
-                      {...register("eventCategory", { required: "Event category is required" })}
-                      value={eventCategory}
-                      onChange={(e) => {
-                        setEventCategory(e.target.value);
-                        dispatch(clearSelectedStadium());
-                      }}
-                    >
-                      <option value="" className="bg-black">SELECT CATEGORY</option>
-                      <option value="Indoor" className="bg-black">🏟️ STADIUM ARENA (INDOOR)</option>
-                      <option value="Outdoor" className="bg-black">🌳 OPEN AIR (OUTDOOR)</option>
-                      <option value="ZoomMeeting" className="bg-black">💻 DIGITAL STREAM (ZOOM)</option>
-                    </select>
-                  </div>
+              <div className="form-input-group">
+                <Label className="form-label-elite">Environment Protocol</Label>
+                <div className="relative">
+                  <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <select
+                    className="form-select-elite"
+                    {...register("eventCategory", { required: "Event category is required" })}
+                    value={eventCategory}
+                    onChange={(e) => {
+                      setEventCategory(e.target.value);
+                      dispatch(clearSelectedStadium());
+                    }}
+                  >
+                    <option value="" className="bg-black">SELECT CATEGORY</option>
+                    <option value="Indoor" className="bg-black">🏟️ STADIUM ARENA (INDOOR)</option>
+                    <option value="Outdoor" className="bg-black">🌳 OPEN AIR (OUTDOOR)</option>
+                    <option value="ZoomMeeting" className="bg-black">💻 DIGITAL STREAM (ZOOM)</option>
+                  </select>
                 </div>
               </div>
 
               <AnimatePresence mode="wait">
                 {eventCategory === "Indoor" && (
-                  <motion.div
-                    key="indoor"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    className="p-6 md:p-8 bg-white/5 rounded-[1.5rem] md:rounded-[2rem] border border-white/5 space-y-6"
-                  >
-                    <div className="space-y-3">
-                      <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#E11D48]">Arena Synchronization</Label>
-                      <button
-                        type="button"
-                        onClick={handleStadiumSelect}
-                        className="w-full h-14 bg-white text-black rounded-xl flex items-center justify-between px-6 hover:bg-[#E11D48] hover:text-white transition-all duration-500 group"
-                      >
+                  <motion.div key="indoor" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="category-specific-panel">
+                    <div className="form-input-group">
+                      <Label className="form-label-elite text-[#E11D48]">Arena Synchronization</Label>
+                      <button type="button" onClick={handleStadiumSelect} className="stadium-select-btn group">
                         <div className="flex items-center gap-4 overflow-hidden">
                           <Building2 className="w-4 h-4 shrink-0" />
-                          <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest truncate">
-                            {selectedStadium ? selectedStadium.name : "Select Target Arena"}
-                          </span>
+                          <span className="stadium-btn-text">{selectedStadium ? selectedStadium.name : "Select Target Arena"}</span>
                         </div>
                         <Zap className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </button>
@@ -308,13 +282,13 @@ export const AddEvent = () => {
 
                     {selectedStadium?.zones && (
                       <div className="space-y-4 pt-4 border-t border-white/5">
-                        <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] text-gray-400">Value Distribution (₹)</Label>
+                        <Label className="form-label-elite">Value Distribution (₹)</Label>
                         <div className="space-y-2">
                           {selectedStadium.zones.map((zone, i) => (
                             <div key={i} className="flex items-center justify-between bg-black/40 px-6 h-12 rounded-xl border border-white/5 group hover:border-[#E11D48]/30 transition-all">
                               <div className="flex items-center gap-4">
                                 <span className="text-[11px] font-black text-[#E11D48]">{String.fromCharCode(65 + i)}</span>
-                                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-gray-400">Tier Access</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Tier Access</span>
                               </div>
                               <input
                                 type="number"
@@ -324,7 +298,7 @@ export const AddEvent = () => {
                                   newPrices[i] = parseInt(e.target.value) || 0;
                                   setCustomZonePrices(newPrices);
                                 }}
-                                className="bg-transparent border-none outline-none text-right text-sm md:text-base font-black w-20 text-[#E11D48]"
+                                className="bg-transparent border-none outline-none text-right text-sm font-black w-20 text-[#E11D48]"
                               />
                             </div>
                           ))}
@@ -335,64 +309,40 @@ export const AddEvent = () => {
                 )}
 
                 {eventCategory === "Outdoor" && (
-                  <motion.div
-                    key="outdoor"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="space-y-6 md:p-8 bg-white/5 rounded-[1.5rem] md:rounded-[2rem] border border-white/5 p-6"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-[8px] md:text-[9px] font-black uppercase text-gray-500">State Node</Label>
-                        <select className="w-full bg-black/40 border border-white/5 rounded-xl px-4 h-11 text-[10px] outline-none appearance-none" {...register("stateId", { required: true })}>
+                  <motion.div key="outdoor" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="category-specific-panel">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="form-input-group">
+                        <Label className="form-label-elite">State Node</Label>
+                        <select className="form-select-elite h-11 text-[10px]" {...register("stateId", { required: true })}>
                           <option value="">SELECT STATE</option>
                           {states.map(s => <option key={s._id} value={s._id} className="bg-black">{s.Name}</option>)}
                         </select>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-[8px] md:text-[9px] font-black uppercase text-gray-500">City Node</Label>
-                        <select className="w-full bg-black/40 border border-white/5 rounded-xl px-4 h-11 text-[10px] outline-none appearance-none" {...register("cityId", { required: true })}>
+                      <div className="form-input-group">
+                        <Label className="form-label-elite">City Node</Label>
+                        <select className="form-select-elite h-11 text-[10px]" {...register("cityId", { required: true })}>
                           <option value="">SELECT CITY</option>
                           {cities.map(c => <option key={c._id} value={c._id} className="bg-black">{c.name}</option>)}
                         </select>
                       </div>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-[8px] md:text-[9px] font-black uppercase text-gray-500">Base Rate (₹)</Label>
-                      <input type="number" className="w-full h-12 bg-black/40 border border-white/5 rounded-xl px-6 text-lg font-black" {...register("ticketRate")} />
+                    <div className="form-input-group">
+                      <Label className="form-label-elite">Base Rate (₹)</Label>
+                      <input type="number" className="form-input-elite" {...register("ticketRate")} />
                     </div>
-
-                    <div className="space-y-3">
-                      <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#E11D48] flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5" /> Mapping Interface
-                      </Label>
-                      <div
-                        ref={mapContainer}
-                        className="h-64 md:h-80 rounded-[1.5rem] md:rounded-[2rem] border border-white/10 bg-black/40 shadow-inner transition-all duration-700 relative z-0"
-                      />
-                      <input type="hidden" {...register("latitude")} />
-                      <input type="hidden" {...register("longitude")} />
+                    <div className="form-input-group">
+                      <Label className="form-label-elite text-[#E11D48] flex items-center gap-2"><MapPin className="w-3.5 h-3.5" /> Mapping Interface</Label>
+                      <div ref={mapContainer} className="map-interface-container" />
                     </div>
                   </motion.div>
                 )}
 
                 {eventCategory === "ZoomMeeting" && (
-                  <motion.div
-                    key="zoom"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="p-6 md:p-8 bg-white/10 rounded-[1.5rem] md:rounded-[2rem] border border-white/10 space-y-4"
-                  >
-                    <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">Transmission Link</Label>
+                  <motion.div key="zoom" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="category-specific-panel">
+                    <Label className="form-label-elite">Transmission Link</Label>
                     <div className="relative">
-                      <Video className="absolute left-6 top-1/2 -translate-y-1/2 text-[#E11D48] w-4 h-4 md:w-5 md:h-5" />
-                      <input
-                        type="url"
-                        className="w-full h-14 bg-black/40 border border-white/10 rounded-xl px-16 text-xs md:text-sm outline-none focus:ring-2 focus:ring-[#E11D48]"
-                        placeholder="https://zoom.us/j/..."
-                        {...register("zoomUrl", { required: true })}
-                      />
+                      <Video className="absolute left-6 top-1/2 -translate-y-1/2 text-[#E11D48] w-5 h-5" />
+                      <input type="url" className="form-input-elite pl-16" placeholder="https://zoom.us/j/..." {...register("zoomUrl", { required: true })} />
                     </div>
                   </motion.div>
                 )}
@@ -400,45 +350,31 @@ export const AddEvent = () => {
             </div>
           </motion.div>
 
-          {/* Right Column: Manifest Configuration */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-7 xl:col-span-8"
-          >
-            <div className="bg-white/10 backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 space-y-10 md:space-y-12 shadow-2xl">
-              <div className="flex items-center gap-4 md:gap-6 border-b border-white/5 pb-8">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-[#E11D48] rounded-xl md:rounded-[2rem] flex items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.4)] shrink-0">
-                  <Activity className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl md:text-3xl font-black uppercase tracking-tighter leading-none">Manifest Parameters</h3>
-                  <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500 mt-2">Finalize production metadata</p>
+          {/* Right Column: Manifest */}
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="form-manifest-panel">
+            <div className="form-manifest-card">
+              <div className="manifest-header">
+                <div className="manifest-icon-box"><Activity className="w-8 h-8 text-white" /></div>
+                <div className="manifest-title-box">
+                  <h3>Manifest Parameters</h3>
+                  <p className="manifest-sub-label">Finalize production metadata</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
-                <div className="sm:col-span-2 space-y-3">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Production Title</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="sm:col-span-2 form-input-group">
+                  <Label className="form-label-elite">Production Title</Label>
                   <div className="relative group">
                     <Zap className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 group-focus-within:text-[#E11D48] transition-colors" />
-                    <input
-                      type="text"
-                      className="w-full h-14 bg-black/40 border border-white/10 rounded-xl pl-16 pr-8 text-sm md:text-base font-black placeholder:text-white/5 focus:ring-2 focus:ring-[#E11D48]/50 outline-none transition-all"
-                      placeholder="ENTER PRODUCTION IDENTIFIER"
-                      {...register("eventName", { required: true })}
-                    />
+                    <input type="text" className="form-input-elite pl-16 font-black" placeholder="ENTER PRODUCTION IDENTIFIER" {...register("eventName", { required: true })} />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Operational Type</Label>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Operational Type</Label>
                   <div className="relative">
-                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none rotate-90 sm:rotate-0" />
-                    <select
-                      className="w-full h-14 bg-black/40 border border-white/10 rounded-xl pl-6 sm:pl-8 pr-12 font-bold outline-none appearance-none focus:ring-2 focus:ring-[#E11D48]/50 transition-all text-xs"
-                      {...register("eventType", { required: true })}
-                    >
+                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                    <select className="form-select-elite text-xs" {...register("eventType", { required: true })}>
                       <option value="" className="bg-[#0A0A0A]">SELECT TYPE</option>
                       <option value="Music consert" className="bg-[#0A0A0A]">MUSIC CONCERT</option>
                       <option value="Conference" className="bg-[#0A0A0A]">CONFERENCE</option>
@@ -451,71 +387,50 @@ export const AddEvent = () => {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Capacity Node</Label>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Capacity Node</Label>
                   <div className="relative">
                     <Users className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      type="number"
-                      className="w-full h-14 bg-black/40 border border-white/10 rounded-xl px-16 font-black outline-none focus:ring-2 focus:ring-[#E11D48]/50 transition-all disabled:opacity-20 text-sm md:text-base"
-                      {...register("numberOfSeats", { required: true })}
-                      disabled={eventCategory === "Indoor" && selectedStadium}
-                    />
+                    <input type="number" className="form-input-elite pl-16 disabled:opacity-20" {...register("numberOfSeats", { required: true })} disabled={eventCategory === "Indoor" && selectedStadium} />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Commencement</Label>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Commencement</Label>
                   <div className="relative">
                     <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-[#E11D48] w-4 h-4 pointer-events-none" />
-                    <input type="date" className="w-full h-14 bg-black/40 border border-white/10 rounded-xl px-16 font-bold outline-none focus:ring-2 focus:ring-[#E11D48]/50 transition-all text-xs" {...register("startDate", { required: true })} />
+                    <input type="date" className="form-input-elite pl-16 text-xs" {...register("startDate", { required: true })} />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Termination</Label>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Termination</Label>
                   <div className="relative">
                     <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input type="date" className="w-full h-14 bg-black/40 border border-white/10 rounded-xl px-16 font-bold outline-none focus:ring-2 focus:ring-[#E11D48]/50 transition-all text-xs" {...register("endDate", { required: true })} />
+                    <input type="date" className="form-input-elite pl-16 text-xs" {...register("endDate", { required: true })} />
                   </div>
                 </div>
 
-                <div className="sm:col-span-2 space-y-4">
-                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Asset Integration (Cover Image)</Label>
-                  <div className="relative h-32 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center group hover:border-[#E11D48]/50 transition-all cursor-pointer overflow-hidden">
+                <div className="sm:col-span-2 form-input-group">
+                  <Label className="form-label-elite">Asset Integration (Cover Image)</Label>
+                  <div className="asset-upload-area group">
                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-20" {...register("image", { required: true })} />
-                    <div className="text-center space-y-2 relative z-10 group-hover:scale-110 transition-transform">
-                      <Upload className="w-6 h-6 text-[#E11D48] mx-auto mb-1" />
-                      <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-gray-400">Upload High-Res Media</p>
+                    <div className="upload-overlay-content">
+                      <Upload className="upload-icon" />
+                      <p className="upload-label-text">Upload High-Res Media</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-center md:justify-end pt-8">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || showSuccess}
-                  className={cn(
-                    "h-14 md:h-16 w-full sm:w-auto px-12 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] transition-all duration-700 relative overflow-hidden group shadow-2xl",
-                    showSuccess ? "bg-green-600 text-white" : "bg-white text-black hover:bg-[#E11D48] hover:text-white"
-                  )}
-                >
+              <div className="form-submit-row">
+                <Button type="submit" disabled={isSubmitting || showSuccess} className={cn("deploy-btn-elite", showSuccess ? "success" : "primary")}>
                   {isSubmitting ? (
-                    <div className="flex items-center gap-4">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      DEPLOYING...
-                    </div>
+                    <div className="btn-content-box"><Loader2 className="w-5 h-5 animate-spin" /> DEPLOYING...</div>
                   ) : showSuccess ? (
-                    <div className="flex items-center gap-4">
-                      <CheckCircle className="w-5 h-5 animate-bounce" />
-                      NODE LIVE
-                    </div>
+                    <div className="btn-content-box"><CheckCircle className="w-5 h-5 animate-bounce" /> NODE LIVE</div>
                   ) : (
-                    <div className="flex items-center gap-4">
-                      <ShieldCheck className="w-5 h-5" />
-                      INITIALIZE
-                    </div>
+                    <div className="btn-content-box"><ShieldCheck className="w-5 h-5" /> INITIALIZE</div>
                   )}
                 </Button>
               </div>
@@ -526,3 +441,5 @@ export const AddEvent = () => {
     </div>
   );
 };
+
+export default AddEvent;

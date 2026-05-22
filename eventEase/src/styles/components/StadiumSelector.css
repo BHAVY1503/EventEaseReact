@@ -1,0 +1,110 @@
+/* StadiumSelector.css */
+
+.stadium-selector-container {
+  min-height: 100vh;
+  padding: 4rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .stadium-selector-container {
+    padding: 4rem;
+  }
+}
+
+.selector-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.selector-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.selector-icon-glow {
+  position: relative;
+}
+
+.selector-icon-glow-blur {
+  position: absolute;
+  inset: 0;
+  background: #9333ea;
+  border-radius: 9999px;
+  filter: blur(8px);
+  opacity: 0.25;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.selector-icon-content {
+  position: relative;
+  padding: 1rem;
+  background: #9333ea;
+  border-radius: 9999px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.selector-title {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #2563eb, #9333ea, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.stadium-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .stadium-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stadium-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stadium-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.5s ease;
+}
+
+.dark .stadium-card {
+  background: #030712;
+  border-color: #1f2937;
+}
+
+.stadium-card:hover {
+  transform: translateY(-0.5rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.stadium-img-wrapper {
+  position: relative;
+  height: 16rem;
+  overflow: hidden;
+}
+
+.stadium-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.stadium-card:hover .stadium-img {
+  transform: scale(1.05);
+}

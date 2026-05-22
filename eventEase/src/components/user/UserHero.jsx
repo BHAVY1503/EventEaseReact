@@ -20,6 +20,7 @@ import {
   Shield,
   MapPin,
   Zap,
+  Building2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ import img2 from "../../assets/img/page-title-bg.webp";
 import img3 from "../../assets/img/speaker.jpg";
 import img4 from "../../assets/img/event.webp";
 import defaultprofile from "../../assets/profile.jpg";
+import '../../styles/components/UserHero.css';
 
 export const UserHero = () => {
   const [userName, setUserName] = useState("");
@@ -126,29 +128,21 @@ export const UserHero = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="user-hero-container">
       {/* NAVBAR */}
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-700 shadow-md"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-purple-600 rounded-lg flex items-center justify-center">
+      <nav className={`user-navbar ${isScrolled ? "scrolled" : ""}`}>
+        <div className="user-navbar-content">
+          <div className="user-navbar-inner">
+            <div className="logo-container">
+              <div className="logo-box">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-purple-600 bg-clip-text text-transparent">
-                EventEase
-              </h1>
+              <h1 className="logo-text">EventEase</h1>
               <DarkModeToggle />
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center space-x-1">
+            <div className="desktop-nav">
               <Button
                 variant="ghost"
                 className="hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700 dark:hover:text-red-400"
@@ -185,14 +179,6 @@ export const UserHero = () => {
                   <Ticket className="w-4 h-4 mr-2" /> My Tickets
                 </Button>
               </Link>
-              {/* <Button
-                variant="ghost"
-                className="text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 dark:text-red-400 hover:text-red-700"
-                onClick={signout}
-              >
-                <DoorOpen className="w-4 h-4 mr-2" />
-                LogOut
-              </Button> */}
             </div>
 
             {/* Profile */}
@@ -261,31 +247,28 @@ export const UserHero = () => {
       </nav>
 
       {/* HERO */}
-      <div id="home" className="relative h-screen mt-16 overflow-hidden">
+      <div id="home" className="hero-viewport">
         {heroImages.map((img, i) => (
           <div
             key={i}
-            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+            className={`hero-slide hero-dynamic-bg ${
               i === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-110"
             }`}
             style={{
-              backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(220,38,127,0.3)), url(${img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundAttachment: "fixed",
+              '--bg-image': `url(${img})`,
             }}
           />
         ))}
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <Card className="bg-white/10 dark:bg-gray-900/70 backdrop-blur-md border-white/20 shadow-2xl">
-            <CardContent className="p-12 text-center text-white">
-              <h1 className="text-5xl font-bold mb-4">Welcome, {userName || "User"}</h1>
-              <p className="text-lg opacity-90 mb-8">
+        <div className="hero-overlay">
+          <Card className="hero-card">
+            <CardContent className="hero-card-content">
+              <h1>Welcome, {userName || "User"}</h1>
+              <p>
                 Discover and enjoy incredible events with EventEase
               </p>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="hero-btn"
                 onClick={() => scrollToSection("events")}
               >
                 <Calendar className="w-5 h-5 mr-2" /> Explore Events
@@ -296,7 +279,7 @@ export const UserHero = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="absolute left-6 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
+          className="hero-nav-btn left"
           onClick={prevSlide}
         >
           <ArrowLeft className="w-6 h-6" />
@@ -304,7 +287,7 @@ export const UserHero = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
+          className="hero-nav-btn right"
           onClick={nextSlide}
         >
           <ArrowRight className="w-6 h-6" />
@@ -312,29 +295,29 @@ export const UserHero = () => {
       </div>
 
       {/* SECTIONS */}
-      <section id="events" className="py-0 bg-gradient-to-b from-red-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 mt-2">
+      <section id="events" className="user-section-events">
         <ViewEvents />
       </section>
 
-      <section id="aboutus" className="py-20 bg-gradient-to-b from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-800">
+      <section id="aboutus" className="user-section-about">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-2">About EventEase</h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             EventEase is your gateway to finding and experiencing world-class events effortlessly.
           </p>
         </div>
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 px-6">
-          <Card className="p-6 shadow-lg group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-black">
+        <div className="stats-grid">
+          <Card className="stat-card">
             <Activity className="w-10 h-10 text-red-500 mb-4" />
             <h3 className="font-semibold text-xl mb-2">Total Events</h3>
             <p className="text-3xl font-bold">{eventStats.totalEvents}</p>
           </Card>
-          <Card className="p-6 shadow-lg group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-black">
+          <Card className="stat-card">
             <Calendar className="w-10 h-10 text-purple-500 mb-4" />
             <h3 className="font-semibold text-xl mb-2">Active Events</h3>
             <p className="text-3xl font-bold">{eventStats.activeEvents}</p>
           </Card>
-          <Card className="p-6 shadow-lg group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-black">
+          <Card className="stat-card">
             <Users className="w-10 h-10 text-pink-500 mb-4" />
             <h3 className="font-semibold text-xl mb-2">Community</h3>
             <p className="text-lg">Join thousands of event enthusiasts!</p>
@@ -352,7 +335,7 @@ export const UserHero = () => {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="features-grid">
                   {[
                     {
                       icon: <Ticket className="h-8 w-8" />,
@@ -391,9 +374,9 @@ export const UserHero = () => {
                       color: "from-indigo-500 to-indigo-600"
                     }
                   ].map((feature, index) => (
-                    <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg dark:bg-gray-900 dark:border-gray-700">
+                    <Card key={index} className="feature-card">
                       <CardHeader>
-                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                        <div className={`feature-icon-box bg-gradient-to-br ${feature.color}`}>
                           {feature.icon}
                         </div>
                         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{feature.title}</CardTitle>
@@ -413,26 +396,10 @@ export const UserHero = () => {
         <UserFeedback />
       </section>
 
-      {/* <section id="contactus" className="py-20 bg-gradient-to-b from-white to-red-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-2">Contact Us</h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Have questions or need support? We're here to help!
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto">
-          <Card className="dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-            <CardContent className="p-8">
-              <ContactUs />
-            </CardContent>
-          </Card>
-        </div>
-      </section> */}
-
       {/* FOOTER */}
-      <footer className="relative bg-gradient-to-br from-slate-100 via-red-100 to-purple-100 dark:from-slate-900 dark:via-red-900 dark:to-purple-900 text-gray-900 dark:text-white mt-1">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="grid md:grid-cols-3 gap-12 items-center mb-10">
+      <footer className="user-footer">
+        <div className="footer-content">
+          <div className="footer-grid">
             <div className="text-center md:text-left">
               <div className="flex justify-center md:justify-start items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-purple-500 rounded-xl flex items-center justify-center">
@@ -451,20 +418,22 @@ export const UserHero = () => {
             </div>
             <div className="text-center">
               <h5 className="text-lg font-semibold mb-6">Quick Links</h5>
-              <Button
-                variant="ghost"
-                className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
-                onClick={() => scrollToSection("events")}
-              >
-                Browse Events
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
-                onClick={() => scrollToSection("contactus")}
-              >
-                Contact Us
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
+                  onClick={() => scrollToSection("events")}
+                >
+                  Browse Events
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 dark:text-gray-300 hover:text-white hover:bg-white/10 dark:hover:bg-gray-800 transition"
+                  onClick={() => scrollToSection("contactus")}
+                >
+                  Contact Us
+                </Button>
+              </div>
             </div>
             <div className="text-center md:text-right">
               <h5 className="text-lg font-semibold mb-6">Connect With Us</h5>
@@ -507,11 +476,6 @@ export const UserHero = () => {
     </div>
   );
 };
-
-
-
-
-
 
 // import React, { useEffect, useState } from 'react';
 // import { Link, Outlet } from 'react-router-dom';

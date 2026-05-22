@@ -1,22 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { 
+  Loader2, 
+  ChevronLeft, 
+  Zap, 
+  ShoppingCart, 
+  ChevronDown,
+  X,
+  Ticket,
+  MapPin
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { useToast } from "../../hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 import RazorpayButton from "../common/RazoryPayButton";
+import "@/styles/components/SeatsSelection.css";
 
-export const SeatSelectionPage = () => {
+const SeatsSelection = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // ✅ Add this
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [bookedSeatLabels, setBookedSeatLabels] = useState([]);
+  const [expandedZone, setExpandedZone] = useState(null);
   const [booking, setBooking] = useState(false);
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -25,8 +35,13 @@ export const SeatSelectionPage = () => {
         const ev = res.data?.data ?? res.data;
         setEvent(ev);
         setBookedSeatLabels(ev?.bookedSeatLabels || []);
+        if (ev?.customZones?.length > 0) {
+          setExpandedZone(0);
+        }
       } catch (err) {
         console.error("Error loading event", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
       }
     };
     fetchEvent();
@@ -36,11 +51,23 @@ export const SeatSelectionPage = () => {
     setSelectedSeats((prev) =>
       prev.includes(label)
         ? prev.filter((s) => s !== label)
-        : [...prev, label]
+        : prev.length < 10 ? [...prev, label] : prev
     );
   };
 
-  // ✅ Updated with redirect
+  const calculateTotalAmount = () => {
+    if (!selectedSeats.length || !event) return 0;
+    if (event.eventCategory === "Indoor" && event.customZones) {
+      let total = 0;
+      for (const zone of event.customZones) {
+        const seatsInZone = zone.seatLabels.filter((seat) => selectedSeats.includes(seat));
+        total += seatsInZone.length * zone.price;
+      }
+      return total;
+    }
+    return selectedSeats.length * (event.ticketRate || 0);
+  };
+
   const handleFinalBooking = async () => {
     setBooking(true);
     try {
@@ -51,546 +78,138 @@ export const SeatSelectionPage = () => {
         stateId: event.stateId?._id || event.stateId,
         cityId: event.cityId?._id || event.cityId,
       };
-
       const res = await api.post(`/event/bookseat/${id}`, payload);
-
-      // prefer server message
-      const message = res.data?.message || "Booking success! 🎉";
-      alert(message);
+      alert(res.data?.message || "Booking success! 🎉");
       setSelectedSeats([]);
       setBookedSeatLabels((prev) => [...prev, ...selectedSeats]);
-      
-      // Redirect after successful booking based on role
       const userRole = localStorage.getItem("role");
       const targetPath = userRole === "Organizer" ? "/bookedtickets" : "/mytickets";
-      
       setTimeout(() => navigate(targetPath), 1500);
-      
     } catch (err) {
       console.error("Booking error", err.response?.data || err.message);
-      const msg = err.response?.data?.message || err.message || "❌ Booking failed.";
-      alert(msg);
+      alert(err.response?.data?.message || "❌ Booking failed.");
     } finally {
       setBooking(false);
     }
   };
 
-  const calculateTotalAmount = () => {
-    if (!selectedSeats.length) return 0;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-6">
+        <Loader2 className="w-10 h-10 animate-spin text-[#E11D48]" />
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#E11D48]">Loading Arena Grid</p>
+      </div>
+    );
+  }
 
-    if (event.eventCategory === "Indoor" && event.customZones) {
-      let total = 0;
-      for (const zone of event.customZones) {
-        const seatsInZone = zone.seatLabels.filter((seat) =>
-          selectedSeats.includes(seat)
-        );
-        total += seatsInZone.length * zone.price;
-      }
-      return total;
-    } else {
-      return selectedSeats.length * (event.ticketRate || 0);
-    }
-  };
+  if (!event) return <p className="text-center mt-20">GRID LINK FAILURE: EVENT NOT DETECTED.</p>;
 
   const totalAmount = calculateTotalAmount();
 
-  if (!event) return <p className="text-center mt-5">Loading event...</p>;
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-2xl">{event.eventName}</CardTitle>
-          <CardDescription>
-            <Badge variant="secondary" className="mr-2">
-              {event.eventCategory}
-            </Badge>
-            Select your preferred seats
-          </CardDescription>
-        </CardHeader>
-      </Card>
+    <div className="seats-selection-container">
+      <div className="seats-selection-content">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="seats-header">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-4 text-gray-500 hover:text-white transition-all w-fit">
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Back to Event</span>
+          </button>
+          <div className="seats-title-box">
+            <p className="seats-subtitle">Arena Node Mapping</p>
+            <h1>SELECT YOUR<br /><span>POSITION</span></h1>
+          </div>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Seating Zones</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {event?.customZones?.map((zone, index) => (
-                  <AccordionItem key={index} value={`zone-${index}`}>
-                    <AccordionTrigger className="px-4">
-                      <div className="flex justify-between items-center w-full pr-4">
-                        <span>{zone.zoneName || `Zone ${String.fromCharCode(65 + index)}`}</span>
-                        <Badge variant="secondary">₹{zone.price}</Badge>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <ScrollArea className="h-[200px] p-4">
-                        <div className="grid grid-cols-8 gap-2">
-                          {zone.seatLabels.map((label, i) => {
-                            const isBooked = bookedSeatLabels.includes(label);
-                            const isSelected = selectedSeats.includes(label);
-
-                            return (
-                              <Badge
-                                key={i}
-                                variant={
-                                  isBooked
-                                    ? "destructive"
-                                    : isSelected
-                                    ? "success"
-                                    : "outline"
-                                }
-                                className={`
-                                  cursor-${isBooked ? "not-allowed" : "pointer"}
-                                  h-10 w-10 flex items-center justify-center
-                                  ${isBooked ? "opacity-60" : ""}
-                                  hover:${isBooked ? "" : "scale-105"}
-                                  transition-transform
-                                `}
-                                onClick={() => !isBooked && toggleSeat(label)}
-                              >
-                                {label}
-                              </Badge>
-                            );
-                          })}
+        <div className="seats-main-grid">
+          <div className="stadium-arena-panel">
+            <div className="arena-stage-visual" />
+            <div className="stadium-grid-wrapper">
+              {event?.customZones?.map((zone, idx) => (
+                <div key={idx} className="zone-accordion-item">
+                  <button className="zone-header-btn" onClick={() => setExpandedZone(expandedZone === idx ? null : idx)}>
+                    <div className="zone-info-box">
+                      <p className="zone-name-text">{zone.zoneName || `Zone ${String.fromCharCode(65 + idx)}`}</p>
+                      <span className="zone-price-badge">₹{zone.price}</span>
+                    </div>
+                    <ChevronDown className={cn("transition-transform", expandedZone === idx && "rotate-180")} />
+                  </button>
+                  <AnimatePresence>
+                    {expandedZone === idx && (
+                      <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden">
+                        <div className="seat-row-container">
+                          <div className="flex flex-wrap gap-3">
+                            {zone.seatLabels.map((label, i) => {
+                              const isBooked = bookedSeatLabels.includes(label);
+                              const isSelected = selectedSeats.includes(label);
+                              return (
+                                <div
+                                  key={i}
+                                  onClick={() => !isBooked && toggleSeat(label)}
+                                  className={cn("seat-node", isSelected && "selected", isBooked && "booked")}
+                                >
+                                  {label}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </ScrollArea>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Booking Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Selected Seats</span>
-                <Badge variant="secondary">{selectedSeats.length}</Badge>
-              </div>
-              {selectedSeats.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {selectedSeats.map((seat) => (
-                    <Badge key={seat} variant="outline" className="cursor-pointer"
-                      onClick={() => toggleSeat(seat)}>
-                      {seat}
-                    </Badge>
-                  ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
+              ))}
+            </div>
+            <div className="seats-legend">
+              <div className="legend-item"><div className="legend-dot available" /><span>Available</span></div>
+              <div className="legend-item"><div className="legend-dot selected" /><span>Selected</span></div>
+              <div className="legend-item"><div className="legend-dot booked" /><span>Allocated</span></div>
+            </div>
+          </div>
+
+          <div className="checkout-panel-premium">
+            <div className="summary-title-box"><h2>Selection Summary</h2></div>
+            {selectedSeats.length === 0 ? (
+              <div className="selection-empty-state"><ShoppingCart /><p>No nodes selected in current sector.</p></div>
+            ) : (
+              <div className="selected-seats-list">
+                <AnimatePresence>
+                  {selectedSeats.map((seat) => {
+                    const seatZone = event.customZones.find(z => z.seatLabels.includes(seat));
+                    return (
+                      <motion.div key={seat} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="selected-seat-item">
+                        <div className="seat-item-info">
+                          <span className="seat-item-label">{seat}</span>
+                          <span className="seat-item-zone">{seatZone?.zoneName || "Zone"}</span>
+                        </div>
+                        <span className="seat-item-price">₹{seatZone?.price || event.ticketRate}</span>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
+              </div>
+            )}
+            <div className="checkout-total-box">
+              <div className="total-label-box"><p>TOTAL COMMITMENT</p><p>₹{totalAmount.toLocaleString()}</p></div>
+              <Zap className="w-8 h-8 text-[#E11D48] opacity-20" />
+            </div>
+            <div className="pt-4">
+              {selectedSeats.length > 0 && !booking && (
+                <RazorpayButton
+                  eventId={event._id}
+                  amount={totalAmount}
+                  quantity={selectedSeats.length}
+                  selectedSeats={selectedSeats}
+                  onPaymentSuccess={handleFinalBooking}
+                />
               )}
-              <div className="flex justify-between items-center pt-4 border-t">
-                <span className="font-semibold">Total Amount</span>
-                <span className="text-xl font-bold">₹{totalAmount}</span>
-              </div>
-              
-              <div className="pt-4">
-                {selectedSeats.length > 0 && !booking && (
-                  <RazorpayButton
-                    eventId={event._id}
-                    amount={totalAmount}
-                    quantity={selectedSeats.length}
-                    selectedSeats={selectedSeats}
-                    onPaymentSuccess={handleFinalBooking}
-                  />
-                )}
-
-                {booking && (
-                  <Button disabled className="w-full">
-                    Processing...
-                  </Button>
-                )}
-              </div>
-
-              {/* ✅ Optional: Add a back button */}
-              <Button 
-                variant="outline" 
-                className="w-full mt-2"
-                onClick={() => navigate('/mytickets')}
-              >
-                Back to Events
-              </Button>
-            </CardContent>
-          </Card>
+              {booking && <Button disabled className="checkout-btn-premium">Processing...</Button>}
+            </div>
+            <p className="text-[8px] font-black text-gray-700 uppercase tracking-widest text-center">Secured by Razorpay Encryption Standard</p>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import axios from "axios";
-// import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Badge } from "@/components/ui/badge";
-// import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-// import { useToast } from "../../hooks/use-toast";
-// // import { Icons } from "@/components/icons";
-// import { ScrollArea } from "@/components/ui/scroll-area";
-// import RazorpayButton from "../common/RazoryPayButton"; // ✅ Adjust path as needed
-
-// export const SeatSelectionPage = () => {
-//   const { id } = useParams(); // event ID from URL
-//   const [event, setEvent] = useState(null);
-//   const [selectedSeats, setSelectedSeats] = useState([]);
-//   const [bookedSeatLabels, setBookedSeatLabels] = useState([]);
-//   const [booking, setBooking] = useState(false);
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     const fetchEvent = async () => {
-//       try {
-//         const res = await axios.get(`/event/geteventbyid/${id}`);
-//         setEvent(res.data.data);
-//         setBookedSeatLabels(res.data.data.bookedSeatLabels || []);
-//       } catch (err) {
-//         console.error("Error loading event", err.response?.data || err.message);
-//       }
-//     };
-//     fetchEvent();
-//   }, [id]);
-
-//   const toggleSeat = (label) => {
-//     setSelectedSeats((prev) =>
-//       prev.includes(label)
-//         ? prev.filter((s) => s !== label)
-//         : [...prev, label]
-//     );
-//   };
-
-//   // ✅ Final booking called after successful payment
-//   const handleFinalBooking = async () => {
-//     setBooking(true);
-//     try {
-//       const res = await axios.post(
-//         `/event/bookseat/${id}`,
-//         {
-//           quantity: selectedSeats.length,
-//           selectedSeats,
-//           organizerId: event.organizerId,
-//           stateId: event.stateId?._id || event.stateId,
-//           cityId: event.cityId?._id || event.cityId,
-//         },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-//       alert("🎉 Booking success!");
-//       setSelectedSeats([]);
-//       setBookedSeatLabels((prev) => [...prev, ...selectedSeats]);
-//     } catch (err) {
-//       console.error("Booking error", err.response?.data || err.message);
-//       alert("❌ Booking failed.");
-//     } finally {
-//       setBooking(false);
-//     }
-//   };
-
-//   // ✅ Calculates total amount accurately (zone-wise or fixed-rate)
-//   const calculateTotalAmount = () => {
-//     if (!selectedSeats.length) return 0;
-
-//     if (event.eventCategory === "Indoor" && event.customZones) {
-//       let total = 0;
-//       for (const zone of event.customZones) {
-//         const seatsInZone = zone.seatLabels.filter((seat) =>
-//           selectedSeats.includes(seat)
-//         );
-//         total += seatsInZone.length * zone.price;
-//       }
-//       return total;
-//     } else {
-//       return selectedSeats.length * (event.ticketRate || 0);
-//     }
-//   };
-
-//   const totalAmount = calculateTotalAmount();
-
-//   if (!event) return <p className="text-center mt-5">Loading event...</p>;
-
-//   if (!event) {
-//     return (
-//       <div className="flex items-center justify-center min-h-[400px]">
-//         <Icons.spinner className="h-8 w-8 animate-spin" />
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="container mx-auto px-4 py-8">
-//       <Card className="mb-8">
-//         <CardHeader>
-//           <CardTitle className="text-2xl">{event.eventName}</CardTitle>
-//           <CardDescription>
-//             <Badge variant="secondary" className="mr-2">
-//               {event.eventCategory}
-//             </Badge>
-//             Select your preferred seats
-//           </CardDescription>
-//         </CardHeader>
-//       </Card>
-
-//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-//         <div className="lg:col-span-2">
-//           <Card>
-//             <CardHeader>
-//               <CardTitle>Seating Zones</CardTitle>
-//             </CardHeader>
-//             <CardContent>
-//               <Accordion type="single" collapsible className="w-full">
-//                 {event?.customZones?.map((zone, index) => (
-//                   <AccordionItem key={index} value={`zone-${index}`}>
-//                     <AccordionTrigger className="px-4">
-//                       <div className="flex justify-between items-center w-full pr-4">
-//                         <span>{zone.zoneName || `Zone ${String.fromCharCode(65 + index)}`}</span>
-//                         <Badge variant="secondary">₹{zone.price}</Badge>
-//                       </div>
-//                     </AccordionTrigger>
-//                     <AccordionContent>
-//                       <ScrollArea className="h-[200px] p-4">
-//                         <div className="grid grid-cols-8 gap-2">
-//                           {zone.seatLabels.map((label, i) => {
-//                             const isBooked = bookedSeatLabels.includes(label);
-//                             const isSelected = selectedSeats.includes(label);
-
-//                             return (
-//                               <Badge
-//                                 key={i}
-//                                 variant={
-//                                   isBooked
-//                                     ? "destructive"
-//                                     : isSelected
-//                                     ? "success"
-//                                     : "outline"
-//                                 }
-//                                 className={`
-//                                   cursor-${isBooked ? "not-allowed" : "pointer"}
-//                                   h-10 w-10 flex items-center justify-center
-//                                   ${isBooked ? "opacity-60" : ""}
-//                                   hover:${isBooked ? "" : "scale-105"}
-//                                   transition-transform
-//                                 `}
-//                                 onClick={() => !isBooked && toggleSeat(label)}
-//                               >
-//                                 {label}
-//                               </Badge>
-//                             );
-//                           })}
-//                         </div>
-//                       </ScrollArea>
-//                     </AccordionContent>
-//                   </AccordionItem>
-//                 ))}
-//               </Accordion>
-//             </CardContent>
-//           </Card>
-//         </div>
-
-//         <div className="lg:col-span-1">
-//           <Card>
-//             <CardHeader>
-//               <CardTitle>Booking Summary</CardTitle>
-//             </CardHeader>
-//             <CardContent className="space-y-4">
-//               <div className="flex justify-between items-center">
-//                 <span className="text-gray-600">Selected Seats</span>
-//                 <Badge variant="secondary">{selectedSeats.length}</Badge>
-//               </div>
-//               {selectedSeats.length > 0 && (
-//                 <div className="flex flex-wrap gap-1">
-//                   {selectedSeats.map((seat) => (
-//                     <Badge key={seat} variant="outline" className="cursor-pointer"
-//                       onClick={() => toggleSeat(seat)}>
-//                       {seat}
-//                     </Badge>
-//                   ))}
-//                 </div>
-//               )}
-//               <div className="flex justify-between items-center pt-4 border-t">
-//                 <span className="font-semibold">Total Amount</span>
-//                 <span className="text-xl font-bold">₹{totalAmount}</span>
-//               </div>
-              
-//               <div className="pt-4">
-//                 {selectedSeats.length > 0 && !booking && (
-//                   <RazorpayButton
-//                     eventId={event._id}
-//                     amount={totalAmount}
-//                     onPaymentSuccess={handleFinalBooking}
-//                   />
-//                 )}
-
-//                 {booking && (
-//                   <Button disabled className="w-full">
-//                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-//                     Processing...
-//                   </Button>
-//                 )}
-//               </div>
-//             </CardContent>
-//           </Card>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-
-
-//without Razorpay
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import axios from "axios";
-
-// export const SeatSelectionPage = () => {
-//   const { id } = useParams(); // event ID from URL
-//   const [event, setEvent] = useState(null);
-//   const [selectedSeats, setSelectedSeats] = useState([]);
-//   const [bookedSeatLabels, setBookedSeatLabels] = useState([]);
-//   const [booking, setBooking] = useState(false);
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     const fetchEvent = async () => {
-//       try {
-//         const res = await axios.get(`/event/geteventbyid/${id}`);
-//         setEvent(res.data.data);
-//         setBookedSeatLabels(res.data.data.bookedSeatLabels || []);
-//       } catch (err) {
-//         console.error("Error loading event", err.response?.data || err.message);
-//       }
-//     };
-//     fetchEvent();
-//   }, [id]);
-
-//   const toggleSeat = (label) => {
-//     setSelectedSeats((prev) =>
-//       prev.includes(label)
-//         ? prev.filter((s) => s !== label)
-//         : [...prev, label]
-//     );
-//   };
-
-//   const confirmBooking = async () => {
-//     if (!selectedSeats.length) return;
-
-//     const confirm = window.confirm(
-//       `Are you sure you want to book ${selectedSeats.length} seat${selectedSeats.length > 1 ? "s" : ""}?`
-//     );
-//     if (!confirm) return;
-
-//     setBooking(true);
-//     try {
-//       const res = await axios.post(
-//         `/event/bookseat/${id}`,
-//         {
-//           quantity: selectedSeats.length,
-//           selectedSeats,
-//           organizerId: event.organizerId,
-//           stateId: event.stateId?._id || event.stateId,
-//           cityId: event.cityId?._id || event.cityId,
-//         },
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-//       alert("Booking success!");
-//       setSelectedSeats([]);
-//       setBookedSeatLabels((prev) => [...prev, ...selectedSeats]);
-//     } catch (err) {
-//       console.error("Booking error", err.response?.data || err.message);
-//       alert("Booking failed.");
-//     } finally {
-//       setBooking(false);
-//     }
-//   };
-
-//   if (!event) return <p className="text-center mt-5">Loading event...</p>;
-
-//   return (
-//     <div className="container mt-4">
-//       <h2>{event.eventName} - Seat Selection</h2>
-//       <p><strong>Category:</strong> {event.eventCategory}</p>
-
-//       <div className="accordion" id="zoneAccordion">
-//         {event?.customZones?.map((zone, index) => (
-//           <div className="accordion-item" key={index}>
-//             <h2 className="accordion-header" id={`heading-${index}`}>
-//               <button
-//                 className="accordion-button collapsed"
-//                 type="button"
-//                 data-bs-toggle="collapse"
-//                 data-bs-target={`#collapse-${index}`}
-//                 aria-expanded="false"
-//                 aria-controls={`collapse-${index}`}
-//               >
-//                 {zone.zoneName || `Zone ${String.fromCharCode(65 + index)}`} – ₹{zone.price}
-//               </button>
-//             </h2>
-//             <div
-//               id={`collapse-${index}`}
-//               className="accordion-collapse collapse"
-//               aria-labelledby={`heading-${index}`}
-//               data-bs-parent="#zoneAccordion"
-//             >
-//               <div className="accordion-body">
-//                 <div className="d-flex flex-wrap gap-2">
-//                   {zone.seatLabels.map((label, i) => {
-//                     const isBooked = bookedSeatLabels.includes(label);
-//                     const isSelected = selectedSeats.includes(label);
-
-//                     return (
-//                       <span
-//                         key={i}
-//                         onClick={() => !isBooked && toggleSeat(label)}
-//                         className={`badge ${
-//                           isBooked
-//                             ? "bg-danger"
-//                             : isSelected
-//                             ? "bg-success"
-//                             : "bg-secondary"
-//                         }`}
-//                         style={{
-//                           cursor: isBooked ? "not-allowed" : "pointer",
-//                           padding: "10px",
-//                           fontSize: "1rem",
-//                           opacity: isBooked ? 0.6 : 1,
-//                         }}
-//                       >
-//                         {label}
-//                       </span>
-//                     );
-//                   })}
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-
-//       <div className="text-center">
-//         <button
-//           className="btn btn-success mt-4"
-//           disabled={selectedSeats.length === 0 || booking}
-//           onClick={confirmBooking}
-//         >
-//           {booking
-//             ? "Booking..."
-//             : `Confirm Booking (${selectedSeats.length} seat${selectedSeats.length > 1 ? "s" : ""})`}
-//         </button>
-//       </div>
-//       {/* <link></link> */}
-//     </div>
-//   );
-// };
-
-
+export default SeatsSelection;

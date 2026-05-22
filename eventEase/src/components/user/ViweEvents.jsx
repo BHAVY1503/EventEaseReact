@@ -44,9 +44,11 @@ import {
   X,
   ShieldCheck,
   Zap,
+  Building2,
 } from "lucide-react";
 import SignInModal from "@/components/user/SignInModal";
 import { cn } from "@/lib/utils";
+import '../../styles/components/ViewEvents.css';
 
 /*
    EventCard - Cinematic Redesign */
@@ -547,46 +549,6 @@ export const ViewEvents = () => {
   const endedEvents = sortedEvents.filter((e) => getEventStatus(e).status === "ended");
   const activeEvents = sortedEvents.filter((e) => getEventStatus(e).status !== "ended");
 
-  useEffect(() => {
-    if (events.length > 0) {
-      console.log("--- EVENTEASE DEBUG ---");
-      console.log("Total Events from API:", events.length);
-      console.log("Active Events (Upcoming/Live):", activeEvents.length);
-      console.log("Past Events (Ended):", endedEvents.length);
-      if (endedEvents.length > 0) console.log("Sample Ended Event:", endedEvents[0].eventName, "End Date:", endedEvents[0].endDate);
-      console.log("-----------------------");
-    }
-  }, [events, activeEvents, endedEvents]);
-
-  /* Lightweight loading skeleton */
-  const LoadingSkeleton = () => (
-    <div className="space-y-12">
-      {[1, 2].map((section) => (
-        <div key={section}>
-          <Skeleton className="h-8 w-48 mb-6" />
-          <div className="flex space-x-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="w-80">
-                <Skeleton className="h-48 w-full rounded-t-lg" />
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-full mb-1" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-2/3 mb-2" />
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-10 w-full" />
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   const [hoveringArchive, setHoveringArchive] = useState(false);
   const archiveScrollRef = React.useRef(null);
 
@@ -612,18 +574,18 @@ export const ViewEvents = () => {
   /* UI */
   return (
     <>
-      <div className="w-full min-h-screen bg-transparent text-white selection:bg-[#E11D48]/30">
-        <div className="w-full py-24 px-6 md:px-12 space-y-24">
+      <div className="view-events-container selection:bg-[#E11D48]/30">
+        <div className="view-events-content">
 
           {/* Header */}
-          <div className="max-w-[1800px] mx-auto">
+          <div className="discovery-header">
             <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
               <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-3 mb-6">
-                  <div className="w-8 h-[2px] bg-[#E11D48]" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Show Discovery</span>
+                <div className="discovery-badge">
+                  <div className="line" />
+                  <span>Show Discovery</span>
                 </div>
-                <h1 className="text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter uppercase">
+                <h1 className="discovery-title">
                   FIND YOUR<br />NEXT SHOW
                 </h1>
               </div>
@@ -633,35 +595,32 @@ export const ViewEvents = () => {
             </div>
 
             {/* Minimalist Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-white/10">
-              <div className="relative group">
-                <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
+            <div className="filters-grid">
+              <div className="filter-group">
+                <Search className="filter-icon" />
                 <input
                   placeholder="SEARCH SHOWS"
                   value={filterName}
                   onChange={(e) => setFilterName(e.target.value)}
-                  className="w-full bg-transparent border-none pl-10 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-700 outline-none"
                 />
-                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#E11D48] transition-all group-focus-within:w-full" />
+                <div className="filter-underline" />
               </div>
 
-              <div className="relative group">
-                <MapPin className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
+              <div className="filter-group">
+                <MapPin className="filter-icon" />
                 <input
                   placeholder="LOCATION"
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full bg-transparent border-none pl-10 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-700 outline-none"
                 />
-                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#E11D48] transition-all group-focus-within:w-full" />
+                <div className="filter-underline" />
               </div>
 
-              <div className="relative group">
-                <Filter className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[#E11D48] transition-colors" />
+              <div className="filter-group">
+                <Filter className="filter-icon" />
                 <select
                   value={filterEventType}
                   onChange={(e) => setFilterEventType(e.target.value)}
-                  className="w-full bg-transparent border-none pl-10 py-4 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 appearance-none cursor-pointer text-white outline-none"
                 >
                   <option value="all" className="bg-black">ALL CATEGORIES</option>
                   <option value="Conference" className="bg-black">CONFERENCE</option>
@@ -670,7 +629,7 @@ export const ViewEvents = () => {
                   <option value="Music concert" className="bg-black">MUSIC CONCERT</option>
                   <option value="ZoomMeeting" className="bg-black">ZOOM MEETING</option>
                 </select>
-                <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#E11D48] transition-all group-focus-within:w-full" />
+                <div className="filter-underline" />
               </div>
             </div>
           </div>
@@ -690,7 +649,7 @@ export const ViewEvents = () => {
               <div className="space-y-40">
                 {/* Active shows */}
                 <section>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
+                  <div className="events-grid">
                     {activeEvents.map((event) => (
                       <EventCard key={event._id} event={event} getEventStatus={getEventStatus} onCardClick={handleEventClick} isAuthenticated={isAuthenticated} onSignInClick={handleCardSignIn} onBookClick={handleCardBook} />
                     ))}
@@ -698,8 +657,8 @@ export const ViewEvents = () => {
                 </section>
 
                 {endedEvents.length > 0 && (
-                  <section className="space-y-16">
-                    <div className="flex items-center justify-between px-2">
+                  <section className="archive-section">
+                    <div className="archive-header px-2">
                       <div className="flex items-center gap-8">
                         <h2 className="text-4xl font-black uppercase tracking-tighter text-white leading-none">PAST SHOWS</h2>
                         <div className="flex items-center gap-4">
@@ -707,15 +666,12 @@ export const ViewEvents = () => {
                           <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.5em] animate-pulse">Historical Archive</span>
                         </div>
                       </div>
-                      <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] group cursor-pointer">
-                        EXPLORE ARCHIVE <div className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center group-hover:border-[#E11D48] group-hover:text-white transition-all"><ArrowRight className="w-4 h-4 text-[#E11D48] group-hover:translate-x-1 transition-transform" /></div>
-                      </div>
                     </div>
 
                     <div className="relative group/scroll px-2">
                       <div
                         ref={archiveScrollRef}
-                        className="flex gap-10 overflow-x-auto no-scrollbar pb-20 scroll-smooth h-fit pt-10"
+                        className="archive-scroll-container h-fit pt-10"
                         onMouseEnter={() => setHoveringArchive(true)}
                         onMouseLeave={() => setHoveringArchive(false)}
                       >
@@ -723,8 +679,8 @@ export const ViewEvents = () => {
                         {[...endedEvents, ...endedEvents].map((event, index) => (
                           <div
                             key={`${event._id}-${index}`}
-                            className="min-w-[75vw] md:min-w-[360px] animate-fade-in-right first:ml-0"
-                            style={{ animationDelay: `${(index % endedEvents.length) * 150}ms` }}
+                            className="archive-item animate-fade-in-right first:ml-0 dynamic-delay"
+                            style={{ '--delay': `${(index % endedEvents.length) * 150}ms` }}
                           >
                             <EventCard
                               event={event}
@@ -800,10 +756,21 @@ export const ViewEvents = () => {
                         </div>
                       )}
                     </div>
-                    <h2 className="text-6xl md:text-[5.5rem] font-black text-white leading-[0.8] uppercase tracking-[-0.04em] mb-6 drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white leading-[0.9] mb-4">
                       {selectedEvent.eventName}
                     </h2>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2 text-[10px] font-black text-[#E11D48] uppercase tracking-widest">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                      </div>
+                      <div className="w-1 h-1 rounded-full bg-white/20" />
+                      <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <MapPin className="w-4 h-4" />
+                        {selectedEvent.cityId?.name || "Global Node"}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 mt-6">
                       <div className="h-px w-12 bg-[#E11D48]" />
                       <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.5em]">{selectedEvent.eventCategory} Protocol • Level 01</p>
                     </div>
@@ -841,8 +808,8 @@ export const ViewEvents = () => {
                         </p>
                         <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#E11D48] shadow-[0_0_10px_rgba(225,29,72,0.5)] transition-all duration-1000"
-                            style={{ width: `${Math.max(5, 100 - (((selectedEvent.bookedSeats || 0) / (selectedEvent.numberOfSeats || 1)) * 100))}%` }}
+                            className="h-full bg-[#E11D48] shadow-[0_0_10px_rgba(225,29,72,0.5)] transition-all duration-1000 dynamic-width"
+                            style={{ '--width': `${Math.max(5, 100 - (((selectedEvent.bookedSeats || 0) / (selectedEvent.numberOfSeats || 1)) * 100))}%` }}
                           />
                         </div>
                       </div>

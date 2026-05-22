@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
-// import "@mapbox-gl/geocoder/dist/mapbox-gl-geocoder.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import api from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -10,6 +9,26 @@ import { fetchEventById, updateEvent } from "../../features/events/eventsSlice";
 import { useToast } from "../../hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { 
+  Globe, 
+  ChevronRight, 
+  Building2, 
+  Zap, 
+  MapPin, 
+  Video, 
+  Activity, 
+  Users, 
+  Calendar, 
+  Upload, 
+  Loader2, 
+  CheckCircle, 
+  ShieldCheck 
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import '../../styles/components/ProductionForm.css';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -25,6 +44,9 @@ export const UpdateEvent = () => {
   const [cities, setCities] = useState([]);
   const [eventCategory, setEventCategory] = useState("");
   const [selectedStadium, setSelectedStadium] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const { list: eventsList } = useAppSelector((s) => s.events);
@@ -101,12 +123,12 @@ export const UpdateEvent = () => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/dark-v10",
       center: [lng, lat],
       zoom,
     });
 
-    const marker = new mapboxgl.Marker({ draggable: true })
+    const marker = new mapboxgl.Marker({ color: "#E11D48", draggable: true })
       .setLngLat([lng, lat])
       .addTo(map.current);
 
@@ -121,8 +143,10 @@ export const UpdateEvent = () => {
     const geo = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
       mapboxgl,
+      placeholder: "SEARCH LOCATION",
+      marker: false
     });
-    map.current.addControl(geo);
+    map.current.addControl(geo, 'top-left');
     geo.on("result", (e) => {
       const [lng2, lat2] = e.result.center;
       setLng(lng2);
@@ -131,537 +155,213 @@ export const UpdateEvent = () => {
       setValue("longitude", lng2);
       marker.setLngLat([lng2, lat2]);
     });
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
   }, [eventCategory, selectedStadium]);
 
   const submitHandler = async (data) => {
+    setIsSubmitting(true);
     const formData = new FormData();
     for (const [k, v] of Object.entries(data)) {
       formData.append(k, k === "image" ? v[0] : v);
     }
     try {
       await dispatch(updateEvent({ id, formData })).unwrap();
+      setShowSuccess(true);
       toast({ title: 'Event updated', description: 'Event updated successfully', status: 'success' });
-      const role = localStorage.getItem("role");
-      if (role === "Admin") {
-        window.location.href = "/admin#groupbyevent";
-      } else {
-        window.location.href = "/organizer#viewevent";
-      }
+      setTimeout(() => {
+        const role = localStorage.getItem("role");
+        if (role === "Admin") navigate('/admin/adminevents');
+        else navigate('/organizer/viewevent');
+      }, 1500);
     } catch (err) {
       console.error(err);
       toast({ title: 'Update failed', description: err || 'Failed to update event', status: 'error' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="container mt-4  dark:text-gray-900 ">
-      {/* <h3 className="mb-4 red text-center">Update Event</h3> */}
-          <h1 className="text-4xl font-bold text-slate-900 mb-2 dark:text-gray-100 ">Update Event</h1>
-      <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow dark:bg-gray-900">
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label>Event Category</label>
-            <input className="form-control" value={eventCategory} disabled />
-          </div>
+    <div className="production-form-wrapper">
+      <div className="production-form-container">
+        <form onSubmit={handleSubmit(submitHandler)} className="form-grid-layout">
+          {/* Left Column: Config */}
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="form-config-panel">
+            <div className="form-config-card">
+              <div className="panel-header">
+                <div className="header-icon-box"><Globe className="w-5 h-5 text-[#E11D48]" /></div>
+                <div className="header-title-box">
+                  <h3>Production Scope</h3>
+                  <p className="header-sub-label">Event environment parameters</p>
+                </div>
+              </div>
 
-          {eventCategory === "Indoor" && (
-            <>
-              <div className="col-md-6 mb-3">
-                <label>Choose Stadium</label>
-                <button
-                 type="button"
-                 className="btn btn-outline-primary form-control"
-                 onClick={() => {
-                 localStorage.setItem("selectedStadium", JSON.stringify(selectedStadium));
-                 localStorage.setItem("selectedCategory", eventCategory);
-                 navigate(`/stadiumselect?redirectTo=/updateevent/${id}`);
-                 }}
-                >
-                  {selectedStadium ? selectedStadium.name : "Select Stadium"}
-                </button>
-                {/* <button
-                  type="button"
-                  className="btn btn-outline-primary form-control"
-                  onClick={() => {
-                    localStorage.setItem("selectedStadium", JSON.stringify(selectedStadium));
-                    localStorage.setItem("selectedCategory", eventCategory);
-                    navigate("/stadiumselect");
-                  }}
-                >
-                  {selectedStadium ? selectedStadium.name : "Select Stadium"}
-                </button> */}
+              <div className="form-input-group">
+                <Label className="form-label-elite">Protocol Type</Label>
+                <input className="form-input-elite opacity-50 cursor-not-allowed" value={eventCategory} disabled />
               </div>
-              <input type="hidden" {...register("stadiumId", { required: true })} />
-              <input type="hidden" {...register("latitude")} />
-              <input type="hidden" {...register("longitude")} />
-              <input type="hidden" {...register("numberOfSeats")} />
-            </>
-          )}
 
-          {eventCategory === "Outdoor" && (
-            <>
-              <div className="col-md-6 mb-3">
-                <label>State</label>
-                <select className="form-control" {...register("stateId")}> 
-                  {states.map((state) => (
-                    <option key={state._id} value={state._id}>{state.Name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6 mb-3">
-                <label>City</label>
-                <select className="form-control" {...register("cityId")}> 
-                  {cities.map((city) => (
-                    <option key={city._id} value={city._id}>{city.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-12 mb-3">
-                <label>Location on Map</label>
-                <div ref={mapContainer} style={{ height: "300px", border: "1px solid #ccc", borderRadius: "8px" }} />
-              </div>
-            </>
-          )}
+              <AnimatePresence mode="wait">
+                {eventCategory === "Indoor" && (
+                  <motion.div key="indoor" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="category-specific-panel">
+                    <div className="form-input-group">
+                      <Label className="form-label-elite text-[#E11D48]">Arena Relocation</Label>
+                      <button
+                        type="button"
+                        className="stadium-select-btn group"
+                        onClick={() => {
+                          localStorage.setItem("selectedStadium", JSON.stringify(selectedStadium));
+                          localStorage.setItem("selectedCategory", eventCategory);
+                          navigate(`/stadiumselect?redirectTo=/updateevent/${id}`);
+                        }}
+                      >
+                        <div className="flex items-center gap-4 overflow-hidden">
+                          <Building2 className="w-4 h-4 shrink-0" />
+                          <span className="stadium-btn-text">{selectedStadium ? selectedStadium.name : "Select Arena"}</span>
+                        </div>
+                        <Zap className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    </div>
+                    <input type="hidden" {...register("stadiumId", { required: true })} />
+                  </motion.div>
+                )}
 
-          {eventCategory === "ZoomMeeting" && (
-            <div className="col-md-12 mb-3">
-              <label>Zoom URL</label>
-              <input type="url" className="form-control" {...register("zoomUrl")}/>
+                {eventCategory === "Outdoor" && (
+                  <motion.div key="outdoor" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="category-specific-panel">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="form-input-group">
+                        <Label className="form-label-elite">State Node</Label>
+                        <select className="form-select-elite h-11 text-[10px]" {...register("stateId")}> 
+                          {states.map((state) => (
+                            <option key={state._id} value={state._id} className="bg-black">{state.Name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-input-group">
+                        <Label className="form-label-elite">City Node</Label>
+                        <select className="form-select-elite h-11 text-[10px]" {...register("cityId")}> 
+                          {cities.map((city) => (
+                            <option key={city._id} value={city._id} className="bg-black">{city.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="form-input-group">
+                      <Label className="form-label-elite text-[#E11D48] flex items-center gap-2"><MapPin className="w-3.5 h-3.5" /> Sector Map</Label>
+                      <div ref={mapContainer} className="map-interface-container" />
+                    </div>
+                  </motion.div>
+                )}
+
+                {eventCategory === "ZoomMeeting" && (
+                  <motion.div key="zoom" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="category-specific-panel">
+                    <Label className="form-label-elite">Transmission URL</Label>
+                    <div className="relative">
+                      <Video className="absolute left-6 top-1/2 -translate-y-1/2 text-[#E11D48] w-5 h-5" />
+                      <input type="url" className="form-input-elite pl-16" {...register("zoomUrl")}/>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          )}
+          </motion.div>
 
-          <div className="col-md-6 mb-3">
-            <label>Event Name</label>
-            <input type="text" className="form-control" {...register("eventName")}/>
-          </div>
+          {/* Right Column: Manifest */}
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="form-manifest-panel">
+            <div className="form-manifest-card">
+              <div className="manifest-header">
+                <div className="manifest-icon-box"><Activity className="w-8 h-8 text-white" /></div>
+                <div className="manifest-title-box">
+                  <h3>Modify Manifest</h3>
+                  <p className="manifest-sub-label">Update production metadata</p>
+                </div>
+              </div>
 
-          <div className="col-md-6 mb-3">
-            <label>Event Type</label>
-            <select className="form-control" {...register("eventType")}>
-              <option value="">Select Type</option>
-              <option value="Conference">Conference</option>
-              <option value="Exhibition">Exhibition</option>
-              <option value="Gala Dinner">Gala Dinner</option>
-              <option value="Incentive">Incentive</option>
-              <option value="Music consert">Music consert</option>
-              <option value="Meeting">Meeting</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="sm:col-span-2 form-input-group">
+                  <Label className="form-label-elite">Production Title</Label>
+                  <div className="relative group">
+                    <Zap className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 group-focus-within:text-[#E11D48] transition-colors" />
+                    <input type="text" className="form-input-elite pl-16 font-black" {...register("eventName")}/>
+                  </div>
+                </div>
 
-          <div className="col-md-6 mb-3">
-            <label>Total Seats</label>
-            <input type="number" className="form-control" {...register("numberOfSeats")} disabled={eventCategory === "Indoor"} />
-          </div>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Operational Type</Label>
+                  <div className="relative">
+                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                    <select className="form-select-elite text-xs" {...register("eventType")}>
+                      <option value="" className="bg-black">SELECT TYPE</option>
+                      <option value="Conference" className="bg-black">CONFERENCE</option>
+                      <option value="Exhibition" className="bg-black">EXHIBITION</option>
+                      <option value="Gala Dinner" className="bg-black">GALA DINNER</option>
+                      <option value="Incentive" className="bg-black">INCENTIVE</option>
+                      <option value="Music consert" className="bg-black">MUSIC CONCERT</option>
+                      <option value="Meeting" className="bg-black">MEETING</option>
+                      <option value="Other" className="bg-black">OTHER</option>
+                    </select>
+                  </div>
+                </div>
 
-          <div className="col-md-6 mb-3">
-            <label>Start Date</label>
-            <input type="date" className="form-control" {...register("startDate")} />
-          </div>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Capacity Limit</Label>
+                  <div className="relative">
+                    <Users className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                    <input type="number" className="form-input-elite pl-16 disabled:opacity-30" {...register("numberOfSeats")} disabled={eventCategory === "Indoor"} />
+                  </div>
+                </div>
 
-          <div className="col-md-6 mb-3">
-            <label>End Date</label>
-            <input type="date" className="form-control" {...register("endDate")} />
-          </div>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Commencement</Label>
+                  <div className="relative">
+                    <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-[#E11D48] w-4 h-4 pointer-events-none" />
+                    <input type="date" className="form-input-elite pl-16 text-xs" {...register("startDate")} />
+                  </div>
+                </div>
 
-          <div className="col-md-6 mb-3">
-            <label>Event Image</label>
-            <input type="file" className="form-control" {...register("image")} />
-          </div>
+                <div className="form-input-group">
+                  <Label className="form-label-elite">Termination</Label>
+                  <div className="relative">
+                    <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                    <input type="date" className="form-input-elite pl-16 text-xs" {...register("endDate")} />
+                  </div>
+                </div>
 
-          <div className="col-md-12 text-center mt-4">
-            <button type="submit" className="btn btn-primary">Update Event</button>
-          </div>
-        </div>
-      </form>
+                <div className="sm:col-span-2 form-input-group">
+                  <Label className="form-label-elite">Update Asset (Cover Image)</Label>
+                  <div className="asset-upload-area group">
+                    <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-20" {...register("image")} />
+                    <div className="upload-overlay-content">
+                      <Upload className="upload-icon" />
+                      <p className="upload-label-text">Select New Media Asset</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-submit-row">
+                <Button type="submit" disabled={isSubmitting || showSuccess} className={cn("deploy-btn-elite", showSuccess ? "success" : "primary")}>
+                  {isSubmitting ? (
+                    <div className="btn-content-box"><Loader2 className="w-5 h-5 animate-spin" /> UPDATING...</div>
+                  ) : showSuccess ? (
+                    <div className="btn-content-box"><CheckCircle className="w-5 h-5 animate-bounce" /> SYNCED</div>
+                  ) : (
+                    <div className="btn-content-box"><ShieldCheck className="w-5 h-5" /> UPDATE MANIFEST</div>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </form>
+      </div>
     </div>
   );
 };
 
-
-// import React, { useEffect, useRef, useState } from "react";
-// import mapboxgl from "mapbox-gl";
-// import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
-// import "mapbox-gl/dist/mapbox-gl.css";
-// import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// import axios from "axios";
-// import { useForm } from "react-hook-form";
-// import { useNavigate, useParams } from "react-router-dom";
-
-// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// export const UpdateEvent = () => {
-//   const { id } = useParams();
-//   const mapContainer = useRef(null);
-//   const map = useRef(null);
-//   const [lng, setLng] = useState(72.8777);
-//   const [lat, setLat] = useState(19.076);
-//   const [zoom] = useState(10);
-
-//   const [states, setStates] = useState([]);
-//   const [cities, setCities] = useState([]);
-//   const [eventCategory, setEventCategory] = useState("");
-//   const [selectedStadium, setSelectedStadium] = useState(null);
-
-//   const { register, handleSubmit, setValue } = useForm();
-//   const navigate = useNavigate();
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     axios.get("/state/getallstates").then((r) => setStates(r.data.data));
-//     axios.get("/city/getallcitys").then((r) => setCities(r.data.data));
-//   }, []);
-
-//   useEffect(() => {
-//     const fetchEventData = async () => {
-//       try {
-//         const res = await axios.get(`/event/geteventbyid/${id}`, {
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-//         const event = res.data.data;
-//         setEventCategory(event.eventCategory);
-//         setValue("eventName", event.eventName);
-//         setValue("eventType", event.eventType);
-//         setValue("startDate", event.startDate.slice(0, 10));
-//         setValue("endDate", event.endDate.slice(0, 10));
-//         setValue("numberOfSeats", event.numberOfSeats);
-
-//         if (event.eventCategory === "ZoomMeeting") {
-//           setValue("zoomUrl", event.zoomUrl);
-//         }
-
-//         if (event.eventCategory === "Outdoor") {
-//           setValue("stateId", event.stateId);
-//           setValue("cityId", event.cityId);
-//           setValue("latitude", event.latitude);
-//           setValue("longitude", event.longitude);
-//           setLat(event.latitude);
-//           setLng(event.longitude);
-//         }
-
-//         if (event.eventCategory === "Indoor" && event.stadiumId) {
-//           const stadiumRes = await axios.get(`/stadium/${event.stadiumId}`);
-//           setSelectedStadium(stadiumRes.data.data);
-//           setValue("stadiumId", stadiumRes.data.data._id);
-//         }
-//       } catch (error) {
-//         console.error("Error fetching event data:", error);
-//       }
-//     };
-
-//     fetchEventData();
-//   }, [id]);
-
-//   useEffect(() => {
-//     if (!mapContainer.current || map.current || eventCategory === "ZoomMeeting" || (eventCategory === "Indoor" && selectedStadium)) return;
-
-//     map.current = new mapboxgl.Map({
-//       container: mapContainer.current,
-//       style: "mapbox://styles/mapbox/streets-v11",
-//       center: [lng, lat],
-//       zoom,
-//     });
-
-//     const marker = new mapboxgl.Marker({ draggable: true })
-//       .setLngLat([lng, lat])
-//       .addTo(map.current);
-
-//     marker.on("dragend", () => {
-//       const pos = marker.getLngLat();
-//       setLng(pos.lng);
-//       setLat(pos.lat);
-//       setValue("latitude", pos.lat);
-//       setValue("longitude", pos.lng);
-//     });
-
-//     const geo = new MapboxGeocoder({
-//       accessToken: mapboxgl.accessToken,
-//       mapboxgl,
-//     });
-//     map.current.addControl(geo);
-//     geo.on("result", (e) => {
-//       const [lng2, lat2] = e.result.center;
-//       setLng(lng2);
-//       setLat(lat2);
-//       setValue("latitude", lat2);
-//       setValue("longitude", lng2);
-//       marker.setLngLat([lng2, lat2]);
-//     });
-//   }, [eventCategory, selectedStadium]);
-
-//   const submitHandler = async (data) => {
-//     const formData = new FormData();
-//     for (const [k, v] of Object.entries(data)) {
-//       formData.append(k, k === "image" ? v[0] : v);
-//     }
-
-//     try {
-//       await axios.put(`/event/updateevent/${eventId}`, formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       alert("Event updated successfully!");
-//       navigate("/organizer");
-//     } catch (err) {
-//       console.error(err);
-//       alert("Failed to update event.");
-//     }
-//   };
-
-//   return (
-//     <div className="container mt-4">
-//       <h2 className="mb-4 text-center">Update Event</h2>
-//       <form onSubmit={handleSubmit(submitHandler)} className="bg-light p-4 rounded shadow">
-//         <div className="row">
-//           <div className="col-md-6 mb-3">
-//             <label>Event Category</label>
-//             <input className="form-control" value={eventCategory} disabled />
-//           </div>
-
-//           {eventCategory === "Indoor" && selectedStadium && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>Stadium</label>
-//                 <input className="form-control" value={selectedStadium.name} disabled />
-//               </div>
-//               <input type="hidden" {...register("stadiumId")}/>
-//               <input type="hidden" {...register("latitude")} />
-//               <input type="hidden" {...register("longitude")} />
-//             </>
-//           )}
-
-//           {eventCategory === "Outdoor" && (
-//             <>
-//               <div className="col-md-6 mb-3">
-//                 <label>State</label>
-//                 <select className="form-control" {...register("stateId")}> 
-//                   {states.map((state) => (
-//                     <option key={state._id} value={state._id}>{state.Name}</option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-6 mb-3">
-//                 <label>City</label>
-//                 <select className="form-control" {...register("cityId")}> 
-//                   {cities.map((city) => (
-//                     <option key={city._id} value={city._id}>{city.name}</option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div className="col-md-12 mb-3">
-//                 <label>Location on Map</label>
-//                 <div ref={mapContainer} style={{ height: "300px", border: "1px solid #ccc", borderRadius: "8px" }} />
-//               </div>
-//             </>
-//           )}
-
-//           {eventCategory === "ZoomMeeting" && (
-//             <div className="col-md-12 mb-3">
-//               <label>Zoom URL</label>
-//               <input type="url" className="form-control" {...register("zoomUrl")}/>
-//             </div>
-//           )}
-
-//           <div className="col-md-6 mb-3">
-//             <label>Event Name</label>
-//             <input type="text" className="form-control" {...register("eventName")}/>
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>Event Type</label>
-//             <select className="form-control" {...register("eventType")}>
-//               <option value="">Select Type</option>
-//               <option value="Conference">Conference</option>
-//               <option value="Exhibition">Exhibition</option>
-//               <option value="Gala Dinner">Gala Dinner</option>
-//               <option value="Incentive">Incentive</option>
-//               <option value="Music consert">Music consert</option>
-//               <option value="Meeting">Meeting</option>
-//               <option value="Other">Other</option>
-//             </select>
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>Total Seats</label>
-//             <input type="number" className="form-control" {...register("numberOfSeats")} disabled={eventCategory === "Indoor"} />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>Start Date</label>
-//             <input type="date" className="form-control" {...register("startDate")} />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>End Date</label>
-//             <input type="date" className="form-control" {...register("endDate")} />
-//           </div>
-
-//           <div className="col-md-6 mb-3">
-//             <label>Event Image</label>
-//             <input type="file" className="form-control" {...register("image")} />
-//           </div>
-
-//           <div className="col-md-12 text-center mt-4">
-//             <button type="submit" className="btn btn-primary">Update Event</button>
-//           </div>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
-// import { useForm } from 'react-hook-form'
-// import { Link, useNavigate, useParams } from 'react-router-dom'
-
-// export const UpdateEvent = () => {
-//   const [states, setStates] = useState([])
-//   const [cities, setCities] = useState([])
-//   const navigate = useNavigate()
-//   const { id } = useParams()
-
-//   const { register, handleSubmit, reset } = useForm()
-
-//   const getAllStates = async () => {
-//     const res = await axios.get("/state/getallstates")
-//     setStates(res.data.data)
-//   }
-
-//   const getAllCities = async () => {
-//     const res = await axios.get("/city/getallcitys")
-//     setCities(res.data.data)
-//   }
-
-//   const fetchEventById = async () => {
-//     const res = await axios.get(`/event/geteventbyid/${id}`)
-//     const event = res.data.data
-//     event.startDate = event.startDate?.slice(0, 10)
-//     event.endDate = event.endDate?.slice(0, 10)
-//     reset(event)
-//   }
-
-//   useEffect(() => {
-//     getAllStates()
-//     getAllCities()
-//     fetchEventById()
-//   }, [])
-
-//   const submitHandler = async (data) => {
-//     const formData = new FormData()
-//     formData.append("eventName", data.eventName)
-//     formData.append("eventType", data.eventType)
-//     formData.append("zoomUrl", data.zoomUrl || "")
-//     formData.append("numberOfSeats", data.numberOfSeats)
-//     formData.append("stateId", data.stateId)
-//     formData.append("cityId", data.cityId)
-//     formData.append("location", data.location || "")
-//     formData.append("startDate", data.startDate)
-//     formData.append("endDate", data.endDate)
-
-//     if (data.image && data.image[0]) {
-//       formData.append("image", data.image[0])
-//     }
-
-//     try {
-//       const res = await axios.put(`/event/updateevent/${id}`, formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//           Authorization: `Bearer ${localStorage.getItem("token")}`,
-//         },
-//       })
-//       alert("Event updated successfully!")
-//       navigate("/organizer")
-//     } catch (err) {
-//       console.error("Update failed:", err)
-//       alert("Failed to update event.")
-//     }
-//   }
-
-//   return (
-//     <div className="container my-5">
-//       <h2 className="text-center mb-4">Update Event</h2>
-//       <div className="card shadow p-4">
-//         <form onSubmit={handleSubmit(submitHandler)}>
-//           <div className="row">
-//             <div className="form-group col-md-6">
-//               <label>Event Name</label>
-//               <input type="text" className="form-control" {...register("eventName")} required />
-//             </div>
-//             <div className="form-group col-md-6">
-//               <label>Event Type</label>
-//               <select className="form-control" {...register("eventType")} required>
-//                 <option value="">Select Type</option>
-//                 <option value="Conference">Conference</option>
-//                 <option value="Exhibition">Exhibition</option>
-//                 <option value="Gala Dinner">Gala Dinner</option>
-//                 <option value="Incentive">Incentive</option>
-//                 <option value="ZoomMeeting">Zoom Meeting</option>
-//                 <option value="Music Consert">Music Concert</option>
-//                 <option value="Meeting">Meeting</option>
-//                 <option value="Other">Other</option>
-//               </select>
-//             </div>
-
-//             <div className="form-group col-md-6">
-//               <label>Zoom URL</label>
-//               <input type="text" className="form-control" {...register("zoomUrl")} />
-//             </div>
-//             <div className="form-group col-md-6">
-//               <label>Number of Seats</label>
-//               <input type="number" className="form-control" {...register("numberOfSeats")} required />
-//             </div>
-
-//             <div className="form-group col-md-6">
-//               <label>State</label>
-//               <select className="form-control" {...register("stateId")} required>
-//                 <option value="">Select State</option>
-//                 {states.map(state => (
-//                   <option key={state._id} value={state._id}>{state.Name}</option>
-//                 ))}
-//               </select>
-//             </div>
-//             <div className="form-group col-md-6">
-//               <label>City</label>
-//               <select className="form-control" {...register("cityId")} required>
-//                 <option value="">Select City</option>
-//                 {cities.map(city => (
-//                   <option key={city._id} value={city._id}>{city.name}</option>
-//                 ))}
-//               </select>
-//             </div>
-
-//             <div className="form-group col-md-12">
-//               <label>Location Link</label>
-//               <input type="text" className="form-control" {...register("location")} />
-//             </div>
-
-//             <div className="form-group col-md-6">
-//               <label>Start Date</label>
-//               <input type="date" className="form-control" {...register("startDate")} required />
-//             </div>
-//             <div className="form-group col-md-6">
-//               <label>End Date</label>
-//               <input type="date" className="form-control" {...register("endDate")} required />
-//             </div>
-
-//             <div className="form-group col-md-12">
-//               <label>Upload Image</label>
-//               <input type="file" className="form-control" {...register("image")} />
-//             </div>
-//           </div>
-
-//           <div className="text-center mt-4">
-//             <button type="submit" className="btn btn-success">Update Event</button>
-//             <Link to="/organizer" className="btn btn-secondary ml-3">Back</Link>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   )
-// }
-
-
+export default UpdateEvent;

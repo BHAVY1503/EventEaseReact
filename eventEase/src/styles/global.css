@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 3%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 346.8 77.2% 49.8%; /* #E11D48 */
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 0 0% 9%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 9%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 346.8 77.2% 49.8%;
+    --radius: 0rem;
+    
+    /* Custom Tokens */
+    --accent-crimson: #E11D48;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+  }
+}
+
+@layer components {
+  /* Reusable Cinematic Elements */
+  .cinematic-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cinematic-button {
+    height: 3rem;
+    padding: 0 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.625rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .text-gradient {
+    background: linear-gradient(to bottom right, #fff, #666);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .badge-status {
+    padding: 0.125rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+}
+
+/* Animations */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s infinite;
+}

@@ -1,0 +1,209 @@
+/* PendingEventsBadge.css */
+
+.pending-badge-trigger {
+  position: relative;
+  width: 3rem !important;
+  height: 3rem !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 1rem !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease !important;
+}
+
+.pending-badge-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.bell-icon-admin {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #4b5563;
+  transition: color 0.3s ease;
+}
+
+.bell-icon-admin.active {
+  color: #E11D48;
+}
+
+.pending-count-tag {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  background-color: #E11D48 !important;
+  color: #ffffff !important;
+  height: 1.25rem !important;
+  min-width: 1.25rem !important;
+  padding: 0 !important;
+  border: 2px solid #000000 !important;
+  border-radius: 9999px !important;
+  font-size: 0.625rem !important;
+  font-weight: 900 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Popover Content */
+.pending-popover-content {
+  width: 25rem !important;
+  padding: 0 !important;
+  background-color: #0a0a0a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2rem !important;
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(24px) !important;
+  overflow: hidden !important;
+}
+
+.popover-header-premium {
+  padding: 2rem;
+  background-color: rgba(225, 29, 72, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.popover-header-bg-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2rem;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.popover-header-info {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-icon-box-admin {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: rgba(225, 29, 72, 0.1);
+  border: 1px solid rgba(225, 29, 72, 0.2);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E11D48;
+}
+
+.header-text-box-admin h3 {
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+}
+
+.header-text-box-admin p {
+  font-size: 0.5625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+/* Event Items */
+.pending-events-list {
+  max-height: 28rem;
+  overflow-y: auto;
+}
+
+.pending-event-item-admin {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pending-event-item-admin:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.event-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.event-name-tag-admin {
+  font-size: 0.6875rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+.pending-event-item-admin:hover .event-name-tag-admin {
+  color: #E11D48;
+}
+
+.organizer-label-admin {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.event-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-info-row-admin {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.meta-tag-admin {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.4375rem;
+  font-weight: 900;
+  color: #4b5563;
+  text-transform: uppercase;
+}
+
+/* Footer Action */
+.popover-footer-admin {
+  padding: 1.5rem;
+  background-color: #050505;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-access-all {
+  width: 100%;
+  height: 3.5rem;
+  background-color: #E11D48 !important;
+  color: #ffffff !important;
+  border-radius: 1rem !important;
+  font-size: 0.625rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2em !important;
+  box-shadow: 0 10px 20px rgba(225, 29, 72, 0.2) !important;
+}

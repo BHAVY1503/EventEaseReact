@@ -1,0 +1,36 @@
+/* Common.css - Shared Utility Classes for Style Extraction */
+
+.dynamic-bg {
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-dynamic-bg {
+  background-image: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(220,38,127,0.3)), var(--bg-image);
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-fixed-bg {
+  background-image: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(59,130,246,0.3)), var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.dynamic-delay {
+  animation-delay: var(--delay);
+}
+
+.dynamic-width {
+  width: var(--width);
+}
+
+.google-signin-wrapper {
+  min-height: 48px;
+  width: 100%;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}

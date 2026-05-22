@@ -8,16 +8,76 @@ import {
    DialogContent,
 } from "@/components/ui/dialog";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "@/features/auth/authSlice";
-import { LogIn, X, Ticket, ShieldCheck, ArrowRight } from "lucide-react";
+import { loginUser, googleLogin } from "@/features/auth/authSlice";
+import { LogIn, X, Ticket, ShieldCheck, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import "@/styles/common/Common.css";
 
 export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
    const { register, handleSubmit, formState: { errors } } = useForm();
    const navigate = useNavigate();
    const [isOpen, setIsOpen] = useState(open);
+   const [showPassword, setShowPassword] = useState(false);
    const dispatch = useDispatch();
    const { isLoading, error } = useSelector((state) => state.auth);
+
+   useEffect(() => {
+      const loadGoogleSignIn = () => {
+         const googleDiv = document.getElementById("googleSignInDiv");
+
+         if (window.google && googleDiv) {
+            try {
+               if (window.google?.accounts?.id) {
+                  window.google.accounts.id.cancel();
+               }
+
+               window.google.accounts.id.initialize({
+                  client_id: "342037145091-qvhlig4d6tn8p35ho40kc8c468mpnqug.apps.googleusercontent.com",
+                  callback: handleGoogleResponse,
+                  auto_select: false,
+               });
+
+               window.google.accounts.id.renderButton(googleDiv, {
+                  type: "standard",
+                  theme: "filled_black",
+                  size: "large",
+                  text: "signin_with",
+                  shape: "rectangular",
+                  width: googleDiv.offsetWidth,
+               });
+            } catch (error) {
+               console.error("Error initializing Google Sign-In:", error);
+            }
+         } else if (googleDiv) {
+            setTimeout(loadGoogleSignIn, 1000);
+         }
+      };
+
+      loadGoogleSignIn();
+
+      return () => {
+         if (window.google?.accounts?.id) {
+            try {
+               window.google.accounts.id.cancel();
+            } catch (error) {
+               console.error("Error cleaning up Google Sign-In:", error);
+            }
+         }
+      };
+   }, []);
+
+   const handleGoogleResponse = async (response) => {
+      try {
+         const result = await dispatch(googleLogin({ token: response.credential, type: 'user' })).unwrap();
+         if (onLoginSuccess) {
+            onLoginSuccess(result.token, result.data);
+         }
+         setIsOpen(false);
+         onClose?.();
+      } catch (err) {
+         console.error("Google login failed:", err);
+      }
+   };
 
    const onSubmit = async (formData) => {
       const result = await dispatch(loginUser(formData));
@@ -89,12 +149,21 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
 
                      <div className="relative group">
                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Access Key</p>
-                        <input
-                           {...register("password", { required: "Key required" })}
-                           type="password"
-                           placeholder="••••••••"
-                           className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors"
-                        />
+                        <div className="relative">
+                           <input
+                              {...register("password", { required: "Key required" })}
+                              type={showPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              className="w-full bg-transparent border-b border-white/10 py-2 text-xs font-black tracking-[0.2em] focus:ring-0 focus:border-[#E11D48] placeholder:text-gray-500 outline-none transition-colors pr-10"
+                           />
+                           <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-0 bottom-2 text-gray-500 hover:text-white transition-colors"
+                           >
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                           </button>
+                        </div>
                         {errors.password && <p className="absolute -bottom-6 left-0 text-[8px] font-black text-[#E11D48] uppercase tracking-widest">{errors.password.message}</p>}
                      </div>
 
@@ -104,7 +173,7 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
                         </div>
                      )}
 
-                     <div className="space-y-8 pt-8">
+                     <div className="space-y-8 pt-4">
                         <Button
                            type="submit"
                            disabled={isLoading}
@@ -112,6 +181,22 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
                         >
                            {isLoading ? "AUTHENTICATING..." : "INITIATE LOGIN"}
                         </Button>
+
+                        <div className="relative">
+                           <div className="absolute inset-0 flex items-center">
+                              <span className="w-full border-t border-white/5"></span>
+                           </div>
+                           <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.5em]">
+                              <span className="bg-black px-4 text-gray-700">Protocol Auth</span>
+                           </div>
+                        </div>
+
+                        <div className="flex justify-center items-center min-h-[48px]">
+                           <div
+                              id="googleSignInDiv"
+                              className="google-signin-wrapper filter grayscale hover:grayscale-0 transition-all duration-500"
+                           />
+                        </div>
 
                         <div className="space-y-4">
                            <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-gray-600">

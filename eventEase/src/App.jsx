@@ -25,7 +25,7 @@ import { AllOrganizers } from './components/admin/AllOrganizers'
 import AddStadiumForm from './components/admin/AddStadiumForm'
 import ViewStadiums from './components/admin/ViewStadiums'
 import { StadiumSelector } from './components/organizer/StadiumSelector'
-import { SeatSelectionPage } from './components/user/SeatsSelection'
+import SeatsSelection from './components/user/SeatsSelection'
 import UpdateStadium from './components/admin/UpdateStadium'
 import AdminLanding from './AdminLanding'
 import { AdminEvents } from './components/admin/AdminEvents'
@@ -125,7 +125,7 @@ function App() {
 						<Route path='viewevents' element={<ViewEvents />} />
 						<Route path='userfeedback' element={<UserFeedback />} />
 					</Route>
-					<Route path='/select-seats/:id' element={<SeatSelectionPage />} />
+					<Route path='/select-seats/:id' element={<SeatsSelection />} />
 				</Route>
 			</Routes>
 		</>

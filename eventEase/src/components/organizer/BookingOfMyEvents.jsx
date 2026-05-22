@@ -1,12 +1,10 @@
-import axios from 'axios';
-import api from '@/lib/api';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import api from '@/lib/api';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -14,42 +12,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
 import { 
-  CalendarDays, 
-  Mail, 
-  MapPin, 
   Users, 
   Search,
-  Filter,
-  TrendingUp,
   Calendar,
-  User,
-  DollarSign,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  ArrowLeft,
-  Sparkles,
+  IndianRupee,
   Activity,
   Zap,
   LayoutGrid,
   History,
-  ShieldCheck,
   Globe,
-  IndianRupee,
   Ticket,
-  ChevronRight,
   Download,
   BarChart3
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import '../../styles/components/SalesReports.css';
 
 export const BookingsOfMyEvents = () => {
   const [tickets, setTickets] = useState([]);
@@ -125,15 +104,6 @@ export const BookingsOfMyEvents = () => {
     return matchesSearch && matchesEvent;
   });
 
-  const LoadingSkeleton = () => (
-    <div className="space-y-12 animate-pulse">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white/5 rounded-3xl" />)}
-      </div>
-      <div className="h-64 bg-white/5 rounded-[3rem]" />
-    </div>
-  );
-
   const getPaymentStatusBadge = (status) => {
     const config = {
       captured: { color: 'bg-green-500/20 text-green-500', text: 'SUCCESS' },
@@ -158,46 +128,41 @@ export const BookingsOfMyEvents = () => {
 
     return (
       <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group">
-        <Card className="bg-white/10 border border-white/10 rounded-[3rem] overflow-hidden backdrop-blur-3xl transition-all duration-700 hover:border-[#E11D48]/40 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-          <div className="flex flex-col xl:flex-row">
-            {/* Event Info Sidebar */}
-            <div className="xl:w-80 p-10 bg-black/40 border-b xl:border-b-0 xl:border-r border-white/5 space-y-8">
+        <div className="event-booking-card-elite">
+          <div className="card-flex-wrapper">
+            <div className="event-info-sidebar">
                <div className="space-y-4">
-                  <Badge className="bg-[#E11D48]/10 text-[#E11D48] text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full">
+                  <Badge className="bg-[#E11D48]/10 text-[#E11D48] text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full border-none">
                      {isPastEvent ? "COMPLETED NODE" : "ACTIVE NODE"}
                   </Badge>
-                  <h3 className="text-2xl font-black uppercase tracking-tighter text-white leading-none group-hover:text-[#E11D48] transition-colors">
-                     {event.eventName}
-                  </h3>
+                  <h3 className="event-title-elite">{event.eventName}</h3>
                   <div className="flex items-center gap-3 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
                      <Calendar className="w-3.5 h-3.5 text-[#E11D48]" />
                      {new Date(event.startDate).toLocaleDateString()}
                   </div>
                </div>
-
                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1">
+                  <div>
                      <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Revenue</p>
                      <p className="text-lg font-black text-white">₹{totalRevenue.toLocaleString()}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div>
                      <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Attendees</p>
                      <p className="text-lg font-black text-white">{totalAttendees}</p>
                   </div>
                </div>
             </div>
 
-            {/* Transactions Area */}
-            <div className="flex-1 p-10 space-y-10">
+            <div className="transactions-area">
                {tickets.length > 0 && (
                  <div className="space-y-6">
                     <div className="flex items-center gap-4">
                        <Ticket className="w-4 h-4 text-[#E11D48]" />
                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Confirmed Manifest</h4>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="manifest-item-grid">
                        {tickets.map(t => (
-                         <div key={t._id} className="p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4 hover:bg-white/10 transition-all">
+                         <div key={t._id} className="transaction-item-card">
                             <div className="flex justify-between items-start">
                                <div className="space-y-1">
                                   <p className="text-[9px] font-black text-white uppercase tracking-tight">{t.userId?.fullName || t.organizerId?.name || "ANONYMOUS"}</p>
@@ -208,7 +173,7 @@ export const BookingsOfMyEvents = () => {
                             <div className="flex justify-between items-end pt-2 border-t border-white/5">
                                <div className="flex items-center gap-2 text-[8px] font-bold text-gray-400">
                                   <Users className="w-3 h-3" /> {t.quantity} SEATS
-                               </div>
+                                </div>
                                <p className="text-sm font-black text-[#E11D48]">₹{(t.ticketRate * t.quantity).toLocaleString()}</p>
                             </div>
                          </div>
@@ -223,28 +188,28 @@ export const BookingsOfMyEvents = () => {
                        <IndianRupee className="w-4 h-4 text-emerald-500" />
                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Transaction Logs</h4>
                     </div>
-                    <div className="overflow-x-auto no-scrollbar">
-                       <table className="w-full text-left border-collapse">
+                    <div className="transaction-table-wrapper no-scrollbar">
+                       <table className="transaction-table">
                           <thead>
-                             <tr className="border-b border-white/5">
-                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest">ID</th>
-                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest">Subject</th>
-                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest text-right">Amount</th>
-                                <th className="pb-4 text-[8px] font-black text-gray-600 uppercase tracking-widest text-right">Status</th>
+                             <tr>
+                                <th className="table-header-cell">ID</th>
+                                <th className="table-header-cell">Subject</th>
+                                <th className="table-header-cell text-right">Amount</th>
+                                <th className="table-header-cell text-right">Status</th>
                              </tr>
                           </thead>
-                          <tbody className="divide-y divide-white/5">
+                          <tbody>
                              {payments.map(p => (
-                               <tr key={p._id} className="group/row">
-                                  <td className="py-4 text-[8px] font-mono text-gray-600 uppercase">{p.orderId?.slice(-8)}</td>
-                                  <td className="py-4">
+                               <tr key={p._id} className="table-row">
+                                  <td className="table-cell text-[8px] font-mono text-gray-600 uppercase">{p.orderId?.slice(-8)}</td>
+                                  <td className="table-cell">
                                      <div className="flex flex-col">
                                         <span className="text-[9px] font-black text-white uppercase">{p.userId?.fullName || "ANONYMOUS"}</span>
                                         <span className="text-[7px] text-gray-600">{new Date(p.createdAt).toLocaleDateString()}</span>
                                      </div>
                                   </td>
-                                  <td className="py-4 text-right text-[10px] font-black text-white">₹{(p.amount / 100).toLocaleString()}</td>
-                                  <td className="py-4 text-right">{getPaymentStatusBadge(p.status)}</td>
+                                  <td className="table-cell text-right text-[10px] font-black text-white">₹{(p.amount / 100).toLocaleString()}</td>
+                                  <td className="table-cell text-right">{getPaymentStatusBadge(p.status)}</td>
                                </tr>
                              ))}
                           </tbody>
@@ -254,63 +219,54 @@ export const BookingsOfMyEvents = () => {
                )}
             </div>
           </div>
-        </Card>
+        </div>
       </motion.div>
     );
   };
 
   return (
-    <div className="w-full space-y-12 pb-20">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16">
-         <div>
-            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-8">
+    <div className="sales-report-layout">
+      <div className="report-header-section">
+         <div className="report-title-box">
+            <div className="status-badge-elite">
                <Activity className="h-4 w-4 text-[#E11D48]" />
-               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Operational Intelligence v4.0</span>
+               <span className="status-badge-label">Operational Intelligence v4.0</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
-               SALES <span className="text-[#E11D48]">REPORT</span>
-            </h1>
+            <h1 className="report-main-title">SALES <span className="report-title-accent">REPORT</span></h1>
          </div>
-         <div className="flex gap-4">
-            <Button variant="outline" className="h-12 px-6 bg-white/5 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl hover:bg-white/10">
-               <Download className="w-3.5 h-3.5 mr-2" /> EXPORT DATA
-            </Button>
-         </div>
+         <Button variant="outline" className="h-12 px-6 bg-white/5 border-white/10 text-white font-black uppercase tracking-widest text-[9px] rounded-xl hover:bg-white/10 border-none">
+            <Download className="w-3.5 h-3.5 mr-2" /> EXPORT DATA
+         </Button>
       </div>
 
       {loading ? (
-        <LoadingSkeleton />
+        <div className="py-20 text-center"><Activity className="w-10 h-10 text-[#E11D48] animate-spin mx-auto" /></div>
       ) : (
         <div className="space-y-16">
-          {/* Intelligence Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="intelligence-stats-grid">
             {[
               { label: 'GROSS REVENUE', val: `₹${stats.totalRevenue.toLocaleString()}`, icon: IndianRupee, color: 'text-[#E11D48]' },
               { label: 'TOTAL BOOKINGS', val: stats.totalBookings, icon: Ticket, color: 'text-blue-500' },
               { label: 'ATTENDEE COUNT', val: stats.totalAttendees, icon: Users, color: 'text-emerald-500' },
               { label: 'ACTIVE NODES', val: stats.totalEvents, icon: Globe, color: 'text-purple-500' },
             ].map((s, i) => (
-              <Card key={i} className="bg-white/10 border border-white/10 rounded-3xl p-8 backdrop-blur-3xl space-y-4 hover:border-white/20 transition-all shadow-xl">
+              <div key={i} className="stat-card-elite">
                 <div className="flex justify-between items-start">
-                   <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
-                      <s.icon className={cn("w-5 h-5", s.color)} />
-                   </div>
+                   <div className="stat-icon-wrapper"><s.icon className={cn("w-5 h-5", s.color)} /></div>
                    <div className="h-1.5 w-1.5 bg-[#E11D48] rounded-full animate-pulse" />
                 </div>
                 <div>
-                   <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">{s.label}</p>
-                   <p className="text-3xl font-black text-white tracking-tighter mt-1">{s.val}</p>
+                   <p className="stat-label-elite">{s.label}</p>
+                   <p className="stat-value-elite">{s.val}</p>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
 
-          {/* Filtering Node */}
-          <Card className="bg-white/10 border border-white/10 rounded-[3rem] p-10 backdrop-blur-3xl shadow-xl">
-             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-                <div className="lg:col-span-5 space-y-4">
-                   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">Search Manifest</p>
+          <div className="filter-node-card">
+             <div className="filter-grid-layout">
+                <div className="search-manifest-group">
+                   <p className="filter-group-label">Search Manifest</p>
                    <div className="relative group">
                       <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-[#E11D48] transition-colors" />
                       <Input 
@@ -321,9 +277,9 @@ export const BookingsOfMyEvents = () => {
                       />
                    </div>
                 </div>
-                <div className="lg:col-span-4 space-y-4">
-                   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">Timeline Filter</p>
-                   <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/5">
+                <div className="timeline-filter-group">
+                   <p className="filter-group-label">Timeline Filter</p>
+                   <div className="custom-tabs-container">
                       {[
                         { id: 'all', label: 'ALL', icon: LayoutGrid },
                         { id: 'upcoming', label: 'UPCOMING', icon: Zap },
@@ -332,20 +288,17 @@ export const BookingsOfMyEvents = () => {
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
-                          className={cn(
-                            "flex-1 h-12 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2",
-                            activeTab === tab.id ? "bg-[#E11D48] text-white shadow-xl" : "text-gray-500 hover:text-white"
-                          )}
+                          className={cn("custom-tab-trigger", activeTab === tab.id && "active")}
                         >
                            <tab.icon className="w-3 h-3" /> {tab.label}
                         </button>
                       ))}
                    </div>
                 </div>
-                <div className="lg:col-span-3 space-y-4">
-                   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">Node Selection</p>
+                <div className="node-selection-group">
+                   <p className="filter-group-label">Node Selection</p>
                    <Select value={filterEvent} onValueChange={setFilterEvent}>
-                      <SelectTrigger className="h-16 bg-white/5 border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-[#E11D48]/50">
+                      <SelectTrigger className="h-16 bg-white/5 border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest focus:ring-1 focus:ring-[#E11D48]/50 border-none">
                          <SelectValue placeholder="FILTER BY NODE" />
                       </SelectTrigger>
                       <SelectContent className="bg-black border-white/5 text-white">
@@ -357,9 +310,8 @@ export const BookingsOfMyEvents = () => {
                    </Select>
                 </div>
              </div>
-          </Card>
+          </div>
 
-          {/* Records Manifest */}
           <div className="space-y-8">
              <AnimatePresence>
                 {filteredData.length === 0 ? (
@@ -385,3 +337,5 @@ export const BookingsOfMyEvents = () => {
     </div>
   );
 };
+
+export default BookingsOfMyEvents;

@@ -31,6 +31,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "@/lib/utils";
+import '../../styles/components/GroupedByEvents.css';
 
 export const GroupedByEvents = () => {
   const navigate = useNavigate();
@@ -124,22 +125,22 @@ export const GroupedByEvents = () => {
   }
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="approvals-container">
       {/* HEADER SECTION */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        className="approvals-header"
       >
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+        <div className="approvals-badge">
           <Activity className="h-3 w-3 text-[#E11D48] animate-pulse" />
           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Authority Oversight Active</span>
         </div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
+            <h1 className="approvals-title">
               EVENT<br />
-              <span className="text-[#E11D48]">APPROVALS</span>
+              <span>APPROVALS</span>
             </h1>
             <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
               Strategic Management of Producer Infrastructure
@@ -186,13 +187,13 @@ export const GroupedByEvents = () => {
               <Collapsible 
                 open={expandedGroups[index]} 
                 onOpenChange={() => toggleGroup(index)}
-                className="group border border-white/5 bg-[#0A0A0A] rounded-[2rem] overflow-hidden hover:border-[#E11D48]/30 transition-all duration-500"
+                className="cluster-card group"
               >
                 <CollapsibleTrigger asChild>
-                  <div className="p-8 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6 group-hover:bg-white/5 transition-colors">
+                  <div className="cluster-trigger group">
                     <div className="flex items-center gap-6">
                       <div className="relative">
-                        <Avatar className="w-16 h-16 rounded-2xl border border-white/10 group-hover:border-[#E11D48]/50 transition-all">
+                        <Avatar className="organizer-avatar">
                           <AvatarFallback className="bg-gradient-to-br from-[#111] to-[#000] text-white font-black text-xl">
                             {group.organizerName.charAt(0).toUpperCase()}
                           </AvatarFallback>
@@ -240,7 +241,7 @@ export const GroupedByEvents = () => {
                               <motion.div
                                 key={event._id}
                                 whileHover={{ y: -10 }}
-                                className="group/card relative bg-[#050505] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col h-full hover:border-[#E11D48]/40 transition-all duration-500 shadow-2xl"
+                                className="event-card-admin group/card"
                               >
                                 <div className="relative h-48 overflow-hidden">
                                   <img 
