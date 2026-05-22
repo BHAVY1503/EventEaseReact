@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "@/styles/components/MapPicker.css";
 
 // Fix Leaflet marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -31,7 +32,7 @@ const MapPicker = ({ location, setLocation }) => {
     <MapContainer
       center={[20.5937, 78.9629]} // Center on India
       zoom={5}
-      style={{ height: "400px", width: "100%" }}
+      className="map-picker-container"
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

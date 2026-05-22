@@ -17,6 +17,8 @@ import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
 import { ContactUs } from './ContactUs';
 import ChatBot from './ChatBot';
+import '../../styles/pages/LandingPage.css';
+import "@/styles/common/Common.css";
 
 export const LandingPage = () => {
   const [eventStats, setEventStats] = useState({ totalEvents: 0, activeEvents: 0 });
@@ -54,14 +56,11 @@ export const LandingPage = () => {
   }, [images.length]);
 
   return (
-    <div className="min-h-screen bg-transparent text-white selection:bg-rose-500/30 selection:text-rose-200 overflow-x-hidden">
+    <div className="landing-container">
       {/* Enhanced Navigation */}
-      <header className={`fixed top-0 z-50 w-full transition-all duration-500 ${isScrolled
-        ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 py-4'
-        : 'bg-transparent py-8'
-        }`}>
-        <div className="max-w-[1800px] mx-auto flex items-center justify-between px-6 md:px-12">
-          <Link to="/" className="flex items-center space-x-4 group">
+      <header className={`landing-header ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="landing-nav-content">
+          <Link to="/" className="flex items-center space-x-4 group bg-transparent border-none">
             <div className="w-10 h-10 bg-[#E11D48] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.5)] group-hover:scale-110 transition-transform">
               <Ticket className="h-6 w-6 text-white" />
             </div>
@@ -74,7 +73,7 @@ export const LandingPage = () => {
               <a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all relative group"
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all relative group no-underline"
               >
                 {item}
                 <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] transition-all group-hover:w-full" />
@@ -85,11 +84,11 @@ export const LandingPage = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-8">
             <DarkModeToggle />
-            <Link to="/signin" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-colors">
+            <Link to="/signin" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-colors no-underline">
               Sign In
             </Link>
             <Button
-              className="btn-primary"
+              className="bg-[#E11D48] hover:bg-[#BE123C] text-white font-black uppercase tracking-widest text-[10px] px-8 h-10 rounded-full border-none shadow-[0_0_20px_rgba(225,29,72,0.3)] transition-all hover:scale-105"
               asChild
             >
               <Link to="/signup">Get Started</Link>
@@ -110,16 +109,16 @@ export const LandingPage = () => {
                     <a
                       key={item}
                       href={`#${item.toLowerCase()}`}
-                      className="text-4xl font-black uppercase tracking-tighter hover:text-[#E11D48] transition-colors"
+                      className="text-4xl font-black uppercase tracking-tighter hover:text-[#E11D48] transition-colors no-underline text-white"
                     >
                       {item}
                     </a>
                   ))}
                   <div className="flex flex-col space-y-4 pt-12 border-t border-white/10">
-                    <Button variant="outline" className="btn-outline w-full py-6 text-lg" asChild>
+                    <Button variant="outline" className="w-full py-6 text-lg bg-transparent border-white/20 text-white hover:bg-white hover:text-black font-black uppercase tracking-widest" asChild>
                       <Link to="/signin">Sign In</Link>
                     </Button>
-                    <Button className="btn-primary w-full py-6 text-lg" asChild>
+                    <Button className="w-full py-6 text-lg bg-[#E11D48] hover:bg-[#BE123C] text-white font-black uppercase tracking-widest border-none" asChild>
                       <Link to="/signup">Get Started</Link>
                     </Button>
                   </div>
@@ -131,9 +130,9 @@ export const LandingPage = () => {
       </header>
 
       {/* Cinematic Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="hero-viewport-landing">
         {/* Dynamic Background */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="hero-bg-layer">
           {images.map((img, index) => (
             <motion.div
               key={index}
@@ -143,42 +142,42 @@ export const LandingPage = () => {
                 scale: index === currentSlide ? 1 : 1.1 
               }}
               transition={{ duration: 2, ease: "easeOut" }}
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${img})` }}
+              className="hero-slide-img dynamic-bg"
+              style={{ '--bg-image': `url(${img})` }}
             >
               <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
             </motion.div>
           ))}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
+          <div className="hero-vignette-overlay" />
+          <div className="hero-gradient-layer" />
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 text-center px-6 max-w-7xl mx-auto pt-20">
+        <div className="hero-content-landing">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-flex items-center gap-3 px-6 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-12">
+            <div className="live-indicator-wrapper">
               <div className="live-indicator" />
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Experience The Future of Events</span>
             </div>
 
-            <h1 className="text-6xl md:text-[120px] font-black text-white mb-12 leading-[0.85] tracking-[-0.05em]">
+            <h1 className="hero-title-landing">
               THE WORLD'S<br />
               <span className="text-white">PREMIER</span><br />
               <span className="text-[#E11D48] text-glow">EXPERIENCES</span>
             </h1>
 
-            <p className="text-lg md:text-2xl text-gray-400 mb-16 max-w-3xl mx-auto font-medium leading-relaxed">
+            <p className="hero-subtitle-landing">
               From sold-out stadium tours to exclusive gala experiences. 
               Manage, market, and sell with the industry standard.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button
-                className="btn-primary text-sm h-16 px-12"
+                className="bg-[#E11D48] hover:bg-[#BE123C] text-white font-black uppercase tracking-widest h-16 px-12 rounded-none border-none text-sm transition-all hover:scale-105"
                 asChild
               >
                 <Link to="/organizersignup">
@@ -186,7 +185,7 @@ export const LandingPage = () => {
                 </Link>
               </Button>
               <Button
-                className="btn-outline text-sm h-16 px-12"
+                className="bg-transparent hover:bg-white hover:text-black text-white font-black uppercase tracking-widest h-16 px-12 rounded-none border border-white/20 text-sm transition-all hover:scale-105"
                 asChild
               >
                 <Link to="/events">Explore Shows</Link>
@@ -215,7 +214,7 @@ export const LandingPage = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`h-1 transition-all duration-500 ${index === currentSlide ? 'w-12 bg-[#E11D48]' : 'w-6 bg-white/20'}`}
+                  className={`h-1 transition-all duration-500 border-none cursor-pointer ${index === currentSlide ? 'w-12 bg-[#E11D48]' : 'w-6 bg-white/20'}`}
                 />
               ))}
             </div>
@@ -224,15 +223,15 @@ export const LandingPage = () => {
       </section>
 
       {/* Featured Shows Section */}
-      <section id="events" className="relative py-40 bg-transparent">
+      <section id="events" className="featured-section-landing">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+          <div className="section-header-row">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-3 mb-6">
-                <div className="w-8 h-[2px] bg-[#E11D48]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Now Showing</span>
+              <div className="accent-line-heading">
+                <div className="accent-line" />
+                <span className="accent-text">Now Showing</span>
               </div>
-              <h2 className="text-5xl md:text-8xl font-black text-white leading-none">
+              <h2 className="featured-title">
                 CURATED<br />SHOWS
               </h2>
             </div>
@@ -246,8 +245,8 @@ export const LandingPage = () => {
           </div>
 
           <div className="flex justify-center">
-             <Button className="btn-outline group h-14" asChild>
-                <Link to="/events" className="flex items-center">
+             <Button className="bg-transparent hover:bg-white hover:text-black text-white font-black uppercase tracking-widest h-14 px-12 rounded-none border border-white/20 group transition-all" asChild>
+                <Link to="/events" className="flex items-center no-underline text-white group-hover:text-black">
                    View All Shows <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform" />
                 </Link>
              </Button>
@@ -256,7 +255,7 @@ export const LandingPage = () => {
       </section>
 
       {/* Features - The Edge */}
-      <section id="features" className="py-40 bg-transparent border-y border-white/5">
+      <section id="features" className="edge-section">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
            <div className="text-center mb-32">
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-6 block">The Edge</span>
@@ -265,52 +264,46 @@ export const LandingPage = () => {
               </h2>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border border-white/5">
+           <div className="edge-grid">
               {[
                 {
                   icon: <Ticket className="h-10 w-10" />,
                   title: "SMART TICKETING",
                   desc: "Precision dynamic pricing and bulk allocation systems for scale.",
-                  accent: "border-blue-500/20"
                 },
                 {
                   icon: <BarChart3 className="h-10 w-10" />,
                   title: "REAL-TIME INTEL",
                   desc: "Live sales tracking and audience behavior analytics.",
-                  accent: "border-[#E11D48]/20"
                 },
                 {
                   icon: <ShieldCheck className="h-10 w-10" />,
                   title: "IRONCLAD SECURITY",
                   desc: "Bank-grade encryption and secure secondary market controls.",
-                  accent: "border-emerald-500/20"
                 },
                 {
                   icon: <Globe className="h-10 w-10" />,
                   title: "GLOBAL NETWORK",
                   desc: "Reach audiences in over 150 countries with localized payments.",
-                  accent: "border-purple-500/20"
                 },
                 {
                   icon: <Zap className="h-10 w-10" />,
                   title: "ZERO LATENCY",
                   desc: "High-concurrency infrastructure built for instant sold-out moments.",
-                  accent: "border-orange-500/20"
                 },
                 {
                   icon: <Rocket className="h-10 w-10" />,
                   title: "VIP UPGRADES",
                   desc: "Integrated hospitality and premium experience management.",
-                  accent: "border-pink-500/20"
                 }
               ].map((f, i) => (
-                <div key={i} className="p-16 bg-black group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-0 bg-[#E11D48] group-hover:h-full transition-all duration-500" />
-                  <div className="mb-10 text-gray-600 group-hover:text-white transition-colors duration-300">
+                <div key={i} className="edge-item group">
+                  <div className="edge-accent-bar" />
+                  <div className="edge-icon-box group-hover:text-white">
                     {f.icon}
                   </div>
-                  <h3 className="text-2xl font-black mb-6 text-white">{f.title}</h3>
-                  <p className="text-gray-500 leading-relaxed font-medium group-hover:text-gray-300 transition-colors">
+                  <h3 className="edge-item-title">{f.title}</h3>
+                  <p className="edge-item-desc group-hover:text-gray-300">
                     {f.desc}
                   </p>
                 </div>
@@ -320,9 +313,9 @@ export const LandingPage = () => {
       </section>
 
       {/* Process Section */}
-      <section id="about" className="py-40 bg-transparent">
+      <section id="about" className="process-section">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+          <div className="process-grid">
             <div>
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-8 block">Our Process</span>
               <h2 className="text-5xl md:text-8xl font-black text-white leading-none mb-12">
@@ -334,24 +327,22 @@ export const LandingPage = () => {
                   { step: "02", title: "Activation", desc: "Launch marketing and open global sales channels." },
                   { step: "03", title: "Execution", desc: "Real-time entry management and live analytics." }
                 ].map((item, i) => (
-                  <div key={i} className="flex gap-12 group">
-                    <span className="text-4xl font-black text-white/10 group-hover:text-[#E11D48] transition-colors">{item.step}</span>
+                  <div key={i} className="process-step group">
+                    <span className="step-number group-hover:text-[#E11D48] transition-colors">{item.step}</span>
                     <div>
-                      <h4 className="text-2xl font-black text-white mb-4">{item.title}</h4>
-                      <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
+                      <h4 className="step-title">{item.title}</h4>
+                      <p className="step-desc">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-[4/5] bg-gray-900 rounded-2xl overflow-hidden relative group">
-                 <img src={img3} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100" />
+            <div className="process-visual-wrapper">
+              <div className="visual-container group">
+                 <img src={img3} alt="Stage" className="visual-img group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100" />
                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                 <div className="absolute bottom-12 left-12">
-                    <p className="text-4xl font-black text-white leading-none">
-                       THE STAGE<br />IS YOURS
-                    </p>
+                 <div className="visual-overlay-text">
+                    THE STAGE<br />IS YOURS
                  </div>
               </div>
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#E11D48] rounded-full flex items-center justify-center -z-10 blur-3xl opacity-20" />
@@ -366,16 +357,16 @@ export const LandingPage = () => {
       </section>
 
       {/* Cinematic Footer */}
-      <footer className="bg-transparent text-white pt-40 pb-20 border-t border-white/5">
+      <footer className="landing-footer">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-24 mb-40">
+          <div className="footer-top-row">
             <div className="lg:col-span-2">
-               <h2 className="text-6xl md:text-9xl font-black mb-16 tracking-tighter uppercase leading-none">
+               <h2 className="footer-brand-heading">
                   JOIN THE<br /><span className="text-[#E11D48]">REVOLUTION</span>
                </h2>
                <div className="flex flex-wrap gap-8">
                   {['Instagram', 'Twitter', 'LinkedIn', 'YouTube'].map(s => (
-                    <a key={s} href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 hover:text-white transition-colors">{s}</a>
+                    <a key={s} href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 hover:text-white transition-colors no-underline">{s}</a>
                   ))}
                </div>
             </div>
@@ -383,17 +374,17 @@ export const LandingPage = () => {
             <div className="grid grid-cols-2 gap-12 lg:col-span-2">
                <div>
                   <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-10">Platform</h4>
-                  <ul className="space-y-6">
+                  <ul className="space-y-6 list-none p-0">
                     {['Home', 'Shows', 'Analytics', 'Enterprise'].map(l => (
-                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors">{l}</a></li>
+                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors no-underline">{l}</a></li>
                     ))}
                   </ul>
                </div>
                <div>
                   <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-10">Support</h4>
-                  <ul className="space-y-6">
+                  <ul className="space-y-6 list-none p-0">
                     {['Help Center', 'API Docs', 'Status', 'Legal'].map(l => (
-                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors">{l}</a></li>
+                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors no-underline">{l}</a></li>
                     ))}
                   </ul>
                </div>
@@ -411,15 +402,15 @@ export const LandingPage = () => {
              </div>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-white/5 gap-8">
-            <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest">
+          <div className="footer-bottom-row-landing">
+            <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest m-0">
               © 2025 EventEase. The Standard in Live Entertainment.
             </p>
-            <div className="flex items-center gap-12">
-              <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-600">
+            <div className="badge-group">
+              <span className="badge-item">
                 <ShieldCheck className="h-4 w-4" /> Secure Platform
               </span>
-              <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-600">
+              <span className="badge-item">
                 <Zap className="h-4 w-4" /> Ultra-Low Latency
               </span>
             </div>

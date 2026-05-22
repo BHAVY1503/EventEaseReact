@@ -48,6 +48,8 @@ import { ViewMyEvent } from './ViewMyEvent';
 import { UserFeedback } from '../user/UserFeedBack';
 import  ViewEvents  from '../user/ViweEvents';
 import { ContactUs } from '../common/ContactUs';
+import "@/styles/common/Common.css";
+import "@/styles/components/OrganizerHeroPage.css";
 
 // Import your existing images
 import img1 from '../../assets/img/hero-bg.jpg';
@@ -294,14 +296,11 @@ export const OrganizerHeroPage = () => {
           {heroImages.map((img, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out hero-fixed-bg ${
                 index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
               }`}
               style={{
-                backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(59,130,246,0.3)), url(${img})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: 'fixed'
+                '--bg-image': `url(${img})`,
               }}
             />
           ))}
@@ -415,10 +414,7 @@ export const OrganizerHeroPage = () => {
       <footer className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white overflow-hidden dark:bg-gray-900 dark:text-gray-300">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, #60a5fa 0%, transparent 50%), 
-                             radial-gradient(circle at 75% 75%, #a855f7 0%, transparent 50%)`
-          }} />
+          <div className="footer-gradient-overlay" />
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

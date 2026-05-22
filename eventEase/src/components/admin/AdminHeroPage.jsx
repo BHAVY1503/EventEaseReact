@@ -58,6 +58,7 @@ import AddStadiumForm from "./AddStadiumForm";
 import ViewStadiums from "./ViewStadiums";
 import { AdminEvents } from "./AdminEvents";
 import { DarkModeToggle } from "@/contexts/DarkModeContext";
+import "@/styles/common/Common.css";
 
 // Images
 import img1 from "../../assets/img/hero-bg.jpg";
@@ -304,11 +305,9 @@ export const AdminHeroPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 1.5, ease: "easeOut" }}
-              className="absolute inset-0"
+              className="absolute inset-0 dynamic-bg"
               style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4), rgba(5,5,5,1)), url(${img})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
+                '--bg-image': `linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4), rgba(5,5,5,1)), url(${img})`,
               }}
             />
           ))}

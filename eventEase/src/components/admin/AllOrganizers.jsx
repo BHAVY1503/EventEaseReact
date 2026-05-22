@@ -45,6 +45,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import '../../styles/components/AllOrganizers.css';
 
 export const AllOrganizers = () => {
   const [organizers, setOrganizers] = useState([]);
@@ -130,22 +131,22 @@ export const AllOrganizers = () => {
   }
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="registry-container">
       {/* HEADER SECTION */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        className="registry-header"
       >
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
+        <div className="registry-status-badge">
           <Briefcase className="h-3 w-3 text-[#E11D48] animate-pulse" />
-          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Global Organizer Directory Active</span>
+          <span className="registry-status-text">Global Organizer Directory Active</span>
         </div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
+            <h1 className="registry-title">
               ORGANIZER<br />
-              <span className="text-[#E11D48]">COMMAND</span>
+              <span>COMMAND</span>
             </h1>
             <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
               Oversight and regulation of all service provider entities.
@@ -165,7 +166,7 @@ export const AllOrganizers = () => {
       </motion.div>
 
       {/* STATS SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="stats-grid">
         {[
           { label: "Active Nodes", value: organizers.length, icon: Activity, color: "text-[#E11D48]" },
           { label: "Verified Corporations", value: [...new Set(organizers.map(o => o.organizationName))].length, icon: Building2, color: "text-blue-500" },
@@ -176,18 +177,18 @@ export const AllOrganizers = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-8 bg-[#0A0A0A] border border-white/5 rounded-[2.5rem] space-y-4 shadow-2xl relative overflow-hidden group"
+            className="stat-card group"
           >
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
+            <div className="stat-card-icon-bg">
                <stat.icon className="w-20 h-20 text-white" />
             </div>
             <div className="flex items-center justify-between relative z-10">
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-500">{stat.label}</p>
+              <p className="stat-label">{stat.label}</p>
               <div className={cn("w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10", stat.color)}>
                 <stat.icon className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-4xl font-black text-white relative z-10">{stat.value}</p>
+            <p className="stat-value">{stat.value}</p>
           </motion.div>
         ))}
       </div>
@@ -197,9 +198,9 @@ export const AllOrganizers = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="border border-white/5 bg-[#0A0A0A] rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-3xl"
+        className="registry-table-container"
       >
-        <div className="p-10 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gradient-to-r from-transparent to-white/[0.02]">
+        <div className="registry-table-header flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="space-y-1">
              <h3 className="text-2xl font-black uppercase tracking-tight text-white">Central Registry</h3>
              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Validated Service Provider Entities</p>
@@ -212,7 +213,7 @@ export const AllOrganizers = () => {
                 placeholder="IDENTIFY BY NAME, EMAIL, OR ORGANIZATION..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-14 pl-14 pr-6 bg-white/5 border-white/10 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase focus:ring-[#E11D48]/30 focus:border-[#E11D48]/30 placeholder:text-gray-500 transition-all"
+                className="search-input"
               />
             </div>
             <Button variant="outline" className="h-14 px-8 border-white/10 bg-transparent text-gray-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-2xl hover:bg-white hover:text-black transition-all">

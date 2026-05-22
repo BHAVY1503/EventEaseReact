@@ -11,6 +11,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { adminLogin, googleLogin } from "../../features/auth/authSlice";
 import { ShieldCheck, Lock, X, Eye, EyeOff } from "lucide-react";
+import "@/styles/common/Common.css";
 
 export const AdminSignIn = ({ onClose }) => {
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -224,8 +225,7 @@ export const AdminSignIn = ({ onClose }) => {
                     <div className="flex justify-center items-center min-h-[48px]">
                       <div
                         id="googleSignInDiv"
-                        className="w-full max-w-[300px] mx-auto filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100"
-                        style={{ minHeight: "48px" }}
+                        className="google-signin-wrapper filter grayscale hover:grayscale-0 transition-all duration-500 opacity-50 hover:opacity-100"
                       />
                     </div>
 

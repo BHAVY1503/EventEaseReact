@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
+import "@/styles/components/ChatBot.css";
+import "@/styles/common/Common.css";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -131,8 +133,8 @@ const ChatBot = () => {
                 <div className="bg-white/5 border border-white/5 rounded-2xl rounded-tl-none px-4 py-3">
                   <div className="flex gap-1.5">
                     <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce"></div>
-                    <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce" style={{animationDelay: '0.15s'}}></div>
-                    <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce" style={{animationDelay: '0.3s'}}></div>
+                    <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce dynamic-delay" style={{ '--delay': '0.15s' }}></div>
+                    <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce dynamic-delay" style={{ '--delay': '0.3s' }}></div>
                   </div>
                 </div>
               </div>
@@ -167,14 +169,6 @@ const ChatBot = () => {
         </div>
       )}
 
-      <style>{`
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-slideUp { animation: slideUp 0.3s ease-out; }
-        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   );
 };

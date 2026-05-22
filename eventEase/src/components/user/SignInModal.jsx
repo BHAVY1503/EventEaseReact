@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser, googleLogin } from "@/features/auth/authSlice";
 import { LogIn, X, Ticket, ShieldCheck, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import "@/styles/common/Common.css";
 
 export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
    const { register, handleSubmit, formState: { errors } } = useForm();
@@ -193,8 +194,7 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
                         <div className="flex justify-center items-center min-h-[48px]">
                            <div
                               id="googleSignInDiv"
-                              className="w-full max-w-[300px] mx-auto filter grayscale hover:grayscale-0 transition-all duration-500"
-                              style={{ minHeight: "48px" }}
+                              className="google-signin-wrapper filter grayscale hover:grayscale-0 transition-all duration-500"
                            />
                         </div>
 

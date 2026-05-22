@@ -1,0 +1,70 @@
+/* Mobile-First Layout Patterns */
+
+.page-container {
+  width: 100%;
+  padding: 1.5rem;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding: 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .page-container {
+    max-width: 1800px;
+    padding: 4rem 6rem;
+  }
+}
+
+/* Responsive Grids */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .grid-auto-fit {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-auto-fit {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1536px) {
+  .grid-auto-fit {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Flex Utilities */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Spacing Utilities */
+.section-spacing {
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    margin-bottom: 6rem;
+  }
+}

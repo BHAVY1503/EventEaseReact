@@ -10,24 +10,21 @@ import {
   Trash2, 
   CheckCircle2, 
   ExternalLink, 
-  BarChart3,
   Activity,
   Globe,
-  Sparkles,
   ShieldAlert,
-  ArrowRight,
   Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import "@/styles/components/AdminEvents.css";
 
 export const AdminEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState({});
-  const token = localStorage.getItem("token");
 
   const fetchAdminEvents = async () => {
     setLoading(true);
@@ -72,171 +69,112 @@ export const AdminEvents = () => {
   }
 
   return (
-    <div className="space-y-12 pb-20">
-      {/* HEADER SECTION */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[#E11D48]/10 border border-[#E11D48]/20 rounded-full">
-          <Activity className="h-3 w-3 text-[#E11D48] animate-pulse" />
-          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#E11D48]">Root Level Event Control</span>
-        </div>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] text-white">
-              ADMIN<br />
-              <span className="text-[#E11D48]">OPERATIONS</span>
-            </h1>
-            <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
-              Direct oversight of central core event modules.
-            </p>
-          </div>
-          <div className="flex items-center gap-8 border-l border-white/10 pl-8 h-fit">
-            <div>
-              <p className="text-[8px] font-black uppercase tracking-[0.3em] text-gray-600 mb-1">Central Assets</p>
-              <p className="text-3xl font-black text-white">{events.length}</p>
-            </div>
-            <div>
-               <Zap className="w-8 h-8 text-[#E11D48] opacity-20" />
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {events.length === 0 ? (
+    <div className="admin-events-container">
+      <div className="admin-events-content">
+        {/* HEADER SECTION */}
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="p-20 bg-white/5 border border-white/5 rounded-[3rem] text-center space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="admin-header"
         >
-          <ShieldAlert className="w-12 h-12 text-gray-700 mx-auto" />
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Zero Active Modules Detected in Central Core.</p>
-        </motion.div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence>
-            {events.map((event, index) => {
-              const eventEnded = new Date(event.endDate) < new Date();
-              const availableSeats = event.numberOfSeats - (event.bookedSeats || 0);
+          <div className="admin-title-box">
+            <p className="admin-subtitle">Root Level Event Control</p>
+            <h1>ADMIN<br /><span>OPERATIONS</span></h1>
+          </div>
 
-              return (
-                <motion.div
-                  key={event._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group relative"
-                >
-                  <div className="relative bg-[#0A0A0A] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl hover:border-[#E11D48]/40 transition-all duration-500 flex flex-col h-full">
-                    {/* IMAGE SECTION */}
-                    <div className="relative h-56 overflow-hidden">
-                      <img 
-                        src={event.eventImgUrl} 
-                        alt={event.eventName} 
-                        className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent opacity-80" />
-                      
+          <div className="admin-stats-box">
+            <div className="admin-stat-item">
+              <p>Central Assets</p>
+              <p>{events.length}</p>
+            </div>
+            <Zap className="admin-zap-icon" />
+          </div>
+        </motion.div>
+
+        {events.length === 0 ? (
+          <div className="p-20 bg-white/5 border border-white/5 rounded-[3rem] text-center space-y-4">
+            <ShieldAlert className="w-12 h-12 text-gray-700 mx-auto" />
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Zero Active Modules Detected in Central Core.</p>
+          </div>
+        ) : (
+          <div className="admin-events-grid">
+            <AnimatePresence>
+              {events.map((event, index) => {
+                const eventEnded = new Date(event.endDate) < new Date();
+                const availableSeats = event.numberOfSeats - (event.bookedSeats || 0);
+
+                return (
+                  <motion.div
+                    key={event._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="admin-event-card-premium"
+                  >
+                    <div className="card-image-box">
+                      <img src={event.eventImgUrl} alt={event.eventName} />
+                      <div className="card-image-overlay" />
                       {eventEnded && (
-                        <div className="absolute top-6 right-6">
-                          <Badge className="bg-emerald-500 text-white font-black text-[8px] uppercase tracking-widest px-4 py-2 rounded-xl">
-                            <CheckCircle2 className="w-3 h-3 mr-2" /> TERMINATED
-                          </Badge>
+                        <div className="status-badge-floating">
+                          <CheckCircle2 className="w-3 h-3" /> TERMINATED
                         </div>
                       )}
-
-                      <div className="absolute bottom-6 left-8 right-8">
-                        <Badge variant="outline" className="border-white/20 text-gray-400 font-black text-[8px] uppercase tracking-[0.2em] mb-2">
-                          {event.eventType}
-                        </Badge>
-                        <h3 className="text-xl font-black text-white uppercase tracking-tight line-clamp-2 leading-tight group-hover:text-[#E11D48] transition-colors">
-                          {event.eventName}
-                        </h3>
+                      <div className="card-header-floating">
+                        <span className="type-label-premium">{event.eventType}</span>
+                        <h3 className="card-title-premium">{event.eventName}</h3>
                       </div>
                     </div>
 
-                    {/* CONTENT SECTION */}
-                    <div className="p-8 space-y-6 flex-1">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
-                            <Calendar className="w-3 h-3 text-gray-500" />
-                          </div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                            {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
-                          </p>
+                    <div className="card-info-segment">
+                      <div className="info-list-admin">
+                        <div className="info-item-admin">
+                          <div className="info-icon-box-admin"><Calendar className="w-3 h-3" /></div>
+                          <p>{new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</p>
                         </div>
-
-                        <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
-                            <MapPin className="w-3 h-3 text-gray-500" />
-                          </div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest line-clamp-1">
-                            {event.cityId?.name}, {event.stateId?.Name}
-                          </p>
+                        <div className="info-item-admin">
+                          <div className="info-icon-box-admin"><MapPin className="w-3 h-3" /></div>
+                          <p className="truncate">{event.cityId?.name}, {event.stateId?.Name}</p>
                         </div>
-
-                        <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
-                            <Users className="w-3 h-3 text-gray-500" />
-                          </div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                            {availableSeats} Nodes Available
-                          </p>
+                        <div className="info-item-admin">
+                          <div className="info-icon-box-admin"><Users className="w-3 h-3" /></div>
+                          <p>{availableSeats} Nodes Available</p>
                         </div>
                       </div>
 
-                      {/* ACTIONS */}
-                      <div className="pt-4 space-y-3">
+                      <div className="card-actions-admin">
                         {event.zoomUrl ? (
-                          <Button variant="outline" className="w-full h-12 border-white/10 bg-white/5 text-white font-black uppercase tracking-[0.2em] text-[9px] rounded-xl hover:bg-[#E11D48] hover:border-[#E11D48] transition-all" asChild>
-                            <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-3 h-3 mr-2" /> Establish Uplink
-                            </a>
-                          </Button>
+                          <a href={event.zoomUrl} target="_blank" rel="noopener noreferrer" className="action-btn-premium secondary">
+                            <ExternalLink className="w-3 h-3" /> Establish Uplink
+                          </a>
                         ) : (
                           event.latitude && event.longitude && (
-                            <Button variant="outline" className="w-full h-12 border-white/10 bg-white/5 text-white font-black uppercase tracking-[0.2em] text-[9px] rounded-xl hover:bg-[#E11D48] hover:border-[#E11D48] transition-all" asChild>
-                              <a href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`} target="_blank" rel="noopener noreferrer">
-                                <Globe className="w-3 h-3 mr-2" /> Coordinate Route
-                              </a>
-                            </Button>
+                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`} target="_blank" rel="noopener noreferrer" className="action-btn-premium secondary">
+                              <Globe className="w-3 h-3" /> Coordinate Route
+                            </a>
                           )
                         )}
 
-                        <div className="flex gap-3">
-                          <Button variant="outline" className="flex-1 h-12 border-white/10 bg-transparent text-gray-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-xl hover:bg-white hover:text-black transition-all" asChild>
-                            <a href={`/updateevent/${event._id}`}>
-                              <Edit className="w-3 h-3 mr-2" /> Reconfigure
-                            </a>
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            className="flex-1 h-12 bg-transparent border border-red-500/20 text-red-500 font-black uppercase tracking-[0.2em] text-[9px] rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                        <div className="action-row-split">
+                          <a href={`/updateevent/${event._id}`} className="action-btn-premium ghost">
+                            <Edit className="w-3 h-3" /> Reconfigure
+                          </a>
+                          <button
+                            className="action-btn-premium danger"
                             onClick={() => handleDelete(event._id)}
                             disabled={deleteLoading[event._id]}
                           >
-                            {deleteLoading[event._id] ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <>
-                                <Trash2 className="w-3 h-3 mr-2" /> Purge
-                              </>
-                            )}
-                          </Button>
+                            {deleteLoading[event._id] ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Trash2 className="w-3 h-3" /> Purge</>}
+                          </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      )}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

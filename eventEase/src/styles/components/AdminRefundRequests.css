@@ -1,0 +1,335 @@
+/* AdminRefundRequests.css */
+
+.refund-command-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.refund-command-content {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem;
+}
+
+/* Header Section */
+.refund-header-premium {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin-bottom: 5rem;
+}
+
+@media (min-width: 768px) {
+  .refund-header-premium {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+}
+
+.command-title-box h1 {
+  font-size: 3.75rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 0.8;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .command-title-box h1 {
+    font-size: 6rem;
+  }
+}
+
+.command-title-box h1 span {
+  color: #E11D48;
+}
+
+.command-subtitle {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: #6b7280;
+}
+
+.command-stats-box {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding-left: 2.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-node-admin {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-node-admin p:first-child {
+  font-size: 0.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: #4b5563;
+  margin-bottom: 0.25rem;
+}
+
+.stat-node-admin p:last-child {
+  font-size: 1.875rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.stat-node-admin.highlight p:last-child {
+  color: #E11D48;
+}
+
+/* Cards Section */
+.refund-requests-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-top: 5rem;
+}
+
+@media (min-width: 1024px) {
+  .refund-requests-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.refund-request-card {
+  position: relative;
+  background-color: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 3rem;
+  padding: 3rem;
+  overflow: hidden;
+  transition: all 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.refund-request-card:hover {
+  border-color: rgba(225, 29, 72, 0.3);
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+}
+
+.card-bg-icon-floating {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 3rem;
+  opacity: 0.03;
+  transform: scale(1.5);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+
+.refund-request-card:hover .card-bg-icon-floating {
+  transform: scale(1.8) rotate(-10deg);
+}
+
+.card-meta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 10;
+}
+
+.event-label-box h4 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.refund-request-card:hover .event-label-box h4 {
+  color: #E11D48;
+}
+
+.ref-tag-admin {
+  font-size: 0.5rem;
+  font-weight: 900;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.info-cluster-admin {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.cluster-item-admin {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+}
+
+.cluster-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cluster-label-row svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: #E11D48;
+}
+
+.cluster-label-row span {
+  font-size: 0.4375rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #4b5563;
+}
+
+.cluster-value-text {
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reason-payload-admin {
+  background-color: rgba(225, 29, 72, 0.03);
+  border: 1px solid rgba(225, 29, 72, 0.05);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.financial-node-admin {
+  background-color: rgba(16, 185, 129, 0.03);
+  border: 1px solid rgba(16, 185, 129, 0.05);
+  border-radius: 2rem;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.amount-display-admin {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #10b981;
+  letter-spacing: -0.02em;
+}
+
+.protocol-actions-admin {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-admin-protocol {
+  height: 3.5rem;
+  flex: 1;
+  border-radius: 1.25rem;
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-admin-protocol.authorize {
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+}
+
+.btn-admin-protocol.authorize:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+.btn-admin-protocol.deny {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #dc2626;
+}
+
+.btn-admin-protocol.deny:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Dialog Styling */
+.admin-dialog-premium {
+  background-color: #050505 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 3rem !important;
+  padding: 3rem !important;
+}
+
+.dialog-header-visual {
+  width: 4rem;
+  height: 4rem;
+  background-color: rgba(225, 29, 72, 0.05);
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  color: #E11D48;
+}
+
+.dialog-title-admin {
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  line-height: 1.1 !important;
+}
+
+.dialog-input-premium {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 1.5rem !important;
+  padding: 1.5rem !important;
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  min-height: 10rem !important;
+  outline: none !important;
+}
+
+.dialog-input-premium:focus {
+  border-color: #E11D48 !important;
+}

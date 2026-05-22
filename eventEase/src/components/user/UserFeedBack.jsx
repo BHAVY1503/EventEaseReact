@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Quote, Star, Send, Sparkles, MessageCircle, ArrowRight } from "lucide-react";
 import { motion } from 'framer-motion';
+import '../../styles/components/UserFeedback.css';
 
 export const UserFeedback = () => {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -43,16 +44,16 @@ export const UserFeedback = () => {
   };
 
   return (
-    <div className="bg-[#000000] text-white py-40">
-      <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+    <div className="feedback-section">
+      <div className="feedback-container">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-32 gap-12">
+        <div className="feedback-header">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-3 mb-8">
-              <div className="w-8 h-[2px] bg-[#E11D48]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48]">Audience Voice</span>
+            <div className="header-accent">
+              <div className="accent-line" />
+              <span className="accent-text">Audience Voice</span>
             </div>
-            <h2 className="text-5xl md:text-[100px] font-black leading-[0.85] tracking-tighter uppercase">
+            <h2 className="feedback-title">
               THE WORLD<br />IS TALKING
             </h2>
           </div>
@@ -62,7 +63,7 @@ export const UserFeedback = () => {
         </div>
 
         {/* Feedback Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/5 border border-white/5 mb-40">
+        <div className="feedback-grid">
           {feedbacks.slice(0, 6).map((fb, i) => (
             <motion.div
               key={i}
@@ -70,12 +71,12 @@ export const UserFeedback = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group p-12 bg-black hover:bg-white/5 transition-all duration-500 relative overflow-hidden"
+              className="feedback-card"
             >
-              <div className="absolute top-0 left-0 w-1 h-0 bg-[#E11D48] group-hover:h-full transition-all duration-500" />
+              <div className="card-accent-border" />
               <Quote className="h-10 w-10 text-[#E11D48]/20 group-hover:text-[#E11D48] transition-colors mb-10" />
               
-              <p className="text-xl font-medium text-gray-300 mb-12 leading-relaxed group-hover:text-white transition-colors">
+              <p className="feedback-message">
                 "{fb.message}"
               </p>
 
@@ -94,59 +95,59 @@ export const UserFeedback = () => {
         </div>
 
         {/* Cinematic Form */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div className="feedback-form-wrapper">
            <div>
               <h3 className="text-4xl font-black uppercase tracking-tighter mb-8">SHARE YOUR<br />STORY</h3>
               <p className="text-gray-500 font-medium leading-relaxed max-w-md">
                  Your experiences help us build the future of live entertainment. Submit your feedback to be featured on our global hub.
               </p>
            </div>
-           <div className="bg-white/5 p-12 border border-white/5">
+           <div className="form-container">
               <form onSubmit={handleSubmit} className="space-y-12">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="relative group">
-                       <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Display Name</p>
+                    <div className="input-group">
+                       <p className="input-label">Display Name</p>
                        <input
                           type="text"
                           placeholder="ENTER NAME"
                           value={form.userName}
                           onChange={(e) => setForm({ ...form, userName: e.target.value })}
                           required
-                          className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-500 outline-none"
+                          className="cinematic-input"
                        />
-                       <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/10 group-focus-within:bg-[#E11D48] transition-colors" />
+                       <div className="input-underline" />
                     </div>
-                    <div className="relative group">
-                       <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Identity URL</p>
+                    <div className="input-group">
+                       <p className="input-label">Identity URL</p>
                        <input
                           type="text"
                           placeholder="AVATAR LINK"
                           value={form.profileImage}
                           onChange={(e) => setForm({ ...form, profileImage: e.target.value })}
-                          className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-500 outline-none"
+                          className="cinematic-input"
                        />
-                       <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/10 group-focus-within:bg-[#E11D48] transition-colors" />
+                       <div className="input-underline" />
                     </div>
                  </div>
 
-                 <div className="relative group">
-                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Message</p>
+                 <div className="input-group">
+                    <p className="input-label">Message</p>
                     <textarea
                        placeholder="DESCRIBE YOUR EXPERIENCE"
                        value={form.message}
                        onChange={(e) => setForm({ ...form, message: e.target.value })}
                        required
                        rows={4}
-                       className="w-full bg-transparent border-none p-0 text-[10px] font-black tracking-[0.2em] uppercase focus:ring-0 placeholder:text-gray-500 outline-none resize-none"
+                       className="cinematic-input resize-none"
                     />
-                    <div className="absolute -bottom-2 left-0 w-full h-[1px] bg-white/10 group-focus-within:bg-[#E11D48] transition-colors" />
+                    <div className="input-underline" />
                  </div>
 
                  <Button
                     type="submit"
                     disabled={loading}
                     className="btn-primary w-full h-16 text-[10px] tracking-[0.3em]"
-                 >
+                  >
                     {loading ? "TRANSMITTING..." : "SUBMIT TO GLOBAL HUB"}
                  </Button>
               </form>
