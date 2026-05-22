@@ -10,7 +10,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-border);
 }
 
 @media (min-width: 1024px) {
@@ -21,9 +21,13 @@
 
 .info-sidebar {
   padding: 2.5rem;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(15, 23, 42, 0.03); /* Slate tint in light mode */
   backdrop-filter: blur(48px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.dark .info-sidebar {
+  background: rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 768px) {
@@ -36,7 +40,7 @@
   .info-sidebar {
     grid-column: span 2 / span 2;
     border-bottom: 0;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid var(--glass-border);
   }
 }
 
@@ -57,6 +61,10 @@
   text-transform: uppercase;
   letter-spacing: -0.05em;
   line-height: 0.9;
+  color: #0f172a; /* Slate 900 in light mode */
+}
+
+.dark .sidebar-title {
   color: #ffffff;
 }
 
@@ -80,12 +88,17 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   transition: all 0.5s ease;
+}
+
+.dark .contact-icon-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .contact-item:hover .contact-icon-box {
@@ -95,8 +108,12 @@
 
 .form-area {
   padding: 2.5rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.4); /* Translucent white in light mode */
   backdrop-filter: blur(4px);
+}
+
+.dark .form-area {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 @media (min-width: 768px) {
@@ -113,17 +130,31 @@
 
 .cinematic-input-admin {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 1rem;
   padding: 1rem 1.5rem;
   font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #0f172a;
   outline: none;
   transition: all 0.3s ease;
+}
+
+.cinematic-input-admin::placeholder {
+  color: #94a3b8; /* slate-400 */
+}
+
+.dark .cinematic-input-admin {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.dark .cinematic-input-admin::placeholder {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .cinematic-input-admin:focus {
@@ -133,21 +164,83 @@
 
 .cinematic-textarea-admin {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 2rem;
   padding: 1.5rem 2rem;
   font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #0f172a;
   outline: none;
   resize: none;
   transition: all 0.3s ease;
 }
 
+.cinematic-textarea-admin::placeholder {
+  color: #94a3b8; /* slate-400 */
+}
+
+.dark .cinematic-textarea-admin {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.dark .cinematic-textarea-admin::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
 .cinematic-textarea-admin:focus {
   border-color: rgba(225, 29, 72, 0.5);
   box-shadow: 0 0 0 1px rgba(225, 29, 72, 0.5);
+}
+
+.contact-submit-btn {
+  width: 100% !important;
+  height: 5rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4em !important;
+  font-size: 11px !important;
+  border-radius: 2rem !important;
+  transition: all 0.5s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: none !important;
+  background-color: #0f172a !important;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+}
+
+.contact-submit-btn,
+.contact-submit-btn span {
+  color: #ffffff !important;
+}
+
+.contact-submit-btn:hover {
+  background-color: #E11D48 !important;
+}
+
+.contact-submit-btn:hover,
+.contact-submit-btn:hover span {
+  color: #ffffff !important;
+}
+
+.dark .contact-submit-btn {
+  background-color: #ffffff !important;
+}
+
+.dark .contact-submit-btn,
+.dark .contact-submit-btn span {
+  color: #000000 !important;
+}
+
+.dark .contact-submit-btn:hover {
+  background-color: #E11D48 !important;
+}
+
+.dark .contact-submit-btn:hover,
+.dark .contact-submit-btn:hover span {
+  color: #ffffff !important;
 }

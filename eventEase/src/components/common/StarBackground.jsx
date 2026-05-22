@@ -43,14 +43,16 @@ const StarBackground = () => {
         this.opacity += this.twinkle;
         if (this.opacity > 0.5 || this.opacity < 0.05) this.twinkle = -this.twinkle;
       }
-      draw() {
-        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+      draw(isDark) {
+        ctx.fillStyle = isDark 
+          ? `rgba(255, 255, 255, ${this.opacity})` 
+          : `rgba(15, 23, 42, ${this.opacity * 0.4})`;
         ctx.beginPath();
         ctx.arc(this.x, this.currentY, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
-
+ 
     class HeroStar {
       constructor(index) {
         this.index = index;
@@ -63,14 +65,14 @@ const StarBackground = () => {
         this.y = ((currentScrollY * 0.8) + this.yOffset) % (height * 3) - height;
         this.rotation += 0.01;
       }
-      draw() {
+      draw(isDark) {
         const x = this.x;
         const y = this.y;
         
         // 1. Draw Vertical Trail (Streak)
         const trailGradient = ctx.createLinearGradient(x, y - 500, x, y);
         trailGradient.addColorStop(0, 'transparent');
-        trailGradient.addColorStop(1, `${starColor}66`); // 40% opacity
+        trailGradient.addColorStop(1, isDark ? `${starColor}66` : `${starColor}22`); // Softer in light mode
         
         ctx.beginPath();
         ctx.moveTo(x, y - 500);
@@ -78,17 +80,17 @@ const StarBackground = () => {
         ctx.lineWidth = 1.5;
         ctx.strokeStyle = trailGradient;
         ctx.stroke();
-
+ 
         // 2. Draw Glow (Multi-layered for "Bloom")
         ctx.save();
-        ctx.shadowBlur = 40;
+        ctx.shadowBlur = isDark ? 40 : 20;
         ctx.shadowColor = starColor;
-        ctx.globalCompositeOperation = 'screen';
+        ctx.globalCompositeOperation = isDark ? 'screen' : 'source-over';
         
         // 3. Draw 4-Point Star Shape
         ctx.translate(x, y);
         ctx.rotate(this.rotation);
-        ctx.fillStyle = '#FFFFFF'; // Inner core is bright white
+        ctx.fillStyle = isDark ? '#FFFFFF' : starColor; // Core white in dark, brand red in light
         
         const drawCross = (size) => {
           ctx.beginPath();
@@ -105,48 +107,55 @@ const StarBackground = () => {
           ctx.arc(0, 0, 2, 0, Math.PI * 2);
           ctx.fill();
         };
-
+ 
         drawCross(10);
         
         // Outer faint glow
-        ctx.shadowBlur = 80;
+        ctx.shadowBlur = isDark ? 80 : 40;
         ctx.shadowColor = starColor;
         drawCross(15);
-
+ 
         ctx.restore();
       }
     }
-
+ 
     // --- Initialization ---
     const bgStars = Array.from({ length: bgStarCount }, () => new BackgroundStar());
     const heroes = Array.from({ length: heroCount }, (_, i) => new HeroStar(i));
-
+ 
     const animate = () => {
       // Smooth Scroll Interpolation
       targetScrollY = window.scrollY;
       scrollY += (targetScrollY - scrollY) * 0.1; // Smooth dampening
-
+ 
       ctx.clearRect(0, 0, width, height);
-
+ 
+      const isDark = document.documentElement.classList.contains('dark');
+ 
       // Draw Background Nebula
       const nebula = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, width * 0.8);
-      nebula.addColorStop(0, 'rgba(20, 0, 5, 1)');
-      nebula.addColorStop(1, 'rgba(0, 0, 0, 1)');
+      if (isDark) {
+        nebula.addColorStop(0, 'rgba(20, 0, 5, 1)');
+        nebula.addColorStop(1, 'rgba(0, 0, 0, 1)');
+      } else {
+        nebula.addColorStop(0, 'rgba(248, 250, 252, 1)');
+        nebula.addColorStop(1, 'rgba(255, 255, 255, 1)');
+      }
       ctx.fillStyle = nebula;
       ctx.fillRect(0, 0, width, height);
-
+ 
       // Update and Draw Background
       bgStars.forEach(star => {
         star.update(scrollY);
-        star.draw();
+        star.draw(isDark);
       });
-
+ 
       // Update and Draw Heroes
       heroes.forEach(hero => {
         hero.update(scrollY);
-        hero.draw();
+        hero.draw(isDark);
       });
-
+ 
       animationFrameId = requestAnimationFrame(animate);
     };
 

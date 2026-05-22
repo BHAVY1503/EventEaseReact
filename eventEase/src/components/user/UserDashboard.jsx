@@ -24,9 +24,7 @@ import img3 from '../../assets/img/speaker.jpg';
 import img4 from '../../assets/img/event.webp';
 import defaultprofile from "../../assets/profile.jpg";
 
-import { UserFeedback } from '../user/UserFeedBack';
 import { ViewEvents } from '../user/ViweEvents';
-import { ContactUs } from '../common/ContactUs';
 import ChatBot from '../common/ChatBot';
 import '../../styles/components/UserDashboard.css';
 import "@/styles/common/Common.css";
@@ -120,6 +118,7 @@ export const UserDashboard = () => {
 
           {/* User Profile Action */}
           <div className="header-actions">
+            <DarkModeToggle />
             <button className="notification-btn">
                <Bell className="h-5 w-5" />
                <span className="notification-dot" />
@@ -258,129 +257,6 @@ export const UserDashboard = () => {
          <ViewEvents />
       </section>
 
-      {/* Features - The Edge (Added from Landing) */}
-      <section id="features" className="features-section">
-        <div className="footer-inner-container">
-           <div className="section-header">
-              <span className="section-pretitle">The Edge</span>
-              <h2 className="section-title-large">
-                UNMATCHED<br />POWER
-              </h2>
-           </div>
-
-           <div className="features-layout-grid">
-              {[
-                {
-                  icon: <Ticket className="h-10 w-10" />,
-                  title: "SMART TICKETING",
-                  desc: "Precision dynamic pricing and bulk allocation systems for scale.",
-                },
-                {
-                  icon: <Activity className="h-10 w-10" />,
-                  title: "REAL-TIME INTEL",
-                  desc: "Live sales tracking and audience behavior analytics.",
-                },
-                {
-                  icon: <ShieldCheck className="h-10 w-10" />,
-                  title: "IRONCLAD SECURITY",
-                  desc: "Bank-grade encryption and secure secondary market controls.",
-                },
-                {
-                  icon: <Globe className="h-10 w-10" />,
-                  title: "GLOBAL NETWORK",
-                  desc: "Reach audiences in over 150 countries with localized payments.",
-                },
-                {
-                  icon: <Zap className="h-10 w-10" />,
-                  title: "ZERO LATENCY",
-                  desc: "High-concurrency infrastructure built for instant sold-out moments.",
-                },
-                {
-                  icon: <Rocket className="h-10 w-10" />,
-                  title: "VIP UPGRADES",
-                  desc: "Integrated hospitality and premium experience management.",
-                }
-              ].map((f, i) => (
-                <div key={i} className="feature-item-card group">
-                  <div className="feature-accent-line" />
-                  <div className="feature-icon-wrapper group-hover:text-white">
-                    {f.icon}
-                  </div>
-                  <h3 className="feature-item-title">{f.title}</h3>
-                  <p className="feature-item-desc group-hover:text-gray-300">
-                    {f.desc}
-                  </p>
-                </div>
-              ))}
-           </div>
-        </div>
-      </section>
-
-      {/* Process Section (Added from Landing) */}
-      <section id="about" className="py-40 bg-transparent">
-        <div className="footer-inner-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-8 block">Our Process</span>
-              <h2 className="text-5xl md:text-8xl font-black text-white leading-none mb-12">
-                FROM CONCEPT<br />TO STAGE
-              </h2>
-              <div className="space-y-16">
-                {[
-                  { step: "01", title: "Curation", desc: "Build your event with our high-fidelity tools." },
-                  { step: "02", title: "Activation", desc: "Launch marketing and open global sales channels." },
-                  { step: "03", title: "Execution", desc: "Real-time entry management and live analytics." }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-12 group">
-                    <span className="text-4xl font-black text-white/10 group-hover:text-[#E11D48] transition-colors">{item.step}</span>
-                    <div>
-                      <h4 className="text-2xl font-black text-white mb-4">{item.title}</h4>
-                      <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              <div className="aspect-[4/5] bg-gray-900 rounded-2xl overflow-hidden relative group">
-                 <img src={img3} alt="Process" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100" />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                 <div className="absolute bottom-12 left-12">
-                    <p className="text-4xl font-black text-white leading-none">
-                       THE STAGE<br />IS YOURS
-                    </p>
-                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feedback Section (Added from Landing) */}
-      <section id="feedback" className="py-40 bg-transparent border-t border-white/5">
-         <UserFeedback />
-      </section>
-
-      {/* Experience Stats */}
-      <section className="py-40 bg-transparent">
-         <div className="footer-inner-container text-center">
-            <h2 className="text-7xl md:text-[150px] font-black leading-none tracking-tighter uppercase opacity-10 mb-20 select-none">PERFORMANCE</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-20">
-               {[
-                  { label: "Shows Attended", val: "14" },
-                  { label: "Points Earned", val: "4.8K" },
-                  { label: "VIP Passes", val: "3" },
-                  { label: "Network Size", val: "842" }
-               ].map((s, i) => (
-                  <div key={i} className="group">
-                     <div className="text-6xl font-black text-white group-hover:text-[#E11D48] transition-colors">{s.val}</div>
-                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] mt-4">{s.label}</p>
-                  </div>
-               ))}
-            </div>
-         </div>
-      </section>
-
       {/* Cinematic Footer */}
       <footer className="cinematic-footer">
         <div className="footer-inner-container">
@@ -414,17 +290,6 @@ export const UserDashboard = () => {
                   </ul>
                </div>
             </div>
-          </div>
-
-          {/* Contact Integration (Added from Landing) */}
-          <div id="contactus" className="contact-integration-box">
-             <div className="contact-header-row">
-                <h3 className="text-4xl font-black">GET IN TOUCH</h3>
-                <p className="text-gray-500 text-sm max-w-xs text-right uppercase font-bold tracking-widest">Our agents are available 24/7 for enterprise support.</p>
-             </div>
-             <div className="contact-form-wrapper">
-                <ContactUs />
-             </div>
           </div>
 
           <div className="footer-bottom-row">

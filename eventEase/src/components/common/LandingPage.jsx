@@ -64,7 +64,7 @@ export const LandingPage = () => {
             <div className="w-10 h-10 bg-[#E11D48] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(225,29,72,0.5)] group-hover:scale-110 transition-transform">
               <Ticket className="h-6 w-6 text-white" />
             </div>
-            <span className="font-black text-2xl tracking-tighter uppercase text-white group-hover:text-[#E11D48] transition-colors">EventEase</span>
+            <span className="font-black text-2xl tracking-tighter uppercase text-slate-900 dark:text-white group-hover:text-[#E11D48] transition-colors">EventEase</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -73,7 +73,7 @@ export const LandingPage = () => {
               <a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-all relative group no-underline"
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-all relative group no-underline"
               >
                 {item}
                 <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-[#E11D48] transition-all group-hover:w-full" />
@@ -84,7 +84,7 @@ export const LandingPage = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-8">
             <DarkModeToggle />
-            <Link to="/signin" className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-colors no-underline">
+            <Link to="/signin" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors no-underline">
               Sign In
             </Link>
             <Button
@@ -161,12 +161,12 @@ export const LandingPage = () => {
           >
             <div className="live-indicator-wrapper">
               <div className="live-indicator" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">Experience The Future of Events</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900/80 dark:text-white/80">Experience The Future of Events</span>
             </div>
 
             <h1 className="hero-title-landing">
               THE WORLD'S<br />
-              <span className="text-white">PREMIER</span><br />
+              <span className="text-slate-900 dark:text-white">PREMIER</span><br />
               <span className="text-[#E11D48] text-glow">EXPERIENCES</span>
             </h1>
 
@@ -175,9 +175,9 @@ export const LandingPage = () => {
               Manage, market, and sell with the industry standard.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pb-32 sm:pb-0">
               <Button
-                className="bg-[#E11D48] hover:bg-[#BE123C] text-white font-black uppercase tracking-widest h-16 px-12 rounded-none border-none text-sm transition-all hover:scale-105"
+                className="bg-[#E11D48] hover:bg-[#BE123C] text-white font-black uppercase tracking-widest h-16 px-12 rounded-full border-none text-sm transition-all hover:scale-105 shadow-xl hover:shadow-[#E11D48]/20"
                 asChild
               >
                 <Link to="/organizersignup">
@@ -185,7 +185,7 @@ export const LandingPage = () => {
                 </Link>
               </Button>
               <Button
-                className="bg-transparent hover:bg-white hover:text-black text-white font-black uppercase tracking-widest h-16 px-12 rounded-none border border-white/20 text-sm transition-all hover:scale-105"
+                className="bg-transparent hover:bg-slate-900 dark:hover:bg-white hover:text-white dark:hover:text-black text-slate-900 dark:text-white font-black uppercase tracking-widest h-16 px-12 rounded-full border border-slate-900/20 dark:border-white/20 text-sm transition-all hover:scale-105 shadow-xl"
                 asChild
               >
                 <Link to="/events">Explore Shows</Link>
@@ -199,12 +199,12 @@ export const LandingPage = () => {
           <div className="max-w-[1800px] mx-auto flex flex-wrap justify-between items-end gap-8">
             <div className="flex items-center gap-12">
               <div>
-                <div className="text-3xl font-black text-white">{eventStats.totalEvents || "500"}+</div>
+                <div className="text-3xl font-black text-slate-900 dark:text-white">{eventStats.totalEvents || "500"}+</div>
                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Global Events</div>
               </div>
-              <div className="w-px h-10 bg-white/10" />
+              <div className="w-px h-10 bg-slate-900/10 dark:bg-white/10" />
               <div>
-                <div className="text-3xl font-black text-white">1M+</div>
+                <div className="text-3xl font-black text-slate-900 dark:text-white">1M+</div>
                 <div className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Tickets Sold</div>
               </div>
             </div>
@@ -225,32 +225,7 @@ export const LandingPage = () => {
       {/* Featured Shows Section */}
       <section id="events" className="featured-section-landing">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
-          <div className="section-header-row">
-            <div className="max-w-2xl">
-              <div className="accent-line-heading">
-                <div className="accent-line" />
-                <span className="accent-text">Now Showing</span>
-              </div>
-              <h2 className="featured-title">
-                CURATED<br />SHOWS
-              </h2>
-            </div>
-            <p className="text-gray-500 font-bold uppercase tracking-widest text-xs max-w-xs text-right">
-              Discover the most anticipated events across the globe, from music to industry conferences.
-            </p>
-          </div>
-
-          <div className="mb-20">
-            <ViewEvents />
-          </div>
-
-          <div className="flex justify-center">
-             <Button className="bg-transparent hover:bg-white hover:text-black text-white font-black uppercase tracking-widest h-14 px-12 rounded-none border border-white/20 group transition-all" asChild>
-                <Link to="/events" className="flex items-center no-underline text-white group-hover:text-black">
-                   View All Shows <ArrowRight className="ml-3 h-4 w-4 group-hover:translate-x-2 transition-transform" />
-                </Link>
-             </Button>
-          </div>
+          <ViewEvents />
         </div>
       </section>
 
@@ -259,7 +234,7 @@ export const LandingPage = () => {
         <div className="max-w-[1800px] mx-auto px-6 md:px-12">
            <div className="text-center mb-32">
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-6 block">The Edge</span>
-              <h2 className="text-5xl md:text-[100px] font-black text-white leading-none tracking-[-0.05em]">
+              <h2 className="text-5xl md:text-[100px] font-black text-slate-900 dark:text-white leading-none tracking-[-0.05em]">
                 UNMATCHED<br />POWER
               </h2>
            </div>
@@ -318,7 +293,7 @@ export const LandingPage = () => {
           <div className="process-grid">
             <div>
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-8 block">Our Process</span>
-              <h2 className="text-5xl md:text-8xl font-black text-white leading-none mb-12">
+              <h2 className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white leading-none mb-12">
                 FROM CONCEPT<br />TO STAGE
               </h2>
               <div className="space-y-16">
@@ -352,7 +327,7 @@ export const LandingPage = () => {
       </section>
 
       {/* Feedback Section */}
-      <section id="feedback" className="py-40 bg-transparent border-t border-white/5">
+      <section id="feedback" className="py-20 bg-transparent border-t border-border">
          <UserFeedback />
       </section>
 
@@ -366,7 +341,7 @@ export const LandingPage = () => {
                </h2>
                <div className="flex flex-wrap gap-8">
                   {['Instagram', 'Twitter', 'LinkedIn', 'YouTube'].map(s => (
-                    <a key={s} href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 hover:text-white transition-colors no-underline">{s}</a>
+                    <a key={s} href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors no-underline">{s}</a>
                   ))}
                </div>
             </div>
@@ -376,7 +351,7 @@ export const LandingPage = () => {
                   <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-10">Platform</h4>
                   <ul className="space-y-6 list-none p-0">
                     {['Home', 'Shows', 'Analytics', 'Enterprise'].map(l => (
-                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors no-underline">{l}</a></li>
+                      <li key={l}><a href="#" className="text-gray-500 hover:text-slate-900 dark:hover:text-white font-bold transition-colors no-underline">{l}</a></li>
                     ))}
                   </ul>
                </div>
@@ -384,7 +359,7 @@ export const LandingPage = () => {
                   <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E11D48] mb-10">Support</h4>
                   <ul className="space-y-6 list-none p-0">
                     {['Help Center', 'API Docs', 'Status', 'Legal'].map(l => (
-                      <li key={l}><a href="#" className="text-gray-500 hover:text-white font-bold transition-colors no-underline">{l}</a></li>
+                      <li key={l}><a href="#" className="text-gray-500 hover:text-slate-900 dark:hover:text-white font-bold transition-colors no-underline">{l}</a></li>
                     ))}
                   </ul>
                </div>
@@ -392,12 +367,12 @@ export const LandingPage = () => {
           </div>
 
           {/* Contact Integration */}
-          <div id="contactus" className="mb-40 scroll-mt-32">
+          <div id="contactus" className="mb-20 scroll-mt-32">
              <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
                 <h3 className="text-4xl font-black">GET IN TOUCH</h3>
                 <p className="text-gray-500 text-sm max-w-xs text-right uppercase font-bold tracking-widest">Our agents are available 24/7 for enterprise support.</p>
              </div>
-             <div className="bg-white/5 border border-white/5 p-12 md:p-20">
+             <div className="bg-card border border-border p-12 md:p-20">
                 <ContactUs />
              </div>
           </div>

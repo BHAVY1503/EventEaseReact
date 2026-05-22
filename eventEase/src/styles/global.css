@@ -4,13 +4,41 @@
 
 @layer base {
   :root {
+    --background: 210 40% 98%; /* light slate slate-50 */
+    --foreground: 222.2 84% 4.9%; /* dark slate slate-950 */
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 346.8 77.2% 49.8%; /* #E11D48 brand crimson */
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 346.8 77.2% 49.8%;
+    --radius: 0.5rem;
+    
+    /* Custom Tokens */
+    --accent-crimson: #E11D48;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(15, 23, 42, 0.08);
+  }
+
+  .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
     --card: 0 0% 3%;
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 3%;
     --popover-foreground: 0 0% 100%;
-    --primary: 346.8 77.2% 49.8%; /* #E11D48 */
+    --primary: 346.8 77.2% 49.8%;
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 0 0% 9%;
     --secondary-foreground: 0 0% 100%;
@@ -23,7 +51,6 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 346.8 77.2% 49.8%;
-    --radius: 0rem;
     
     /* Custom Tokens */
     --accent-crimson: #E11D48;
@@ -36,12 +63,18 @@
   }
 
   body {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: #f8fafc;
+    color: #0f172a;
     font-family: 'Outfit', 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     margin: 0;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .dark body {
+    background-color: #000000;
+    color: #ffffff;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -101,4 +134,201 @@
 
 .animate-pulse-soft {
   animation: pulse-soft 2s infinite;
+}
+
+/* ==========================================================================
+   GLOBAL LIGHT MODE STYLING OVERRIDES (Applied when NOT in Dark Mode)
+   ========================================================================== */
+html:not(.dark) body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Landing Page / Dashboard Container Overrides */
+html:not(.dark) .landing-container,
+html:not(.dark) .user-dashboard-container,
+html:not(.dark) .organizer-dashboard-layout,
+html:not(.dark) .admin-dashboard-layout {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Header & Command Bar Scrolled States */
+html:not(.dark) .landing-header.scrolled,
+html:not(.dark) .cinematic-header.scrolled,
+html:not(.dark) .org-top-navbar.scrolled,
+html:not(.dark) .top-command-bar.scrolled {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+/* Header Text / Links */
+html:not(.dark) .brand-name,
+html:not(.dark) .sidebar-brand-name,
+html:not(.dark) .org-brand-name,
+html:not(.dark) .landing-nav-content a:not(.bg-[#E11D48]),
+html:not(.dark) .desktop-nav-links .nav-link-item,
+html:not(.dark) .nexus-active-label {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .landing-nav-content a:hover,
+html:not(.dark) .desktop-nav-links .nav-link-item:hover {
+  color: #E11D48 !important;
+}
+
+/* Hero Section Gradients & Titles */
+html:not(.dark) .hero-vignette-overlay,
+html:not(.dark) .hero-vignette,
+html:not(.dark) .hero-vignette-org {
+  background: radial-gradient(circle at 50% 50%, transparent 20%, rgba(248, 250, 252, 0.8) 100%) !important;
+}
+
+html:not(.dark) .hero-gradient-layer,
+html:not(.dark) .hero-gradient,
+html:not(.dark) .hero-gradient-org,
+html:not(.dark) .hero-overlay-gradient {
+  background: linear-gradient(to top, #f8fafc 0%, rgba(248, 250, 252, 0.4) 50%, rgba(248, 250, 252, 0) 100%) !important;
+}
+
+html:not(.dark) .hero-title-landing,
+html:not(.dark) .hero-title,
+html:not(.dark) .hero-title-org,
+html:not(.dark) .hero-title-large {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .hero-subtitle-landing,
+html:not(.dark) .hero-subtitle-text {
+  color: #475569 !important;
+}
+
+html:not(.dark) .authority-name,
+html:not(.dark) .nexus-status-box p,
+html:not(.dark) .sidebar-group-label {
+  color: #64748b !important;
+}
+
+/* Stat Rows */
+html:not(.dark) .hero-stat-item .stat-value {
+  color: #0f172a !important;
+}
+html:not(.dark) .hero-stat-item .stat-label {
+  color: #475569 !important;
+}
+
+/* Sidebars (Admin & Organizer) */
+html:not(.dark) .admin-sidebar,
+html:not(.dark) .organizer-sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+html:not(.dark) .sidebar-nav-item {
+  color: #475569;
+}
+html:not(.dark) .sidebar-nav-item:hover {
+  background: rgba(15, 23, 42, 0.04);
+  color: #0f172a;
+}
+html:not(.dark) .sidebar-nav-item.active {
+  background: rgba(225, 29, 72, 0.08) !important;
+  color: #E11D48 !important;
+}
+html:not(.dark) .sidebar-nav-item.active .sidebar-nav-icon {
+  color: #E11D48 !important;
+}
+
+/* Card Elements (Feature Card, Edge Card, Stadium Card, Module Section) */
+html:not(.dark) .edge-item,
+html:not(.dark) .feature-item-card,
+html:not(.dark) .stadium-card,
+html:not(.dark) .quick-actions-panel,
+html:not(.dark) .org-section-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .edge-item:hover,
+html:not(.dark) .feature-item-card:hover {
+  background-color: rgba(15, 23, 42, 0.02) !important;
+}
+
+html:not(.dark) .edge-item:hover .edge-icon-box {
+  color: #E11D48 !important;
+}
+
+html:not(.dark) .featured-title,
+html:not(.dark) .edge-item-title,
+html:not(.dark) .feature-item-title,
+html:not(.dark) .edge-item-desc,
+html:not(.dark) .feature-item-desc,
+html:not(.dark) .step-title,
+html:not(.dark) .step-desc,
+html:not(.dark) .module-title,
+html:not(.dark) .module-tag {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .edge-item-desc,
+html:not(.dark) .feature-item-desc,
+html:not(.dark) .step-desc {
+  color: #475569 !important;
+}
+
+/* Process Section */
+html:not(.dark) .step-number {
+  color: rgba(15, 23, 42, 0.1) !important;
+}
+html:not(.dark) .process-step:hover .step-number {
+  color: #E11D48 !important;
+}
+
+/* Footers */
+html:not(.dark) .landing-footer,
+html:not(.dark) .cinematic-footer,
+html:not(.dark) .org-footer,
+html:not(.dark) .admin-footer {
+  background-color: #ffffff !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.06) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .footer-brand-heading,
+html:not(.dark) .footer-brand-title {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .social-link,
+html:not(.dark) .footer-nav-link,
+html:not(.dark) .footer-link {
+  color: #475569 !important;
+}
+html:not(.dark) .social-link:hover,
+html:not(.dark) .footer-nav-link:hover,
+html:not(.dark) .footer-link:hover {
+  color: #E11D48 !important;
+}
+
+/* Dropdown Menus and Modals */
+html:not(.dark) .DropdownMenuContent,
+html:not(.dark) [role="menu"],
+html:not(.dark) .dropdown-menu-content {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .notification-btn,
+html:not(.dark) .notification-btn-org {
+  color: #475569 !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+html:not(.dark) .notification-btn:hover,
+html:not(.dark) .notification-btn-org:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.08) !important;
 }

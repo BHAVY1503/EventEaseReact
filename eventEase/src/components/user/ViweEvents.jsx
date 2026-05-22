@@ -73,10 +73,10 @@ const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSign
   return (
     <div
       className={cn(
-        "group relative flex flex-col bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+        "group relative flex flex-col bg-card text-card-foreground rounded-[2.5rem] border border-border transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
         dimmed
-          ? "opacity-50 grayscale scale-95 hover:grayscale-0 hover:opacity-100 hover:scale-[1.08] hover:shadow-[0_0_100px_rgba(225,29,72,0.25)] hover:border-white/20 hover:z-50"
-          : "hover:border-[#E11D48]/30 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(225,29,72,0.1)]"
+          ? "opacity-85 dark:opacity-50 grayscale scale-95 hover:grayscale-0 hover:opacity-100 dark:hover:opacity-100 hover:scale-[1.08] hover:shadow-[0_0_100px_rgba(225,29,72,0.15)] dark:hover:shadow-[0_0_100px_rgba(225,29,72,0.25)] hover:border-border hover:z-50"
+          : "hover:border-[#E11D48]/30 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(225,29,72,0.06)] dark:hover:shadow-[0_20px_50px_rgba(225,29,72,0.1)]"
       )}
       onClick={() => onCardClick(event)}
     >
@@ -99,7 +99,7 @@ const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSign
 
         {/* Floating Price Tag */}
         <div className="absolute top-4 right-4">
-          <div className="bg-white text-black px-4 py-2 rounded-full font-black text-[9px] shadow-2xl tracking-widest transform transition-transform group-hover:-translate-y-1">
+          <div className="bg-slate-900 dark:bg-white text-white dark:text-black px-4 py-2 rounded-full font-black text-[9px] shadow-2xl tracking-widest transform transition-transform group-hover:-translate-y-1">
             {(() => {
               if (event.eventCategory === "Indoor" && event.zonePrices?.length > 0) {
                 const validPrices = event.zonePrices.filter(p => p > 0);
@@ -117,7 +117,7 @@ const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSign
 
         {/* 3D Archive Badge (Only for dimmed) */}
         {dimmed && (
-          <div className="absolute bottom-4 left-4 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 flex items-center gap-2 px-3 py-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-full text-[8px] font-black tracking-widest text-white uppercase">
+          <div className="absolute bottom-4 left-4 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 flex items-center gap-2 px-3 py-1 bg-white/40 dark:bg-black/40 backdrop-blur-md border border-black/10 dark:border-white/10 rounded-full text-[8px] font-black tracking-widest text-slate-900 dark:text-white uppercase">
             <Clock className="w-3 h-3 text-[#E11D48]" />
             Relive Experience
           </div>
@@ -130,60 +130,60 @@ const EventCard = ({ event, getEventStatus, onCardClick, isAuthenticated, onSign
           <div className="flex-1">
             <p className={cn(
               "text-[9px] font-black uppercase tracking-[0.4em] mb-3 transition-colors duration-500",
-              dimmed ? "text-gray-600 group-hover:text-[#E11D48]" : "text-[#E11D48]"
+              dimmed ? "text-slate-600 dark:text-gray-500 group-hover:text-[#E11D48]" : "text-[#E11D48]"
             )}>
               {event.eventType || "Premium Experience"}
             </p>
             <h3 className={cn(
               "text-2xl md:text-3xl font-black leading-[1.1] uppercase tracking-tighter transition-all duration-500",
-              dimmed ? "text-gray-500 group-hover:text-white group-hover:translate-x-2" : "text-white group-hover:translate-x-1"
+              dimmed ? "text-slate-700 dark:text-gray-400 group-hover:text-slate-900 dark:group-hover:text-white group-hover:translate-x-2" : "text-slate-900 dark:text-white group-hover:translate-x-1"
             )}>
               {event.eventName}
             </h3>
           </div>
           <div className={cn(
             "w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 transform group-hover:rotate-12",
-            dimmed ? "bg-white/5 border border-white/5 group-hover:bg-[#E11D48] group-hover:shadow-[0_0_20px_rgba(225,29,72,0.4)]" : "bg-white/5 border border-white/10 group-hover:bg-[#E11D48]"
+            dimmed ? "bg-muted border border-border group-hover:bg-[#E11D48] group-hover:shadow-[0_0_20px_rgba(225,29,72,0.4)]" : "bg-muted border border-border group-hover:bg-[#E11D48]"
           )}>
-            <Ticket className="w-5 h-5 text-white" />
+            <Ticket className="w-5 h-5 text-muted-foreground group-hover:text-white" />
           </div>
         </div>
 
-        <div className="mt-auto pt-8 border-t border-white/5 flex items-end justify-between">
+        <div className="mt-auto pt-8 border-t border-border flex items-end justify-between">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               {eventStatus.status === 'ongoing' ? (
                 <div className="flex items-center gap-2">
                   <div className="live-indicator" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white">Live Status</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Live Status</span>
                 </div>
               ) : (
                 <div className={cn(
                   "flex items-center gap-2 transition-colors duration-500",
-                  dimmed ? "text-gray-700 group-hover:text-[#E11D48]" : "text-gray-500"
+                  dimmed ? "text-slate-600 dark:text-gray-500 group-hover:text-[#E11D48]" : "text-slate-500 dark:text-gray-500"
                 )}>
                   <StatusIcon className="w-3 h-3" />
                   <span className="text-[10px] font-black uppercase tracking-widest">{eventStatus.label}</span>
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest">
               <Calendar className="w-3 h-3 text-[#E11D48]" />
               {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </div>
           </div>
 
           <div className="text-right">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest justify-end mb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600 dark:text-gray-400 uppercase tracking-widest justify-end mb-2">
               <MapPin className="w-3 h-3 text-[#E11D48]" />
               {event.cityId?.name || 'Global'}
             </div>
             <Button
               className={cn(
-                "h-8 px-4 border-white/10 text-[8px] font-black tracking-widest uppercase rounded-full transition-all duration-500",
+                "h-8 px-4 border-border text-[8px] font-black tracking-widest uppercase rounded-full transition-all duration-500",
                 dimmed
-                  ? "bg-white/5 text-gray-600 group-hover:bg-white group-hover:text-black group-hover:scale-110"
-                  : "bg-white/5 hover:bg-[#E11D48] text-white"
+                  ? "bg-muted text-muted-foreground group-hover:bg-slate-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black group-hover:scale-110"
+                  : "bg-muted hover:bg-[#E11D48] text-foreground hover:text-white"
               )}
               onClick={handleActionClick}
             >
@@ -622,12 +622,12 @@ export const ViewEvents = () => {
                   value={filterEventType}
                   onChange={(e) => setFilterEventType(e.target.value)}
                 >
-                  <option value="all" className="bg-black">ALL CATEGORIES</option>
-                  <option value="Conference" className="bg-black">CONFERENCE</option>
-                  <option value="Exhibition" className="bg-black">EXHIBITION</option>
-                  <option value="Gala Dinner" className="bg-black">GALA DINNER</option>
-                  <option value="Music concert" className="bg-black">MUSIC CONCERT</option>
-                  <option value="ZoomMeeting" className="bg-black">ZOOM MEETING</option>
+                  <option value="all">ALL CATEGORIES</option>
+                  <option value="Conference">CONFERENCE</option>
+                  <option value="Exhibition">EXHIBITION</option>
+                  <option value="Gala Dinner">GALA DINNER</option>
+                  <option value="Music concert">MUSIC CONCERT</option>
+                  <option value="ZoomMeeting">ZOOM MEETING</option>
                 </select>
                 <div className="filter-underline" />
               </div>
@@ -637,16 +637,16 @@ export const ViewEvents = () => {
           <div className="max-w-[1800px] mx-auto">
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[3/4] bg-white/5 animate-pulse" />)}
+                {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[3/4] bg-slate-900/5 dark:bg-white/5 animate-pulse" />)}
               </div>
             ) : activeEvents.length === 0 && endedEvents.length === 0 ? (
-              <div className="py-40 text-center border border-white/5 bg-white/5">
-                <Calendar className="mx-auto w-12 h-12 text-gray-700 mb-8" />
-                <h3 className="text-2xl font-black uppercase tracking-widest text-white">No Shows Found</h3>
-                <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-4">Try adjusting your filters.</p>
+              <div className="py-40 text-center border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/5">
+                <Calendar className="mx-auto w-12 h-12 text-slate-400 dark:text-gray-700 mb-8" />
+                <h3 className="text-2xl font-black uppercase tracking-widest text-slate-900 dark:text-white">No Shows Found</h3>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4">Try adjusting your filters.</p>
               </div>
             ) : (
-              <div className="space-y-40">
+              <div className="space-y-12">
                 {/* Active shows */}
                 <section>
                   <div className="events-grid">
@@ -660,10 +660,10 @@ export const ViewEvents = () => {
                   <section className="archive-section">
                     <div className="archive-header px-2">
                       <div className="flex items-center gap-8">
-                        <h2 className="text-4xl font-black uppercase tracking-tighter text-white leading-none">PAST SHOWS</h2>
+                        <h2 className="text-4xl font-black uppercase tracking-tighter text-slate-900 dark:text-white leading-none">PAST SHOWS</h2>
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-px bg-[#E11D48]" />
-                          <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.5em] animate-pulse">Historical Archive</span>
+                          <span className="text-[10px] font-black text-slate-500 dark:text-gray-600 uppercase tracking-[0.5em] animate-pulse">Historical Archive</span>
                         </div>
                       </div>
                     </div>
@@ -696,8 +696,8 @@ export const ViewEvents = () => {
                       </div>
 
                       {/* Subtle fade edges for scroll awareness */}
-                      <div className="absolute top-0 right-0 bottom-0 w-64 bg-gradient-to-l from-black via-black/40 to-transparent pointer-events-none z-10 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-1000" />
-                      <div className="absolute top-0 left-0 bottom-0 w-64 bg-gradient-to-r from-black via-black/40 to-transparent pointer-events-none z-10 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-1000" />
+                      <div className="absolute top-0 right-0 bottom-0 w-64 bg-gradient-to-l from-slate-50 dark:from-black via-slate-50/40 dark:via-black/40 to-transparent pointer-events-none z-10 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-1000" />
+                      <div className="absolute top-0 left-0 bottom-0 w-64 bg-gradient-to-r from-slate-50 dark:from-black via-slate-50/40 dark:via-black/40 to-transparent pointer-events-none z-10 opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-1000" />
                     </div>
                   </section>
                 )}
@@ -716,7 +716,7 @@ export const ViewEvents = () => {
 
             <aside
               className={cn(
-                "relative ml-auto w-full max-w-xl h-full bg-[#050505] border-l border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.8)] transform transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)",
+                "relative ml-auto w-full max-w-xl h-full bg-white dark:bg-[#050505] border-l border-black/5 dark:border-white/5 shadow-[0_0_100px_rgba(15,23,42,0.1)] dark:shadow-[0_0_100px_rgba(0,0,0,0.8)] transform transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1)",
                 isDrawerOpen ? "translate-x-0" : "translate-x-full"
               )}
             >
@@ -732,13 +732,13 @@ export const ViewEvents = () => {
                   </div>
 
                   {/* Overlays */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#050505] via-white/40 dark:via-[#050505]/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/60 dark:from-[#050505]/60 to-transparent" />
 
                   {/* Close Button */}
                   <button
                     onClick={() => setIsDrawerOpen(false)}
-                    className="absolute top-10 right-10 w-12 h-12 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#E11D48] transition-all duration-500 hover:rotate-90 shadow-2xl z-20"
+                    className="absolute top-10 right-10 w-12 h-12 bg-slate-900/5 dark:bg-white/5 backdrop-blur-2xl border border-black/5 dark:border-white/10 rounded-full flex items-center justify-center text-slate-900 dark:text-white hover:bg-[#E11D48] hover:text-white hover:border-none transition-all duration-500 hover:rotate-90 shadow-2xl z-20"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -750,13 +750,13 @@ export const ViewEvents = () => {
                         {selectedEvent.eventType || "Exclusive Access"}
                       </div>
                       {getEventStatus(selectedEvent).status === 'ongoing' && (
-                        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 backdrop-blur-2xl border border-white/10 text-white text-[9px] font-black uppercase tracking-[0.4em]">
+                        <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-slate-900/5 dark:bg-white/5 backdrop-blur-2xl border border-black/5 dark:border-white/10 text-slate-900 dark:text-white text-[9px] font-black uppercase tracking-[0.4em]">
                           <div className="live-indicator animate-pulse" />
                           Live Experience
                         </div>
                       )}
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white leading-[0.9] mb-4">
+                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 dark:text-white leading-[0.9] mb-4">
                       {selectedEvent.eventName}
                     </h2>
                     <div className="flex items-center gap-6">
@@ -764,15 +764,15 @@ export const ViewEvents = () => {
                         <Calendar className="w-4 h-4" />
                         {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                       </div>
-                      <div className="w-1 h-1 rounded-full bg-white/20" />
-                      <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      <div className="w-1 h-1 rounded-full bg-slate-900/20 dark:bg-white/20" />
+                      <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest">
                         <MapPin className="w-4 h-4" />
                         {selectedEvent.cityId?.name || "Global Node"}
                       </div>
                     </div>
                     <div className="flex items-center gap-4 mt-6">
                       <div className="h-px w-12 bg-[#E11D48]" />
-                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.5em]">{selectedEvent.eventCategory} Protocol • Level 01</p>
+                      <p className="text-[11px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-[0.5em]">{selectedEvent.eventCategory} Protocol • Level 01</p>
                     </div>
                   </div>
                 </div>
@@ -781,32 +781,32 @@ export const ViewEvents = () => {
                 <div className="flex-1 overflow-y-auto p-12 md:p-16 space-y-16 no-scrollbar">
                   {/* Glass Cards Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-8 bg-white/5 border border-white/5 backdrop-blur-sm group/card hover:bg-white/10 transition-colors duration-500 rounded-3xl">
+                    <div className="p-8 bg-slate-900/5 dark:bg-white/5 border border-black/5 dark:border-white/5 backdrop-blur-sm group/card hover:bg-slate-900/10 dark:hover:bg-white/10 transition-colors duration-500 rounded-3xl">
                       <div className="flex items-center gap-4 mb-6">
                         <div className="w-8 h-8 rounded-xl bg-[#E11D48]/10 flex items-center justify-center">
                           <Calendar className="w-4 h-4 text-[#E11D48]" />
                         </div>
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Date & Time</p>
+                        <p className="text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-[0.3em]">Date & Time</p>
                       </div>
-                      <p className="text-xl font-black text-white uppercase leading-tight">
+                      <p className="text-xl font-black text-slate-900 dark:text-white uppercase leading-tight">
                         {new Date(selectedEvent.startDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                         <br />
-                        <span className="text-gray-500 text-sm font-bold tracking-widest">{new Date(selectedEvent.startDate).getFullYear()} • 19:00 PM</span>
+                        <span className="text-slate-500 dark:text-gray-500 text-sm font-bold tracking-widest">{new Date(selectedEvent.startDate).getFullYear()} • 19:00 PM</span>
                       </p>
                     </div>
 
-                    <div className="p-8 bg-white/5 border border-white/5 backdrop-blur-sm group/card hover:bg-white/10 transition-colors duration-500 rounded-3xl">
+                    <div className="p-8 bg-slate-900/5 dark:bg-white/5 border border-black/5 dark:border-white/5 backdrop-blur-sm group/card hover:bg-slate-900/10 dark:hover:bg-white/10 transition-colors duration-500 rounded-3xl">
                       <div className="flex items-center gap-4 mb-6">
                         <div className="w-8 h-8 rounded-xl bg-[#E11D48]/10 flex items-center justify-center">
                           <Users className="w-4 h-4 text-[#E11D48]" />
                         </div>
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Availability</p>
+                        <p className="text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-[0.3em]">Availability</p>
                       </div>
                       <div className="space-y-4">
-                        <p className="text-xl font-black text-white uppercase leading-tight">
-                          {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} <span className="text-gray-500 text-sm font-bold tracking-widest">SEATS LEFT</span>
+                        <p className="text-xl font-black text-slate-900 dark:text-white uppercase leading-tight">
+                          {(selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0)} <span className="text-slate-500 dark:text-gray-500 text-sm font-bold tracking-widest">SEATS LEFT</span>
                         </p>
-                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-slate-900/5 dark:bg-white/5 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#E11D48] shadow-[0_0_10px_rgba(225,29,72,0.5)] transition-all duration-1000 dynamic-width"
                             style={{ '--width': `${Math.max(5, 100 - (((selectedEvent.bookedSeats || 0) / (selectedEvent.numberOfSeats || 1)) * 100))}%` }}
@@ -817,36 +817,36 @@ export const ViewEvents = () => {
                   </div>
 
                   {/* Venue Block */}
-                  <div className="p-8 bg-white/5 border border-white/5 backdrop-blur-sm rounded-3xl">
+                  <div className="p-8 bg-slate-900/5 dark:bg-white/5 border border-black/5 dark:border-white/5 backdrop-blur-sm rounded-3xl">
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-8 h-8 rounded-xl bg-[#E11D48]/10 flex items-center justify-center">
                         <MapPin className="w-4 h-4 text-[#E11D48]" />
                       </div>
-                      <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Security Sector / Venue</p>
+                      <p className="text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-[0.3em]">Security Sector / Venue</p>
                     </div>
                     {selectedEvent.eventCategory === "ZoomMeeting" && selectedEvent.zoomUrl ? (
-                      <a href={selectedEvent.zoomUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-4 text-2xl font-black text-white hover:text-[#E11D48] transition-colors uppercase group">
+                      <a href={selectedEvent.zoomUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-4 text-2xl font-black text-slate-900 dark:text-white hover:text-[#E11D48] transition-colors uppercase group">
                         Secure Virtual Link <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                       </a>
                     ) : (
-                      <p className="text-2xl font-black text-white uppercase leading-tight">
+                      <p className="text-2xl font-black text-slate-900 dark:text-white uppercase leading-tight">
                         {selectedEvent.stadiumId?.location?.address || selectedEvent.cityId?.name || "Access Point Restricted"}
                       </p>
                     )}
                   </div>
 
                   {/* Pricing & Booking */}
-                  <div className="pt-12 border-t border-white/5">
+                  <div className="pt-12 border-t border-black/5 dark:border-white/5">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 mb-12">
                       <div>
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Pricing Protocol</p>
+                        <p className="text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-[0.3em] mb-4">Pricing Protocol</p>
                         <div className="flex items-baseline gap-4">
-                          <span className="text-6xl font-black text-white leading-none tracking-tighter">
+                          <span className="text-6xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">
                             {(() => {
                               if (selectedEvent.eventCategory === 'Indoor' && selectedEvent.zonePrices?.length > 0) {
                                 const validPrices = selectedEvent.zonePrices.filter(p => p > 0);
                                 if (validPrices.length === 0) return 'FREE';
-                                const minPrice = Math.min(...validPrices);
+                                  const minPrice = Math.min(...validPrices);
                                 return `₹${minPrice.toLocaleString()}`;
                               } else if (selectedEvent.ticketRate) {
                                 return `₹${selectedEvent.ticketRate.toLocaleString()}`;
@@ -855,7 +855,7 @@ export const ViewEvents = () => {
                               }
                             })()}
                           </span>
-                          {selectedEvent.eventCategory === 'Indoor' && <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em]">BASE TIER</span>}
+                          {selectedEvent.eventCategory === 'Indoor' && <span className="text-[10px] font-black text-slate-400 dark:text-gray-700 uppercase tracking-[0.3em]">BASE TIER</span>}
                         </div>
                       </div>
                     </div>
@@ -865,7 +865,7 @@ export const ViewEvents = () => {
                       {(() => {
                         const eventStatus = getEventStatus(selectedEvent);
                         if (eventStatus.status === 'ended') return (
-                          <div className="flex items-center justify-center p-8 border border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">
+                          <div className="flex items-center justify-center p-8 border border-black/5 dark:border-white/5 bg-slate-900/5 dark:bg-white/5 text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 dark:text-gray-600">
                             MISSION COMPLETE • ARCHIVED
                           </div>
                         );
@@ -879,7 +879,7 @@ export const ViewEvents = () => {
                           return (
                             <Button
                               onClick={(e) => { e.stopPropagation(); handleSeatSelectionClick(selectedEvent); }}
-                              className="w-full h-20 bg-white text-black hover:bg-gray-200 rounded-full text-[11px] font-black tracking-[0.5em] uppercase transition-all duration-500 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transform hover:scale-[1.02]"
+                              className="w-full h-20 bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-slate-850 dark:hover:bg-gray-200 rounded-full text-[11px] font-black tracking-[0.5em] uppercase transition-all duration-500 shadow-[0_0_40px_rgba(15,23,42,0.1)] dark:shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(15,23,42,0.2)] dark:hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] transform hover:scale-[1.02]"
                             >
                               INITIALIZE SEAT SELECTION
                             </Button>
@@ -889,18 +889,18 @@ export const ViewEvents = () => {
                         return (
                           <div className="space-y-8">
                             <div className="relative">
-                              <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">Transmission Units</p>
+                              <p className="text-[9px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-[0.3em] mb-4">Transmission Units</p>
                               <div className="relative group">
                                 <select
                                   value={String(ticketQuantities[selectedEvent._id] || 1)}
                                   onChange={(e) => setTicketQuantities({ ...ticketQuantities, [selectedEvent._id]: parseInt(e.target.value) })}
-                                  className="w-full bg-white/5 border border-white/10 px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] appearance-none focus:ring-0 focus:border-[#E11D48] transition-all cursor-pointer rounded-2xl"
+                                  className="w-full bg-slate-900/5 dark:bg-white/5 border border-black/5 dark:border-white/10 px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] appearance-none focus:ring-0 focus:border-[#E11D48] text-slate-900 dark:text-white transition-all cursor-pointer rounded-2xl"
                                 >
                                   {Array.from({ length: Math.min(10, Math.max(1, (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0))) }, (_, i) => (
-                                    <option key={i + 1} value={String(i + 1)} className="bg-black">{i + 1} TICKET UNITS</option>
+                                    <option key={i + 1} value={String(i + 1)} className="bg-white dark:bg-black text-slate-900 dark:text-white">{i + 1} TICKET UNITS</option>
                                   ))}
                                 </select>
-                                <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600 group-focus-within:text-[#E11D48] transition-colors">
+                                <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 dark:text-gray-600 group-focus-within:text-[#E11D48] transition-colors">
                                   <Ticket className="w-4 h-4" />
                                 </div>
                               </div>
@@ -933,12 +933,12 @@ export const ViewEvents = () => {
                       {/* Footer Badges */}
                       <div className="pt-8 flex justify-center items-center gap-10 opacity-30 group-hover:opacity-60 transition-opacity">
                         <div className="flex items-center gap-3">
-                          <ShieldCheck className="w-4 h-4" />
-                          <span className="text-[8px] font-black uppercase tracking-widest text-white">Secure Encrypted</span>
+                          <ShieldCheck className="w-4 h-4 text-slate-500 dark:text-white" />
+                          <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 dark:text-white">Secure Encrypted</span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <Zap className="w-4 h-4" />
-                          <span className="text-[8px] font-black uppercase tracking-widest text-white">Instant Fulfillment</span>
+                          <Zap className="w-4 h-4 text-slate-500 dark:text-white" />
+                          <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 dark:text-white">Instant Fulfillment</span>
                         </div>
                       </div>
                     </div>

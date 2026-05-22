@@ -2,21 +2,21 @@
 
 .view-events-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: auto;
   background: transparent;
   color: #ffffff;
 }
 
 .view-events-content {
   width: 100%;
-  padding: 6rem 1.5rem;
+  padding: 2rem 1.5rem;
   max-width: 1800px;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .view-events-content {
-    padding: 6rem 3rem;
+    padding: 2rem 3rem;
   }
 }
 
@@ -77,6 +77,17 @@
 
 .filter-group {
   position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 0 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.filter-group:focus-within {
+  border-color: #E11D48;
+  box-shadow: 0 0 15px rgba(225, 29, 72, 0.15);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .filter-group input,
@@ -84,18 +95,19 @@
   width: 100%;
   background: transparent;
   border: none;
-  padding: 1rem 0 1rem 2.5rem;
+  padding: 1rem 0 1rem 2rem;
   font-size: 0.625rem;
   font-weight: 900;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #ffffff;
   outline: none;
+  cursor: pointer;
 }
 
 .filter-icon {
   position: absolute;
-  left: 0;
+  left: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
   width: 1rem;
@@ -109,17 +121,7 @@
 }
 
 .filter-underline {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: #E11D48;
-  transition: width 0.3s ease;
-}
-
-.filter-group:focus-within .filter-underline {
-  width: 100%;
+  display: none;
 }
 
 /* Event Grid */
@@ -143,7 +145,7 @@
 
 /* Archive Section */
 .archive-section {
-  margin-top: 10rem;
+  margin-top: 3rem;
 }
 
 .archive-header {
@@ -173,4 +175,45 @@
   .archive-item {
     min-width: 22.5rem;
   }
+}
+
+/* Light Theme Overrides */
+html:not(.dark) .view-events-container {
+  color: #0f172a;
+}
+
+html:not(.dark) .discovery-title {
+  color: #0f172a;
+}
+
+html:not(.dark) .filters-grid {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+html:not(.dark) .filter-group {
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+html:not(.dark) .filter-group:focus-within {
+  background: rgba(15, 23, 42, 0.02);
+  box-shadow: 0 0 15px rgba(225, 29, 72, 0.08);
+}
+
+html:not(.dark) .filter-group input,
+html:not(.dark) .filter-group select {
+  color: #0f172a;
+}
+
+html:not(.dark) .filter-icon {
+  color: rgba(15, 23, 42, 0.4);
+}
+
+html:not(.dark) .archive-header h2 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .filter-group select option {
+  background-color: #ffffff;
+  color: #0f172a;
 }

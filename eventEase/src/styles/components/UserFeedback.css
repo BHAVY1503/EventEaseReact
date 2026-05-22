@@ -71,9 +71,9 @@
 .feedback-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 2rem;
+  background: transparent;
+  border: none;
   margin-bottom: 10rem;
 }
 
@@ -85,14 +85,20 @@
 
 .feedback-card {
   padding: 3rem;
-  background: #000000;
-  transition: all 0.5s ease;
+  background: #0b0b0c;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
 .feedback-card:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #111113;
+  transform: translateY(-8px);
+  border-color: rgba(225, 29, 72, 0.25);
+  box-shadow: 0 30px 60px rgba(225, 29, 72, 0.08), 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .card-accent-border {
@@ -102,7 +108,7 @@
   width: 4px;
   height: 0;
   background-color: #E11D48;
-  transition: all 0.5s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .feedback-card:hover .card-accent-border {
@@ -110,12 +116,13 @@
 }
 
 .feedback-message {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 500;
-  color: #d1d5db;
+  color: #94a3b8;
   margin-bottom: 3rem;
-  line-height: 1.625;
+  line-height: 1.7;
   transition: color 0.3s ease;
+  min-height: 5.5rem;
 }
 
 .feedback-card:hover .feedback-message {

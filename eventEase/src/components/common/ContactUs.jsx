@@ -93,7 +93,7 @@ export const ContactUs = () => {
                </div>
                <div>
                   <p className="text-[8px] font-black uppercase tracking-[0.4em] text-gray-500 mb-1">Electronic Mail</p>
-                  <p className="text-sm font-black uppercase tracking-tight text-white group-hover:text-[#E11D48] transition-colors">VIP-DESK@EVENTEEASE.COM</p>
+                  <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white group-hover:text-[#E11D48] transition-colors">VIP-DESK@EVENTEEASE.COM</p>
                </div>
             </div>
             
@@ -103,7 +103,7 @@ export const ContactUs = () => {
                </div>
                <div>
                   <p className="text-[8px] font-black uppercase tracking-[0.4em] text-gray-500 mb-1">Priority Voice</p>
-                  <p className="text-sm font-black uppercase tracking-tight text-white group-hover:text-[#E11D48] transition-colors">+1 (800) EVENT-ELITE</p>
+                  <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white group-hover:text-[#E11D48] transition-colors">+1 (800) EVENT-ELITE</p>
                </div>
             </div>
 
@@ -113,7 +113,7 @@ export const ContactUs = () => {
                </div>
                <div>
                   <p className="text-[8px] font-black uppercase tracking-[0.4em] text-gray-500 mb-1">Global Presence</p>
-                  <p className="text-sm font-black uppercase tracking-tight text-white group-hover:text-[#E11D48] transition-colors">NYC / LONDON / TOKYO</p>
+                  <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white group-hover:text-[#E11D48] transition-colors">NYC / LONDON / TOKYO</p>
                </div>
             </div>
           </div>
@@ -196,7 +196,7 @@ export const ContactUs = () => {
                  type="submit"
                  disabled={isSubmitting}
                  className={cn(
-                   "w-full h-20 bg-white text-black font-black uppercase tracking-[0.4em] text-[11px] rounded-[2rem] hover:bg-[#E11D48] hover:text-white transition-all shadow-2xl relative group overflow-hidden",
+                   "contact-submit-btn group",
                    isSubmitting && "opacity-80"
                  )}
                >

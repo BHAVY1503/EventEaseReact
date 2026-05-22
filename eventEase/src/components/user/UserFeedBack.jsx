@@ -64,34 +64,49 @@ export const UserFeedback = () => {
 
         {/* Feedback Cards Grid */}
         <div className="feedback-grid">
-          {feedbacks.slice(0, 6).map((fb, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="feedback-card"
-            >
-              <div className="card-accent-border" />
-              <Quote className="h-10 w-10 text-[#E11D48]/20 group-hover:text-[#E11D48] transition-colors mb-10" />
-              
-              <p className="feedback-message">
-                "{fb.message}"
-              </p>
+          {feedbacks.slice(0, 6).map((fb, i) => {
+            const formatFeedbackMessage = (msg) => {
+              if (!msg) return '';
+              let cleaned = msg.replace(/^["'\s\u201C\u201D\u201E\u201F\u2033\u2036\u203F]+/g, '')
+                               .replace(/["'\s\u201C\u201D\u201E\u201F\u2033\u2036\u203F]+$/g, '')
+                               .trim();
+              if (cleaned.length > 0) {
+                cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+              }
+              cleaned = cleaned.replace(/\bi\b/g, 'I');
+              cleaned = cleaned.replace(/\bai\b/gi, 'AI');
+              return cleaned;
+            };
 
-              <div className="flex items-center gap-6 pt-10 border-t border-white/10">
-                <Avatar className="h-12 w-12 border border-white/10 group-hover:border-[#E11D48] transition-colors">
-                  <AvatarImage src={fb.profileImage} />
-                  <AvatarFallback className="bg-white/5 font-black text-xs">{fb.userName.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h5 className="text-[10px] font-black uppercase tracking-widest text-white">{fb.userName}</h5>
-                  <p className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mt-1">Verified Member</p>
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="feedback-card group"
+              >
+                <div className="card-accent-border" />
+                <Quote className="h-10 w-10 text-[#E11D48]/20 group-hover:text-[#E11D48] transition-colors mb-10" />
+                
+                <p className="feedback-message">
+                  “{formatFeedbackMessage(fb.message)}”
+                </p>
+
+                <div className="flex items-center gap-6 pt-10 border-t border-white/10">
+                  <Avatar className="h-12 w-12 border border-white/10 group-hover:border-[#E11D48] transition-colors">
+                    <AvatarImage src={fb.profileImage} />
+                    <AvatarFallback className="bg-white/5 font-black text-xs">{fb.userName ? fb.userName.charAt(0) : 'U'}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h5 className="text-[10px] font-black uppercase tracking-widest text-white">{fb.userName || 'Anonymous'}</h5>
+                    <p className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mt-1">Verified Member</p>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Cinematic Form */}

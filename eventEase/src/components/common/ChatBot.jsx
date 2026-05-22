@@ -94,11 +94,11 @@ const ChatBot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="bg-[#050505] rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] w-[350px] h-[550px] max-h-[calc(100vh-120px)] flex flex-col overflow-hidden border border-white/10 animate-slideUp">
+        <div className="bg-card text-foreground rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] w-[350px] h-[550px] max-h-[calc(100vh-120px)] flex flex-col overflow-hidden border border-black/5 dark:border-white/10 animate-slideUp">
           {/* Header */}
-          <div className="bg-black text-white p-6 flex items-center justify-between border-b border-white/5">
+          <div className="bg-card text-foreground p-6 flex items-center justify-between border-b border-black/5 dark:border-white/5">
             <div className="flex items-center gap-4">
-               <div className="w-10 h-10 bg-[#E11D48] rounded-full flex items-center justify-center">
+               <div className="w-10 h-10 bg-[#E11D48] rounded-full flex items-center justify-center text-white">
                   <MessageCircle size={20} />
                </div>
                <div>
@@ -109,19 +109,19 @@ const ChatBot = () => {
                   </p>
                </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-white transition-colors">
+            <button onClick={() => setIsOpen(false)} className="text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors">
                <X size={20} />
             </button>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-black scrollbar-hide">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-black scrollbar-hide">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
                 <div className={`max-w-[85%] p-4 text-[10px] font-bold uppercase tracking-widest leading-relaxed ${
                   msg.type === 'user' 
                     ? 'bg-[#E11D48] text-white rounded-2xl rounded-tr-none shadow-[0_0_20px_rgba(225,29,72,0.2)]' 
-                    : 'bg-white/5 text-gray-300 border border-white/5 rounded-2xl rounded-tl-none'
+                    : 'bg-slate-900/5 dark:bg-white/5 text-slate-700 dark:text-gray-300 border border-black/5 dark:border-white/5 rounded-2xl rounded-tl-none'
                 }`}>
                   {msg.text}
                 </div>
@@ -130,7 +130,7 @@ const ChatBot = () => {
             
             {isTyping && (
               <div className="flex justify-start animate-fadeIn">
-                <div className="bg-white/5 border border-white/5 rounded-2xl rounded-tl-none px-4 py-3">
+                <div className="bg-slate-900/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl rounded-tl-none px-4 py-3">
                   <div className="flex gap-1.5">
                     <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce"></div>
                     <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-bounce dynamic-delay" style={{ '--delay': '0.15s' }}></div>
@@ -143,7 +143,7 @@ const ChatBot = () => {
           </div>
 
           {/* Input Area */}
-          <div className="p-6 bg-black border-t border-white/5">
+          <div className="p-6 bg-white dark:bg-black border-t border-black/5 dark:border-white/5">
              <div className="flex gap-4">
                 <input
                   type="text"
@@ -152,7 +152,7 @@ const ChatBot = () => {
                   onKeyPress={handleKeyPress}
                   placeholder="TRANSMIT MESSAGE..."
                   disabled={isTyping}
-                  className="flex-1 bg-white/5 border-none rounded-full px-6 py-4 text-[10px] font-black tracking-widest text-white focus:ring-1 focus:ring-[#E11D48] outline-none placeholder:text-gray-500 disabled:opacity-50"
+                  className="flex-1 bg-slate-900/5 dark:bg-white/5 border-none rounded-full px-6 py-4 text-[10px] font-black tracking-widest text-slate-900 dark:text-white focus:ring-1 focus:ring-[#E11D48] outline-none placeholder:text-slate-500 dark:placeholder:text-gray-500 disabled:opacity-50"
                 />
                 <button
                   onClick={handleSendMessage}
@@ -162,7 +162,7 @@ const ChatBot = () => {
                   {isTyping ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 </button>
              </div>
-             <p className="text-center text-[7px] font-black text-gray-500 uppercase tracking-[0.4em] mt-4">
+             <p className="text-center text-[7px] font-black text-slate-500 dark:text-gray-500 uppercase tracking-[0.4em] mt-4">
                 Powered by EventEase Core AI
              </p>
           </div>
