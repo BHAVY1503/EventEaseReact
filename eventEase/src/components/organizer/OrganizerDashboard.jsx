@@ -39,10 +39,9 @@ import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Components
-import { UserFeedback } from "../user/UserFeedBack";
-import { ContactUs } from "../common/ContactUs";
 import ViewEventsOrg from "./ViewEventsOrg";
 import ChatBot from "../common/ChatBot";
+import { DarkModeToggle } from "@/contexts/DarkModeContext";
 import '../../styles/components/OrganizerDashboard.css';
 import "@/styles/common/Common.css";
 
@@ -118,8 +117,6 @@ export const OrganizerDashboard = () => {
     { id: "viewevent", label: "Archive", icon: Calendar, to: "/organizer/viewevent" },
     { id: "bookedtickets", label: "Booked Tickets", icon: Ticket, to: "/bookedtickets" },
     { id: "salesreport", label: "Sales Report", icon: BarChart3, to: "/organizer/bookingofmyevents" },
-    { id: "feedback", label: "Intel", icon: Star },
-    { id: "contactus", label: "Support", icon: MessageCircle },
   ];
 
   return (
@@ -172,6 +169,7 @@ export const OrganizerDashboard = () => {
           </div>
 
           <div className="user-action-box">
+            <DarkModeToggle />
             <button className="notification-btn-org"><Bell className="w-5 h-5" /><span className="notification-dot-org" /></button>
             <div className="v-divider" />
             <DropdownMenu>
@@ -235,8 +233,6 @@ export const OrganizerDashboard = () => {
 
                   <div className="org-dashboard-modules">
                     <section id="events" className="org-section-card"><div className="org-section-container"><ViewEventsOrg /></div></section>
-                    <section id="feedback" className="org-section-card"><div className="org-section-container"><div className="org-section-heading-box"><span className="section-pre-label">Audience Matrix</span><h2 className="section-title-org">Historical Intel</h2></div><UserFeedback /></div></section>
-                    <section id="contactus" className="org-section-card"><div className="org-section-container"><div className="mb-20 text-center"><span className="section-pre-label text-[#E11D48]">Support Node</span><h2 className="section-title-org">Direct Channel</h2></div><div className="bg-white/5 border border-white/5 rounded-[3rem] overflow-hidden backdrop-blur-3xl shadow-2xl"><ContactUs /></div></div></section>
                   </div>
                 </motion.div>
               ) : (

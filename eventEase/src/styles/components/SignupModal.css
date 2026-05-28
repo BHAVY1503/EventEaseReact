@@ -296,3 +296,46 @@
   color: #ffffff;
   text-decoration: underline;
 }
+
+/* Light Mode Overrides for SignupModal */
+html:not(.dark) .signup-modal-dialog-content {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 50px 100px -20px rgba(15, 23, 42, 0.15) !important;
+}
+
+html:not(.dark) .signup-modal-visual {
+  background-color: #f8fafc;
+  border-right-color: rgba(15, 23, 42, 0.08);
+}
+
+html:not(.dark) .brand-label,
+html:not(.dark) .visual-title,
+html:not(.dark) .form-title {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .secure-protocol-tag {
+  color: #475569;
+}
+
+html:not(.dark) .signup-modal-form-area {
+  background-color: #ffffff;
+}
+
+html:not(.dark) .input-signup-premium {
+  color: #0f172a;
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+}
+
+html:not(.dark) .input-signup-premium::placeholder {
+  color: #94a3b8;
+}
+
+html:not(.dark) .switch-auth-text {
+  color: #475569;
+}
+
+html:not(.dark) .switch-auth-link:hover {
+  color: #0f172a;
+}

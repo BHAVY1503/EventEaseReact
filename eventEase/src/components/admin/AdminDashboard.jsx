@@ -51,7 +51,6 @@ import img4 from "../../assets/img/event.webp";
 import defaultprofile from "../../assets/img/testimonials-2.jpg";
 import ViewEvents from "../user/ViweEvents";
 import { GroupedByEvents } from "./GroupedByEvents";
-import { UserFeedback } from "../user/UserFeedBack";
 import PendingEventsBadge from "./PendingEventsBadge";
 import { RefundNotificationBadge } from "./RefundNotificationBadge";
 import '../../styles/components/AdminDashboard.css';
@@ -272,10 +271,6 @@ export const AdminDashboard = () => {
                     <section id="groupbyevent" className="module-section">
                       <div className="module-header-row"><h2 className="module-title">Intelligence Grids</h2><div className="module-divider" /><span className="module-tag">Data Clusters</span></div>
                       <GroupedByEvents />
-                    </section>
-                    <section id="feedback" className="module-section">
-                      <div className="module-header-row"><h2 className="module-title">Neural Feedback</h2><div className="module-divider" /><span className="module-tag">User Sentiment</span></div>
-                      <UserFeedback />
                     </section>
                   </div>
                 </motion.div>
