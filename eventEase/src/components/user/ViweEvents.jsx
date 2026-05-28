@@ -897,7 +897,7 @@ export const ViewEvents = () => {
                                   className="w-full bg-slate-900/5 dark:bg-white/5 border border-black/5 dark:border-white/10 px-8 py-5 text-[10px] font-black uppercase tracking-[0.3em] appearance-none focus:ring-0 focus:border-[#E11D48] text-slate-900 dark:text-white transition-all cursor-pointer rounded-2xl"
                                 >
                                   {Array.from({ length: Math.min(10, Math.max(1, (selectedEvent.numberOfSeats || 0) - (selectedEvent.bookedSeats || 0))) }, (_, i) => (
-                                    <option key={i + 1} value={String(i + 1)} className="bg-white dark:bg-black text-slate-900 dark:text-white">{i + 1} TICKET UNITS</option>
+                                    <option key={i + 1} value={String(i + 1)} className="bg-card text-slate-900 dark:text-white">{i + 1} TICKET UNITS</option>
                                   ))}
                                 </select>
                                 <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 dark:text-gray-600 group-focus-within:text-[#E11D48] transition-colors">

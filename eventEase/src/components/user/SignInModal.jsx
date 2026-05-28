@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import api from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
@@ -21,63 +21,64 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
    const dispatch = useDispatch();
    const { isLoading, error } = useSelector((state) => state.auth);
 
-   useEffect(() => {
-      const loadGoogleSignIn = () => {
-         const googleDiv = document.getElementById("googleSignInDiv");
+   const [googleReady, setGoogleReady] = useState(false);
+   const googleBtnRef = useRef(null);
+   // Use a ref so the GSI callback always sees the latest dispatch/handlers
+   const responseHandlerRef = useRef(null);
 
-         if (window.google && googleDiv) {
-            try {
-               if (window.google?.accounts?.id) {
-                  window.google.accounts.id.cancel();
-               }
-
-               window.google.accounts.id.initialize({
-                  client_id: "342037145091-qvhlig4d6tn8p35ho40kc8c468mpnqug.apps.googleusercontent.com",
-                  callback: handleGoogleResponse,
-                  auto_select: false,
-               });
-
-               window.google.accounts.id.renderButton(googleDiv, {
-                  type: "standard",
-                  theme: "filled_black",
-                  size: "large",
-                  text: "signin_with",
-                  shape: "rectangular",
-                  width: googleDiv.offsetWidth,
-               });
-            } catch (error) {
-               console.error("Error initializing Google Sign-In:", error);
-            }
-         } else if (googleDiv) {
-            setTimeout(loadGoogleSignIn, 1000);
-         }
-      };
-
-      loadGoogleSignIn();
-
-      return () => {
-         if (window.google?.accounts?.id) {
-            try {
-               window.google.accounts.id.cancel();
-            } catch (error) {
-               console.error("Error cleaning up Google Sign-In:", error);
-            }
-         }
-      };
-   }, []);
-
-   const handleGoogleResponse = async (response) => {
+   const handleGoogleResponse = useCallback(async (response) => {
       try {
          const result = await dispatch(googleLogin({ token: response.credential, type: 'user' })).unwrap();
-         if (onLoginSuccess) {
-            onLoginSuccess(result.token, result.data);
-         }
+         if (onLoginSuccess) onLoginSuccess(result.token, result.data);
          setIsOpen(false);
          onClose?.();
       } catch (err) {
          console.error("Google login failed:", err);
       }
+   }, [dispatch, onLoginSuccess, onClose]);
+
+   // Keep the ref in sync with the latest callback
+   useEffect(() => {
+      responseHandlerRef.current = handleGoogleResponse;
+   }, [handleGoogleResponse]);
+
+   useEffect(() => {
+      const initGoogle = () => {
+         if (window.google?.accounts?.id && googleBtnRef.current) {
+            try {
+               window.google.accounts.id.initialize({
+                  client_id: "342037145091-qvhlig4d6tn8p35ho40kc8c468mpnqug.apps.googleusercontent.com",
+                  // Always call through the ref to avoid stale closures
+                  callback: (res) => responseHandlerRef.current?.(res),
+                  auto_select: false,
+               });
+               window.google.accounts.id.renderButton(googleBtnRef.current, {
+                  type: "standard",
+                  theme: "outline",
+                  size: "large",
+                  text: "signin_with",
+                  shape: "rectangular",
+                  width: googleBtnRef.current.offsetWidth || 300,
+               });
+               setGoogleReady(true);
+            } catch (err) {
+               console.error("Google Sign-In init error:", err);
+            }
+         } else {
+            setTimeout(initGoogle, 600);
+         }
+      };
+      initGoogle();
+      return () => { try { window.google?.accounts?.id?.cancel(); } catch (_) {} };
+   }, []);
+
+   const handleGoogleButtonClick = () => {
+      // Click the hidden Google-rendered button — most reliable approach
+      const btn = googleBtnRef.current?.querySelector("div[role=button]");
+      btn?.click();
    };
+
+
 
    const onSubmit = async (formData) => {
       const result = await dispatch(loginUser(formData));
@@ -93,7 +94,7 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
 
    return (
       <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if (!val) onClose?.(); }}>
-         <DialogContent className="max-w-4xl bg-white dark:bg-black border border-black/5 dark:border-white/5 p-0 overflow-hidden shadow-[0_0_100px_rgba(15,23,42,0.1)] dark:shadow-[0_0_100px_rgba(0,0,0,0.8)] z-[1000] rounded-[2rem] max-h-[85vh]">
+         <DialogContent className="max-w-4xl bg-card border border-black/5 dark:border-white/5 p-0 overflow-hidden shadow-[0_0_100px_rgba(15,23,42,0.1)] dark:shadow-[0_0_100px_rgba(0,0,0,0.8)] z-[1000] rounded-[2rem] max-h-[85vh]">
             <div className="grid grid-cols-1 md:grid-cols-12 h-full max-h-[85vh]">
                {/* Visual Side (40%) */}
                <div className="hidden md:flex md:col-span-5 relative bg-slate-50 dark:bg-[#050505] p-10 lg:p-12 flex-col justify-between border-r border-black/5 dark:border-white/5 overflow-hidden">
@@ -124,7 +125,7 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
                </div>
 
                {/* Form Side (60%) */}
-               <div className="md:col-span-7 p-10 md:p-12 bg-white dark:bg-black flex flex-col overflow-y-auto no-scrollbar">
+               <div className="md:col-span-7 p-10 md:p-12 bg-card flex flex-col overflow-y-auto no-scrollbar">
                   <div className="flex justify-between items-center mb-12">
                      <div>
                         <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-900 dark:text-white mb-2 text-glow">Access Portal</h3>
@@ -187,23 +188,43 @@ export const SignInModal = ({ open = true, onClose, onLoginSuccess }) => {
                               <span className="w-full border-t border-black/5 dark:border-white/5"></span>
                            </div>
                            <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.5em]">
-                              <span className="bg-white dark:bg-black px-4 text-slate-500 dark:text-gray-700">Protocol Auth</span>
+                              <span className="bg-card px-4 text-slate-500 dark:text-slate-400">Protocol Auth</span>
                            </div>
                         </div>
 
-                        <div className="flex justify-center items-center min-h-[48px]">
+                        {/* Custom Google button layered over hidden GSI-rendered button */}
+                        <div className="relative w-full">
+                           {/* Hidden Google-rendered button (provides real OAuth flow) */}
                            <div
-                              id="googleSignInDiv"
-                              className="google-signin-wrapper filter grayscale hover:grayscale-0 transition-all duration-500"
+                              ref={googleBtnRef}
+                              className="absolute inset-0 opacity-0 overflow-hidden pointer-events-none"
+                              aria-hidden="true"
                            />
+                           {/* Visible premium button that clicks the hidden one */}
+                           <button
+                              type="button"
+                              onClick={handleGoogleButtonClick}
+                              disabled={!googleReady || isLoading}
+                              className="w-full h-14 flex items-center justify-center gap-3 border border-black/10 dark:border-white/10 rounded-full bg-transparent hover:bg-slate-50 dark:hover:bg-white/5 text-slate-900 dark:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                           >
+                              <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                              </svg>
+                              <span className="text-xs font-black tracking-[0.3em] uppercase">
+                                 {!googleReady ? "LOADING..." : "CONTINUE WITH GOOGLE"}
+                              </span>
+                           </button>
                         </div>
 
                         <div className="space-y-4">
-                           <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-600">
+                           <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                               <Link to="/signup" className="hover:text-[#E11D48] transition-colors">Create Identity</Link>
                               <Link to="/forgot-password" title="protocol-forgot" className="hover:text-[#E11D48] transition-colors">Key Recovery</Link>
                            </div>
-                           <div className="pt-4 border-t border-black/5 dark:border-white/5 flex justify-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-700">
+                           <div className="pt-4 border-t border-black/5 dark:border-white/5 flex justify-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                               <Link to="/adminsignin" className="hover:text-[#E11D48] transition-colors">Admin Access Portal</Link>
                            </div>
                         </div>

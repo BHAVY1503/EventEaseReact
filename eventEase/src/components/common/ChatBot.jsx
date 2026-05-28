@@ -115,7 +115,7 @@ const ChatBot = () => {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-black scrollbar-hide">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-card scrollbar-hide">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
                 <div className={`max-w-[85%] p-4 text-[10px] font-bold uppercase tracking-widest leading-relaxed ${
@@ -143,7 +143,7 @@ const ChatBot = () => {
           </div>
 
           {/* Input Area */}
-          <div className="p-6 bg-white dark:bg-black border-t border-black/5 dark:border-white/5">
+          <div className="p-6 bg-card border-t border-black/5 dark:border-white/5">
              <div className="flex gap-4">
                 <input
                   type="text"
