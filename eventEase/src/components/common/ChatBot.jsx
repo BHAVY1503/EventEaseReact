@@ -1,15 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Calendar, MapPin, Ticket } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import "@/styles/components/ChatBot.css";
 import "@/styles/common/Common.css";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([
     {
       type: 'bot',
-      text: 'Hi! I\'m your EventEase assistant. How can I help you today?',
+      text: "Hi! I'm your EventEase assistant. How can I help you today?",
+      suggestions: [
+        'Explore upcoming events',
+        'How to book tickets',
+        'Show events in Surat'
+      ],
+      events: [],
       timestamp: new Date()
     }
   ]);
@@ -23,44 +31,69 @@ const ChatBot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim() || isTyping) return;
+  const parseBotMessage = (botText) => {
+    const parts = botText.split("👉 Next, you can:");
+    const cleanedText = parts[0].trim();
+    let suggestions = [];
+    
+    if (parts.length > 1) {
+      const lines = parts[1].split('\n');
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('-')) {
+          suggestions.push(trimmed.substring(1).trim());
+        } else if (trimmed.startsWith('•')) {
+          suggestions.push(trimmed.substring(1).trim());
+        } else if (trimmed.length > 0) {
+          suggestions.push(trimmed);
+        }
+      });
+    }
+    
+    return { cleanedText, suggestions };
+  };
+
+  const handleSendMessage = async (textToSend = null) => {
+    const messageContent = textToSend || inputText;
+    if (!messageContent.trim() || isTyping) return;
 
     const userMessage = {
       type: 'user',
-      text: inputText,
+      text: messageContent,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const currentInput = inputText;
-    setInputText('');
+    if (!textToSend) setInputText('');
     setIsTyping(true);
 
     try {
       const res = await api.post('/api/ai/chat', {
-        message: currentInput,
-        conversationHistory: [...messages, userMessage].map((msg) => ({
-          role: msg.type === 'user' ? 'user' : 'assistant',
-          content: msg.text,
-        })),
+        message: messageContent
       });
 
       const data = res.data;
-      const botText = data.response || data.text || data.message || 'Sorry, I couldn\'t process that.';
+      const botText = data.reply || data.response || data.text || data.message || "Sorry, I couldn't process that.";
+      const events = data.events || [];
+
+      const { cleanedText, suggestions } = parseBotMessage(botText);
 
       setMessages(prev => [...prev, {
         type: 'bot',
-        text: botText,
+        text: cleanedText,
+        suggestions: suggestions,
+        events: events,
         timestamp: new Date()
       }]);
     } catch (error) {
       console.error('Error calling chatbot API:', error);
       setMessages(prev => [...prev, {
         type: 'bot',
-        text: 'Sorry, I\'m having trouble connecting right now. Please try again later.',
+        text: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        suggestions: [],
+        events: [],
         timestamp: new Date()
       }]);
     } finally {
@@ -109,7 +142,7 @@ const ChatBot = () => {
                   </p>
                </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <button onClick={() => setIsOpen(false)} className="text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors border-none bg-transparent cursor-pointer">
                <X size={20} />
             </button>
           </div>
@@ -117,14 +150,71 @@ const ChatBot = () => {
           {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-card scrollbar-hide">
             {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
-                <div className={`max-w-[85%] p-4 text-[10px] font-bold uppercase tracking-widest leading-relaxed ${
-                  msg.type === 'user' 
-                    ? 'bg-[#E11D48] text-white rounded-2xl rounded-tr-none shadow-[0_0_20px_rgba(225,29,72,0.2)]' 
-                    : 'bg-slate-900/5 dark:bg-white/5 text-slate-700 dark:text-gray-300 border border-black/5 dark:border-white/5 rounded-2xl rounded-tl-none'
-                }`}>
-                  {msg.text}
+              <div key={idx} className="space-y-3">
+                <div className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
+                  <div className={`max-w-[85%] p-4 text-xs font-bold leading-relaxed whitespace-pre-line ${
+                    msg.type === 'user' 
+                      ? 'bg-[#E11D48] text-white rounded-2xl rounded-tr-none shadow-[0_0_20px_rgba(225,29,72,0.2)] uppercase tracking-widest' 
+                      : 'bg-slate-900/5 dark:bg-white/5 text-slate-700 dark:text-gray-300 border border-black/5 dark:border-white/5 rounded-2xl rounded-tl-none tracking-normal normal-case'
+                  }`}>
+                    {msg.text}
+                  </div>
                 </div>
+
+                {/* Suggestions rendering */}
+                {msg.type === 'bot' && msg.suggestions && msg.suggestions.length > 0 && (
+                  <div className="flex flex-wrap gap-2 justify-start pl-2 animate-fadeIn">
+                    {msg.suggestions.map((suggestion, sIdx) => (
+                      <button
+                        key={sIdx}
+                        onClick={() => handleSendMessage(suggestion)}
+                        className="bg-[#E11D48]/10 hover:bg-[#E11D48] text-[#E11D48] hover:text-white border border-[#E11D48]/20 hover:border-transparent rounded-full px-3 py-1.5 text-[8px] font-black tracking-widest uppercase transition-all duration-300 cursor-pointer"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Event Cards rendering */}
+                {msg.type === 'bot' && msg.events && msg.events.length > 0 && (
+                  <div className="flex gap-4 overflow-x-auto py-2 no-scrollbar pl-2 animate-fadeIn">
+                    {msg.events.map((event) => (
+                      <div 
+                        key={event._id}
+                        onClick={() => {
+                          if (event.eventCategory === "Indoor") {
+                            navigate(`/select-seats/${event._id}`);
+                          } else {
+                            navigate(`/user/viewevents`);
+                          }
+                          setIsOpen(false);
+                        }}
+                        className="flex-shrink-0 w-[190px] bg-slate-100 dark:bg-zinc-900 border border-black/5 dark:border-white/10 rounded-xl overflow-hidden hover:border-[#E11D48] transition-all duration-300 cursor-pointer shadow-sm"
+                      >
+                        <img 
+                          src={event.eventImgUrl || "/placeholder-event.jpg"} 
+                          alt={event.eventName} 
+                          className="w-full h-20 object-cover"
+                        />
+                        <div className="p-3 space-y-1">
+                          <p className="text-[7px] text-[#E11D48] font-black uppercase tracking-widest">{event.eventType}</p>
+                          <h4 className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-tighter truncate">{event.eventName}</h4>
+                          <div className="flex justify-between items-center text-[8px] text-slate-500 dark:text-gray-400 font-bold uppercase pt-1">
+                            <span className="flex items-center gap-0.5">
+                              <Ticket size={8} className="text-[#E11D48]" />
+                              ₹{event.ticketRate?.toLocaleString() || "FREE"}
+                            </span>
+                            <span className="flex items-center gap-0.5">
+                              <MapPin size={8} className="text-[#E11D48]" />
+                              {event.cityId?.name || "Global"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             
@@ -155,9 +245,9 @@ const ChatBot = () => {
                   className="flex-1 bg-slate-900/5 dark:bg-white/5 border-none rounded-full px-6 py-4 text-[10px] font-black tracking-widest text-slate-900 dark:text-white focus:ring-1 focus:ring-[#E11D48] outline-none placeholder:text-slate-500 dark:placeholder:text-gray-500 disabled:opacity-50"
                 />
                 <button
-                  onClick={handleSendMessage}
+                  onClick={() => handleSendMessage()}
                   disabled={isTyping || !inputText.trim()}
-                  className="bg-[#E11D48] text-white rounded-full p-4 hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+                  className="bg-[#E11D48] text-white rounded-full p-4 hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 border-none cursor-pointer"
                 >
                   {isTyping ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 </button>

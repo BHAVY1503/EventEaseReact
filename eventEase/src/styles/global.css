@@ -167,7 +167,7 @@ html:not(.dark) .top-command-bar.scrolled {
 html:not(.dark) .brand-name,
 html:not(.dark) .sidebar-brand-name,
 html:not(.dark) .org-brand-name,
-html:not(.dark) .landing-nav-content a:not(.bg-[#E11D48]),
+html:not(.dark) .landing-nav-content a:not(.bg-\[\#E11D48\]),
 html:not(.dark) .desktop-nav-links .nav-link-item,
 html:not(.dark) .nexus-active-label {
   color: #0f172a !important;
